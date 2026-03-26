@@ -19,6 +19,7 @@ Six phases take this project from a blank Vite scaffold to a fully working behav
 **Goal**: Establish the data model, Zustand store with LocalStorage persistence, schema versioning, and the TDD harness — so every subsequent phase has a tested, persistent foundation to build on.
 **Depends on**: Nothing
 **Requirements**: FOUND-01, FOUND-02, FOUND-03, FOUND-04, DOGS-01, DOGS-02, DOGS-03, DOGS-04
+**Plans:** 2 plans
 **Success Criteria** (what must be TRUE):
   1. Dog can be added, edited, and archived — changes survive a page refresh
   2. LocalStorage data includes a `schemaVersion` field
@@ -26,9 +27,8 @@ Six phases take this project from a blank Vite scaffold to a fully working behav
   4. `npm run test` passes with no failures
 
 Plans:
-- [ ] 01-01: Configure Vitest + React Testing Library; install and configure Zustand with persist middleware; define domain types (`Dog`, `WalkGroup`, `WalkSession`, `CompatibilityEntry`, `TimeSlot`)
-- [ ] 01-02: Implement `dogSlice` (CRUD + archive) with full unit tests; implement `LocalStorageAdapter` with schema versioning and migration scaffold
-- [ ] 01-03: Build Dog Roster UI — list, add form, edit form, archive action; wire to store; integration tests with RTL
+- [ ] 01-01-PLAN.md — Toolchain setup (Tailwind v3, shadcn/ui, Vitest, Zustand), domain types, store with persist + schema versioning, dogSlice with unit tests
+- [ ] 01-02-PLAN.md — Dog Roster UI (card grid, add/edit slide-in panel, archive flow, archived toggle) wired to store, integration tests
 
 ### Phase 2: Compatibility System
 **Goal**: Define compatibility between dog pairs, implement the scoring algorithm and auto-suggest function as pure, fully-tested library modules — before any graph UI exists.
@@ -108,7 +108,7 @@ Plans:
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Foundation | 0/3 | Not started | - |
+| 1. Foundation | 0/2 | Planning complete | - |
 | 2. Compatibility System | 0/3 | Not started | - |
 | 3. Compatibility Graph | 0/2 | Not started | - |
 | 4. Group Builder | 0/2 | Not started | - |
