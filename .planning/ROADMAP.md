@@ -50,7 +50,7 @@ Plans:
 **Goal**: Render the compatibility data as an interactive force-directed network graph where edges can be clicked to update compatibility status.
 **Depends on**: Phase 2
 **Requirements**: COMPAT-02, COMPAT-03
-**Plans:** 2 plans
+**Plans:** 1/2 plans executed
 **Success Criteria** (what must be TRUE):
   1. All active dogs appear as nodes on the graph
   2. Edges are coloured by status: green (Compatible), grey (Neutral), red (Conflict), dashed (Unknown)
@@ -58,7 +58,7 @@ Plans:
   4. Graph layout is stable (no constant re-render thrash)
 
 Plans:
-- [ ] 03-01-PLAN.md — Install react-force-graph; build CompatBadge and CompatibilityGraph (ForceGraph2D wrapper with stable graphData via useMemo); tab bar in App.tsx
+- [x] 03-01-PLAN.md — Install react-force-graph; build CompatBadge and CompatibilityGraph (ForceGraph2D wrapper with stable graphData via useMemo); tab bar in App.tsx
 - [ ] 03-02-PLAN.md — EdgeSheet status picker; wire edge click to EdgeSheet and node click to DogPanel; store integration tests
 
 ### Phase 4: Group Builder
@@ -112,7 +112,7 @@ Plans:
 |-------|----------------|--------|-----------|
 | 1. Foundation | 2/2 | Complete   | 2026-03-27 |
 | 2. Compatibility System | 3/3 | Complete |  |
-| 3. Compatibility Graph | 0/2 | Planned | - |
+| 3. Compatibility Graph | 1/2 | In Progress|  |
 | 4. Group Builder | 0/2 | Not started | - |
 | 5. Calendar Scheduler | 0/2 | Not started | - |
 | 6. Walk History | 0/2 | Not started | - |

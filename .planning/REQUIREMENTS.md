@@ -22,7 +22,7 @@
 ### Compatibility Graph
 
 - [x] **COMPAT-01**: Behaviorist can set a compatibility status between any two dogs: Compatible, Neutral, Conflict, or Unknown
-- [ ] **COMPAT-02**: Compatibility is displayed as an interactive network graph — nodes are dogs, edges are coloured by status (green/grey/red/dashed)
+- [x] **COMPAT-02**: Compatibility is displayed as an interactive network graph — nodes are dogs, edges are coloured by status (green/grey/red/dashed)
 - [ ] **COMPAT-03**: Behaviorist can click an edge on the graph to update the compatibility status between those two dogs
 - [x] **COMPAT-04**: Unknown compatibility is visually distinct from Neutral — it is not treated as safe
 
@@ -105,7 +105,7 @@
 | DOGS-03 | Phase 2 | Complete |
 | DOGS-04 | Phase 2 | Complete |
 | COMPAT-01 | Phase 3 | Complete |
-| COMPAT-02 | Phase 3 | Pending |
+| COMPAT-02 | Phase 3 | Complete |
 | COMPAT-03 | Phase 3 | Pending |
 | COMPAT-04 | Phase 3 | Complete |
 | SCORE-01 | Phase 3 | Complete |
