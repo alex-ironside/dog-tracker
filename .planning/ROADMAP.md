@@ -34,7 +34,7 @@ Plans:
 **Goal**: Define compatibility between dog pairs, implement the scoring algorithm and auto-suggest function as pure, fully-tested library modules — before any graph UI exists.
 **Depends on**: Phase 1
 **Requirements**: COMPAT-01, COMPAT-04, SCORE-01, SCORE-02, SCORE-03, SCORE-04
-**Plans:** 3 plans
+**Plans:** 1/3 plans executed
 **Success Criteria** (what must be TRUE):
   1. Compatibility status between any two dogs can be set to Compatible / Neutral / Conflict / Unknown
   2. `scoreGroup(dogs, compatMap)` returns a 0–100 score; Unknown pairs are penalised, not treated as safe
@@ -42,7 +42,7 @@ Plans:
   4. Both functions have 100% unit test coverage in `src/lib/`
 
 Plans:
-- [ ] 02-01-PLAN.md — compatSlice (set/get pairwise compatibility status, canonical key symmetry, store wiring)
+- [x] 02-01-PLAN.md — compatSlice (set/get pairwise compatibility status, canonical key symmetry, store wiring)
 - [ ] 02-02-PLAN.md — scoring.ts (pairKey, buildCompatMap, scoreGroup, getConflictsInGroup pure functions)
 - [ ] 02-03-PLAN.md — groupSuggest.ts (iterative combination auto-suggest with ranked results)
 
@@ -110,7 +110,7 @@ Plans:
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. Foundation | 2/2 | Complete   | 2026-03-27 |
-| 2. Compatibility System | 0/3 | Not started | - |
+| 2. Compatibility System | 1/3 | In Progress|  |
 | 3. Compatibility Graph | 0/2 | Not started | - |
 | 4. Group Builder | 0/2 | Not started | - |
 | 5. Calendar Scheduler | 0/2 | Not started | - |
