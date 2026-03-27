@@ -1,9 +1,10 @@
 import { useState } from 'react'
 import { DogRoster } from '@/components/DogRoster'
 import { CompatibilityGraph } from '@/components/CompatibilityGraph'
+import { GroupBuilder } from '@/components/GroupBuilder'
 
 function App() {
-  const [activeTab, setActiveTab] = useState<'dogs' | 'compatibility'>('dogs')
+  const [activeTab, setActiveTab] = useState<'dogs' | 'compatibility' | 'groups'>('dogs')
 
   return (
     <div className='flex flex-col min-h-screen'>
@@ -25,6 +26,14 @@ function App() {
         >
           Compatibility
         </button>
+        <button
+          role='tab'
+          aria-selected={activeTab === 'groups'}
+          onClick={() => setActiveTab('groups')}
+          className={`px-4 py-2 text-sm font-semibold ${activeTab === 'groups' ? 'text-slate-900 border-b-2 border-primary' : 'text-slate-500 hover:text-slate-700'}`}
+        >
+          Groups
+        </button>
       </div>
 
       {/* Tab panels */}
@@ -33,8 +42,10 @@ function App() {
           <div className='px-4 py-6 md:px-8 md:py-8'>
             <DogRoster />
           </div>
-        ) : (
+        ) : activeTab === 'compatibility' ? (
           <CompatibilityGraph />
+        ) : (
+          <GroupBuilder />
         )}
       </div>
     </div>
