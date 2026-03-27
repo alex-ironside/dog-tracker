@@ -34,7 +34,7 @@ Plans:
 **Goal**: Define compatibility between dog pairs, implement the scoring algorithm and auto-suggest function as pure, fully-tested library modules — before any graph UI exists.
 **Depends on**: Phase 1
 **Requirements**: COMPAT-01, COMPAT-04, SCORE-01, SCORE-02, SCORE-03, SCORE-04
-**Plans:** 2/3 plans executed
+**Plans:** 3/3 plans complete
 **Success Criteria** (what must be TRUE):
   1. Compatibility status between any two dogs can be set to Compatible / Neutral / Conflict / Unknown
   2. `scoreGroup(dogs, compatMap)` returns a 0–100 score; Unknown pairs are penalised, not treated as safe
@@ -50,6 +50,7 @@ Plans:
 **Goal**: Render the compatibility data as an interactive force-directed network graph where edges can be clicked to update compatibility status.
 **Depends on**: Phase 2
 **Requirements**: COMPAT-02, COMPAT-03
+**Plans:** 2 plans
 **Success Criteria** (what must be TRUE):
   1. All active dogs appear as nodes on the graph
   2. Edges are coloured by status: green (Compatible), grey (Neutral), red (Conflict), dashed (Unknown)
@@ -57,8 +58,8 @@ Plans:
   4. Graph layout is stable (no constant re-render thrash)
 
 Plans:
-- [ ] 03-01: Install and configure react-force-graph (ForceGraph2D); build `GraphAdapter` wrapper with stable `graphData` via `useMemo`; mock in tests via `vi.mock`
-- [ ] 03-02: Implement edge click → status picker → `compatSlice` update; add `CompatBadge` component; visual tests with RTL
+- [ ] 03-01-PLAN.md — Install react-force-graph; build CompatBadge and CompatibilityGraph (ForceGraph2D wrapper with stable graphData via useMemo); tab bar in App.tsx
+- [ ] 03-02-PLAN.md — EdgeSheet status picker; wire edge click to EdgeSheet and node click to DogPanel; store integration tests
 
 ### Phase 4: Group Builder
 **Goal**: Let the behaviorist drag dogs from the roster into named walk groups, with live compatibility scoring and inline conflict highlighting on each drop.
@@ -110,8 +111,8 @@ Plans:
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. Foundation | 2/2 | Complete   | 2026-03-27 |
-| 2. Compatibility System | 2/3 | In Progress|  |
-| 3. Compatibility Graph | 0/2 | Not started | - |
+| 2. Compatibility System | 3/3 | Complete |  |
+| 3. Compatibility Graph | 0/2 | Planned | - |
 | 4. Group Builder | 0/2 | Not started | - |
 | 5. Calendar Scheduler | 0/2 | Not started | - |
 | 6. Walk History | 0/2 | Not started | - |
