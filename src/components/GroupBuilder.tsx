@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import {
   DndContext,
   PointerSensor,
@@ -13,8 +13,9 @@ import { useShallow } from 'zustand/react/shallow'
 import { Button } from '@/components/ui/button'
 import { RosterRow } from '@/components/RosterRow'
 import { GroupPanel } from '@/components/GroupPanel'
+import { EdgeSheet } from '@/components/EdgeSheet'
 import { useAppStore } from '@/store'
-import { scoreGroup, getConflictsInGroup, buildCompatMap } from '@/lib/scoring'
+import { scoreGroup, getConflictsInGroup, buildCompatMap, pairKey } from '@/lib/scoring'
 
 function RosterPanel() {
   const { setNodeRef, isOver } = useDroppable({ id: 'roster' })
@@ -52,8 +53,14 @@ function RosterPanel() {
   )
 }
 
+type EdgeSheetState = {
+  open: boolean
+  dogIdA: string
+  dogIdB: string
+}
+
 export function GroupBuilder() {
-  const { dogs, walkGroups, compatibilityEntries, addGroup, renameGroup, deleteGroup, addDogToGroup, removeDogFromGroup } = useAppStore(
+  const { dogs, walkGroups, compatibilityEntries, addGroup, renameGroup, deleteGroup, addDogToGroup, removeDogFromGroup, setCompatibility, removeCompatibility } = useAppStore(
     useShallow((s) => ({
       dogs: s.dogs,
       walkGroups: s.walkGroups,
@@ -63,12 +70,15 @@ export function GroupBuilder() {
       deleteGroup: s.deleteGroup,
       addDogToGroup: s.addDogToGroup,
       removeDogFromGroup: s.removeDogFromGroup,
+      setCompatibility: s.setCompatibility,
+      removeCompatibility: s.removeCompatibility,
     }))
   )
 
   const activeDogs = dogs.filter((d) => !d.archived)
 
   const [activeDragId, setActiveDragId] = useState<string | null>(null)
+  const [edgeSheetState, setEdgeSheetState] = useState<EdgeSheetState | null>(null)
 
   const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 8 } }),
@@ -107,58 +117,80 @@ export function GroupBuilder() {
     }
   }
 
-  const compatMap = buildCompatMap(compatibilityEntries)
+  const compatMap = useMemo(() => buildCompatMap(compatibilityEntries), [compatibilityEntries])
 
   return (
-    <DndContext sensors={sensors} onDragStart={handleDragStart} onDragEnd={handleDragEnd}>
-      <div className='flex h-full'>
-        {/* Left panel: roster */}
-        <RosterPanel />
+    <>
+      <DndContext sensors={sensors} onDragStart={handleDragStart} onDragEnd={handleDragEnd}>
+        <div className='flex h-full'>
+          {/* Left panel: roster */}
+          <RosterPanel />
 
-        {/* Right panel: groups */}
-        <div className='flex-1 overflow-y-auto bg-white p-4 flex flex-col gap-4'>
-          <Button
-            variant='outline'
-            className='self-start'
-            onClick={() => addGroup(`Group ${walkGroups.length + 1}`)}
-          >
-            + Add Group
-          </Button>
+          {/* Right panel: groups */}
+          <div className='flex-1 overflow-y-auto bg-white p-4 flex flex-col gap-4'>
+            <Button
+              variant='outline'
+              className='self-start'
+              onClick={() => addGroup(`Group ${walkGroups.length + 1}`)}
+            >
+              + Add Group
+            </Button>
 
-          {walkGroups.map((group) => {
-            const groupDogs = group.dogIds
-              .map((id) => activeDogs.find((d) => d.id === id))
-              .filter((d): d is NonNullable<typeof d> => d != null)
+            {walkGroups.map((group) => {
+              const groupDogs = group.dogIds
+                .map((id) => activeDogs.find((d) => d.id === id))
+                .filter((d): d is NonNullable<typeof d> => d != null)
 
-            const score = scoreGroup(group.dogIds, compatMap)
-            const conflicts = getConflictsInGroup(group.dogIds, compatMap)
-            const hasConflicts = conflicts.some((c) => c.status === 'conflict')
+              const score = scoreGroup(group.dogIds, compatMap)
+              const conflicts = getConflictsInGroup(group.dogIds, compatMap)
+              const hasConflicts = conflicts.some((c) => c.status === 'conflict')
 
-            return (
-              <GroupPanel
-                key={group.id}
-                group={group}
-                dogs={groupDogs}
-                onRename={(name) => renameGroup(group.id, name)}
-                onDelete={() => deleteGroup(group.id)}
-                onRemoveDog={(dogId) => removeDogFromGroup(group.id, dogId)}
-                score={score}
-                hasConflicts={hasConflicts}
-                conflicts={conflicts}
-                onConflictClick={() => {}}
-              />
-            )
-          })}
-        </div>
-      </div>
-
-      <DragOverlay>
-        {activeDragId ? (
-          <div className='px-3 py-2 rounded-md bg-white shadow-lg opacity-70 text-sm'>
-            {activeDogs.find((d) => d.id === activeDragId)?.name}
+              return (
+                <GroupPanel
+                  key={group.id}
+                  group={group}
+                  dogs={groupDogs}
+                  onRename={(name) => renameGroup(group.id, name)}
+                  onDelete={() => deleteGroup(group.id)}
+                  onRemoveDog={(dogId) => removeDogFromGroup(group.id, dogId)}
+                  score={score}
+                  hasConflicts={hasConflicts}
+                  conflicts={conflicts}
+                  onConflictClick={(idA, idB) => setEdgeSheetState({ open: true, dogIdA: idA, dogIdB: idB })}
+                />
+              )
+            })}
           </div>
-        ) : null}
-      </DragOverlay>
-    </DndContext>
+        </div>
+
+        <DragOverlay>
+          {activeDragId ? (
+            <div className='px-3 py-2 rounded-md bg-white shadow-lg opacity-70 text-sm'>
+              {activeDogs.find((d) => d.id === activeDragId)?.name}
+            </div>
+          ) : null}
+        </DragOverlay>
+      </DndContext>
+
+      {edgeSheetState && (
+        <EdgeSheet
+          open={edgeSheetState.open}
+          onOpenChange={(open) => {
+            if (!open) setEdgeSheetState(null)
+          }}
+          dogNameA={dogs.find((d) => d.id === edgeSheetState.dogIdA)?.name ?? ''}
+          dogNameB={dogs.find((d) => d.id === edgeSheetState.dogIdB)?.name ?? ''}
+          currentStatus={compatMap.get(pairKey(edgeSheetState.dogIdA, edgeSheetState.dogIdB)) ?? 'unknown'}
+          onSetStatus={(status) => {
+            setCompatibility(edgeSheetState.dogIdA, edgeSheetState.dogIdB, status)
+            setEdgeSheetState(null)
+          }}
+          onRemove={() => {
+            removeCompatibility(edgeSheetState.dogIdA, edgeSheetState.dogIdB)
+            setEdgeSheetState(null)
+          }}
+        />
+      )}
+    </>
   )
 }

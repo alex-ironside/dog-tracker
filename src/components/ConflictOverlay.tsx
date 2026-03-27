@@ -1,5 +1,3 @@
-import { useState, useLayoutEffect } from 'react'
-
 type ConflictLine = {
   x1: number
   y1: number
@@ -9,6 +7,8 @@ type ConflictLine = {
   idB: string
 }
 
+export type { ConflictLine }
+
 type ConflictOverlayProps = {
   conflicts: Array<{ idA: string; idB: string; status: 'conflict' | 'unknown' }>
   cardRefs: React.RefObject<Map<string, HTMLElement>>
@@ -16,39 +16,52 @@ type ConflictOverlayProps = {
   onConflictClick: (idA: string, idB: string) => void
 }
 
-export function ConflictOverlay({ conflicts, cardRefs, containerRef, onConflictClick }: ConflictOverlayProps) {
-  const [lines, setLines] = useState<ConflictLine[]>([])
+/**
+ * Compute SVG line coordinates from DOM element positions.
+ * Called from GroupPanel's useLayoutEffect (where containerRef is guaranteed to be set).
+ */
+export function computeConflictLines(
+  conflicts: ConflictOverlayProps['conflicts'],
+  cardRefs: React.RefObject<Map<string, HTMLElement>>,
+  containerRef: React.RefObject<HTMLDivElement>
+): ConflictLine[] {
+  if (!containerRef.current || !cardRefs.current) return []
 
-  useLayoutEffect(() => {
-    if (!containerRef.current || !cardRefs.current) return
+  const containerRect = containerRef.current.getBoundingClientRect()
 
-    const containerRect = containerRef.current.getBoundingClientRect()
+  return conflicts
+    .filter((c) => c.status === 'conflict') // D-04: only 'conflict' triggers a line, not unknown
+    .map((c) => {
+      const refA = cardRefs.current!.get(c.idA)
+      const refB = cardRefs.current!.get(c.idB)
+      if (!refA || !refB) return null
 
-    const computed = conflicts
-      .filter((c) => c.status === 'conflict') // D-04: only 'conflict' triggers a line, not unknown
-      .map((c) => {
-        const refA = cardRefs.current!.get(c.idA)
-        const refB = cardRefs.current!.get(c.idB)
-        if (!refA || !refB) return null
+      const rA = refA.getBoundingClientRect()
+      const rB = refB.getBoundingClientRect()
 
-        const rA = refA.getBoundingClientRect()
-        const rB = refB.getBoundingClientRect()
+      return {
+        x1: rA.left + rA.width / 2 - containerRect.left,
+        y1: rA.top + rA.height / 2 - containerRect.top,
+        x2: rB.left + rB.width / 2 - containerRect.left,
+        y2: rB.top + rB.height / 2 - containerRect.top,
+        idA: c.idA,
+        idB: c.idB,
+      }
+    })
+    .filter((l): l is ConflictLine => l !== null)
+}
 
-        return {
-          x1: rA.left + rA.width / 2 - containerRect.left,
-          y1: rA.top + rA.height / 2 - containerRect.top,
-          x2: rB.left + rB.width / 2 - containerRect.left,
-          y2: rB.top + rB.height / 2 - containerRect.top,
-          idA: c.idA,
-          idB: c.idB,
-        }
-      })
-      .filter((l): l is ConflictLine => l !== null)
+type ConflictOverlayRenderProps = {
+  lines: ConflictLine[]
+  onConflictClick: (idA: string, idB: string) => void
+}
 
-    setLines(computed)
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [JSON.stringify(conflicts)])
-
+/**
+ * Pure render component — receives pre-computed line coordinates.
+ * This avoids the ref timing issue where useLayoutEffect in a child fires before
+ * the parent's containerRef is set.
+ */
+export function ConflictOverlay({ lines, onConflictClick }: ConflictOverlayRenderProps) {
   return (
     <svg className='absolute inset-0 w-full h-full pointer-events-none' style={{ zIndex: 10 }}>
       {lines.map((l) => (
@@ -68,3 +81,6 @@ export function ConflictOverlay({ conflicts, cardRefs, containerRef, onConflictC
     </svg>
   )
 }
+
+// Re-export conflicts prop type for GroupPanel usage
+export type { ConflictOverlayProps }

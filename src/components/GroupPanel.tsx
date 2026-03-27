@@ -1,9 +1,10 @@
-import { useState, useRef } from 'react'
+import { useState, useRef, useLayoutEffect } from 'react'
 import { useDroppable } from '@dnd-kit/core'
 import { AlertTriangle, Trash2 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { MiniDogCard } from '@/components/MiniDogCard'
-import { ConflictOverlay } from '@/components/ConflictOverlay'
+import { ConflictOverlay, computeConflictLines } from '@/components/ConflictOverlay'
+import type { ConflictLine } from '@/components/ConflictOverlay'
 import type { Dog, WalkGroup } from '@/types'
 
 type GroupPanelProps = {
@@ -28,6 +29,15 @@ export function GroupPanel({ group, dogs, onRename, onDelete, onRemoveDog, score
   const { setNodeRef, isOver } = useDroppable({ id: group.id })
   const containerRef = useRef<HTMLDivElement>(null)
   const cardRefs = useRef<Map<string, HTMLElement>>(new Map())
+
+  const [conflictLines, setConflictLines] = useState<ConflictLine[]>([])
+
+  // Compute SVG line positions in useLayoutEffect — containerRef is guaranteed set here
+  // (GroupPanel owns containerRef, so it's set before this layout effect fires)
+  useLayoutEffect(() => {
+    setConflictLines(computeConflictLines(conflicts, cardRefs, containerRef))
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [JSON.stringify(conflicts), dogs.length])
 
   const [isEditing, setIsEditing] = useState(false)
   const [editValue, setEditValue] = useState(group.name)
@@ -126,11 +136,9 @@ export function GroupPanel({ group, dogs, onRename, onDelete, onRemoveDog, score
             ))}
           </div>
         )}
-        {conflicts.length > 0 && dogs.length >= 2 && (
+        {conflictLines.length > 0 && (
           <ConflictOverlay
-            conflicts={conflicts}
-            cardRefs={cardRefs}
-            containerRef={containerRef}
+            lines={conflictLines}
             onConflictClick={onConflictClick}
           />
         )}
