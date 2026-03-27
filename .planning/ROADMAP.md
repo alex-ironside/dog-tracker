@@ -34,6 +34,7 @@ Plans:
 **Goal**: Define compatibility between dog pairs, implement the scoring algorithm and auto-suggest function as pure, fully-tested library modules — before any graph UI exists.
 **Depends on**: Phase 1
 **Requirements**: COMPAT-01, COMPAT-04, SCORE-01, SCORE-02, SCORE-03, SCORE-04
+**Plans:** 3 plans
 **Success Criteria** (what must be TRUE):
   1. Compatibility status between any two dogs can be set to Compatible / Neutral / Conflict / Unknown
   2. `scoreGroup(dogs, compatMap)` returns a 0–100 score; Unknown pairs are penalised, not treated as safe
@@ -41,9 +42,9 @@ Plans:
   4. Both functions have 100% unit test coverage in `src/lib/`
 
 Plans:
-- [ ] 02-01: Implement `compatSlice` (set/get pairwise status); define `CompatibilityStatus` union type; unit tests
-- [ ] 02-02: Implement `src/lib/scoring.ts` — `scoreGroup` pure function with full test suite covering all status combinations and unknown-pair penalty
-- [ ] 02-03: Implement `src/lib/groupSuggest.ts` — greedy constraint-satisfaction auto-suggest; unit tests with varied compatibility scenarios
+- [ ] 02-01-PLAN.md — compatSlice (set/get pairwise compatibility status, canonical key symmetry, store wiring)
+- [ ] 02-02-PLAN.md — scoring.ts (pairKey, buildCompatMap, scoreGroup, getConflictsInGroup pure functions)
+- [ ] 02-03-PLAN.md — groupSuggest.ts (iterative combination auto-suggest with ranked results)
 
 ### Phase 3: Compatibility Graph
 **Goal**: Render the compatibility data as an interactive force-directed network graph where edges can be clicked to update compatibility status.
