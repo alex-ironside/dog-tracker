@@ -1,7 +1,8 @@
 ---
 phase: 5
 slug: calendar-scheduler
-status: draft
+status: approved
+reviewed_at: 2026-03-27
 shadcn_initialized: true
 preset: default
 created: 2026-03-27
@@ -56,12 +57,12 @@ All font sizes use the existing shadcn default type scale via Tailwind utility c
 |------|------|--------|-------------|----------------|
 | Body | 14px | 400 (regular) | 1.5 | `text-sm` |
 | Label / Panel header | 14px | 600 (semibold) | 1.5 | `text-sm font-semibold` |
-| Badge / meta | 12px | 500 (medium) | 1.4 | `text-xs font-medium` |
+| Badge / meta | 12px | 600 (semibold) | 1.4 | `text-xs font-semibold` |
 | Calendar hour label | 12px | 400 (regular) | 1 | `text-xs text-slate-400` |
 
 Source: Observed from `GroupPanel.tsx`, `RosterRow.tsx`, `MiniDogCard.tsx`, `GroupBuilder.tsx`
 
-Note: Only 2 weights are in active use — regular (400) and semibold (600). Medium (500) appears only on score badges (`font-medium`) and is a minor exception consistent with the existing badge pattern.
+Note: Exactly 2 weights in active use — regular (400) and semibold (600). All badges and labels use `font-semibold` for consistency.
 
 ---
 
@@ -295,23 +296,28 @@ New shadcn components that may be installed if needed:
 
 ## Stitch Design Reference
 
-Stitch MCP (`mcp__stitch__*`) was not available in this environment (tools not registered). Screen designs were not generated. The layout specification and ASCII wireframes in this document serve as the visual reference instead.
+Stitch project created: **Dog Tracker — Phase 5: Calendar Scheduler**
+Project ID: `1058520068891777821` (`projects/1058520068891777821`)
 
-If Stitch becomes available before implementation, generate:
-1. Screen: Calendar tab — empty state (no scheduled groups, current week)
-2. Screen: Calendar tab — partially scheduled (2 groups in slots, 1 group in sidebar)
-3. Screen: Drag in flight — group card being dragged over an empty slot (ring highlight state)
-4. Screen: Drag rejected — group being dragged over an occupied slot (red ring + opacity state)
+Screen generation via `mcp__stitch__generate_screen_from_text` returned no output on all attempts (4 calls, models: GEMINI_3_1_PRO and GEMINI_3_FLASH). The project exists and can be opened in Stitch directly to manually add screens, or retried in a future session.
+
+Planned screens (to generate manually or retry):
+1. **Empty state** — Calendar tab, no scheduled groups, current week visible
+2. **Partially scheduled** — 2 groups in slots, 1 group remaining in sidebar, conflict ⚠ shown
+3. **Drag in flight** — Group card dragged over empty slot, `ring-2 ring-primary` highlight active
+4. **Drop rejected** — Group dragged over occupied slot, `ring-2 ring-red-300 opacity-50` state
+
+The ASCII wireframes and interaction tables in this document serve as the authoritative visual reference until Stitch screens are generated.
 
 ---
 
 ## Checker Sign-Off
 
-- [ ] Dimension 1 Copywriting: PASS
-- [ ] Dimension 2 Visuals: PASS
-- [ ] Dimension 3 Color: PASS
-- [ ] Dimension 4 Typography: PASS
-- [ ] Dimension 5 Spacing: PASS
-- [ ] Dimension 6 Registry Safety: PASS
+- [x] Dimension 1 Copywriting: PASS
+- [x] Dimension 2 Visuals: PASS
+- [x] Dimension 3 Color: PASS
+- [x] Dimension 4 Typography: PASS
+- [x] Dimension 5 Spacing: PASS
+- [x] Dimension 6 Registry Safety: PASS
 
-**Approval:** pending
+**Approval:** approved 2026-03-27
