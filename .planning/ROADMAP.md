@@ -65,6 +65,7 @@ Plans:
 **Goal**: Let the behaviorist drag dogs from the roster into named walk groups, with live compatibility scoring and inline conflict highlighting on each drop.
 **Depends on**: Phase 3
 **Requirements**: GROUP-01, GROUP-02, GROUP-03, GROUP-04, GROUP-05
+**Plans:** 2 plans
 **Success Criteria** (what must be TRUE):
   1. Behaviorist can drag a dog from the roster panel into a group panel
   2. A dog cannot appear in two groups simultaneously
@@ -73,8 +74,8 @@ Plans:
   5. Dog can be removed from a group by drag-back or remove button
 
 Plans:
-- [ ] 04-01: Install dnd-kit; implement two-panel layout (roster ↔ groups) with `DndContext`, `Draggable` dog cards, `Droppable` group panels; commit drag state only in `onDragEnd`
-- [ ] 04-02: Wire group drops to `groupSlice`; integrate `scoreGroup` for live score display and `CompatBadge` for inline conflict highlighting; tests for drag state and scoring integration
+- [ ] 04-01-PLAN.md — Install dnd-kit; groupSlice TDD; GroupBuilder two-panel DnD layout with roster, group panels, drag interactions; Groups tab in App.tsx
+- [ ] 04-02-PLAN.md — ConflictOverlay SVG lines between conflicting dogs; EdgeSheet integration from conflict clicks; GroupPanel tests for score/conflict display
 
 ### Phase 5: Calendar Scheduler
 **Goal**: Display a weekly hour-slot grid and let the behaviorist drag walk groups into time slots to build a schedule.
