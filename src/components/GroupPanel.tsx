@@ -3,6 +3,7 @@ import { useDroppable } from '@dnd-kit/core'
 import { AlertTriangle, Trash2 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { MiniDogCard } from '@/components/MiniDogCard'
+import { ConflictOverlay } from '@/components/ConflictOverlay'
 import type { Dog, WalkGroup } from '@/types'
 
 type GroupPanelProps = {
@@ -13,6 +14,8 @@ type GroupPanelProps = {
   onRemoveDog: (dogId: string) => void
   score: number
   hasConflicts: boolean
+  conflicts: Array<{ idA: string; idB: string; status: 'conflict' | 'unknown' }>
+  onConflictClick: (idA: string, idB: string) => void
 }
 
 function scoreBadgeClasses(score: number): string {
@@ -21,9 +24,10 @@ function scoreBadgeClasses(score: number): string {
   return 'bg-red-100 text-red-700'
 }
 
-export function GroupPanel({ group, dogs, onRename, onDelete, onRemoveDog, score, hasConflicts }: GroupPanelProps) {
+export function GroupPanel({ group, dogs, onRename, onDelete, onRemoveDog, score, hasConflicts, conflicts, onConflictClick }: GroupPanelProps) {
   const { setNodeRef, isOver } = useDroppable({ id: group.id })
   const containerRef = useRef<HTMLDivElement>(null)
+  const cardRefs = useRef<Map<string, HTMLElement>>(new Map())
 
   const [isEditing, setIsEditing] = useState(false)
   const [editValue, setEditValue] = useState(group.name)
@@ -94,7 +98,11 @@ export function GroupPanel({ group, dogs, onRename, onDelete, onRemoveDog, score
       </div>
 
       {/* Body */}
-      <div ref={containerRef} className='px-4 py-3 min-h-[64px] relative'>
+      <div
+        ref={containerRef}
+        data-testid='group-body'
+        className='px-4 py-3 min-h-[64px] relative'
+      >
         {dogs.length === 0 ? (
           <div className='border-2 border-dashed border-slate-200 rounded-lg flex items-center justify-center py-4'>
             <span className='text-sm text-slate-400'>Drop a dog here</span>
@@ -102,13 +110,29 @@ export function GroupPanel({ group, dogs, onRename, onDelete, onRemoveDog, score
         ) : (
           <div className='flex flex-wrap gap-2'>
             {dogs.map((dog) => (
-              <MiniDogCard
+              <div
                 key={dog.id}
-                dogName={dog.name}
-                onRemove={() => onRemoveDog(dog.id)}
-              />
+                data-card-id={dog.id}
+                ref={(el) => {
+                  if (el) cardRefs.current.set(dog.id, el)
+                  else cardRefs.current.delete(dog.id)
+                }}
+              >
+                <MiniDogCard
+                  dogName={dog.name}
+                  onRemove={() => onRemoveDog(dog.id)}
+                />
+              </div>
             ))}
           </div>
+        )}
+        {conflicts.length > 0 && dogs.length >= 2 && (
+          <ConflictOverlay
+            conflicts={conflicts}
+            cardRefs={cardRefs}
+            containerRef={containerRef}
+            onConflictClick={onConflictClick}
+          />
         )}
       </div>
     </div>

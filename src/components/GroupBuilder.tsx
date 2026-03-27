@@ -144,6 +144,8 @@ export function GroupBuilder() {
                 onRemoveDog={(dogId) => removeDogFromGroup(group.id, dogId)}
                 score={score}
                 hasConflicts={hasConflicts}
+                conflicts={conflicts}
+                onConflictClick={() => {}}
               />
             )
           })}
