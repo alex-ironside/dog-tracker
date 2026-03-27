@@ -49,14 +49,16 @@ Exceptions:
 
 Pre-populated from DogPanel.tsx and DogRoster.tsx observed patterns.
 
+Weights reduced to 2 per contract rule: 400 (normal) and 600 (semibold). Label role merged from 500 into 600; Display role weight changed from 700 to 600.
+
 | Role | Size | Weight | Line Height | Usage |
 |------|------|--------|-------------|-------|
-| Body | 14px (text-sm) | 400 (normal) | 1.5 | Status picker labels, node tooltips, sheet body text |
-| Label | 14px (text-sm) | 500 (medium) | normal | Form field labels, tab labels, status option labels |
+| Body | 14px (text-sm) | 400 (normal) | 1.5 | Status picker labels, node labels on graph canvas, node tooltips, sheet body text |
+| Label | 14px (text-sm) | 600 (semibold) | normal | Form field labels, tab labels, status option labels |
 | Heading | 18px (text-lg) | 600 (semibold) | 1.2 | Sheet title (dog names in edge-click sheet), panel headers |
-| Display | 20px (text-xl) | 700 (bold) | 1.2 | Page/section heading ("Compatibility") — reserved for section-level only |
+| Display | 20px (text-xl) | 600 (semibold) | 1.2 | Page/section heading ("Compatibility") — reserved for section-level only |
 
-Note: text-sm at weight 500/600 is the established pattern from DogPanel SheetTitle (`text-lg font-semibold`). Body copy in forms uses `text-sm font-medium text-slate-700`.
+Note: Node labels on the graph canvas use Body (14px / 400 / 1.5) rendered via ForceGraph2D `nodeCanvasObject`. This reuses the Body role — no additional size is needed.
 
 ---
 
@@ -68,12 +70,12 @@ Pre-populated from index.css CSS custom properties and observed Tailwind usage i
 |------|-------|-------|
 | Dominant (60%) | hsl(0 0% 100%) — `--background` / `bg-white` | Page background, sheet backgrounds, graph canvas background |
 | Secondary (30%) | hsl(210 40% 96.1%) — `--secondary` / `bg-slate-50` | Tab bar background, sheet header/footer, node fill |
-| Accent (10%) | hsl(222.2 47.4% 11.2%) — `--primary` (dark navy) | Active tab indicator, primary CTA buttons ("Save"), focused ring |
+| Accent (10%) | hsl(222.2 47.4% 11.2%) — `--primary` (dark navy) | Active tab indicator, primary CTA buttons ("Set compatibility"), focused ring |
 | Destructive | hsl(0 84.2% 60.2%) — `--destructive` | "Remove" edge action in status picker sheet only |
 
 Accent reserved for:
 - Active tab underline/indicator
-- Primary Save button (`variant="default"`)
+- Primary "Set compatibility" button (`variant="default"`)
 - Focus ring on interactive inputs
 - Selected status option highlight in edge-click sheet
 
@@ -99,7 +101,7 @@ All components to be used in this phase. No new primitives — all drawn from ex
 | `Sheet` | `@/components/ui/sheet` (exists) | Edge-click status picker; node-click DogPanel wrapper |
 | `SheetContent` | `@/components/ui/sheet` (exists) | Right-side drawer, `side="right"`, `w-full max-w-md` |
 | `SheetTitle` | `@/components/ui/sheet` (exists) | Both dog names as sheet heading |
-| `Button` | `@/components/ui/button` (exists) | Status picker options, Save/Cancel actions, Remove |
+| `Button` | `@/components/ui/button` (exists) | Status picker options, Set compatibility/Discard changes actions, Remove |
 | `AlertDialog` | `@/components/ui/alert-dialog` (exists) | NOT used in Phase 3 — no destructive confirmation needed beyond Remove edge |
 | `ForceGraph2D` | `react-force-graph` (to be installed) | Main graph canvas component |
 | `DogPanel` | `@/components/DogPanel` (exists) | Reused on node click — requires `open` + `onOpenChange` + `editingDog` props |
@@ -158,7 +160,7 @@ Matches DogPanel sheet pattern exactly:
 │ ─────────────────────          │
 │ [Remove]                       │  ← destructive, text-destructive
 └────────────────────────────────┘
-  sticky footer: [Cancel] [Save] │  ← border-t, px-6 py-4
+  sticky footer: [Discard changes] [Set compatibility] │  ← border-t, px-6 py-4
 ```
 
 Status picker buttons: `variant="outline"` with a coloured left border matching edge color when selected. Selected state adds `ring-2 ring-offset-1` in the status color.
@@ -173,7 +175,7 @@ Status picker buttons: `variant="outline"` with a coloured left border matching 
 |-------------|-----------|
 | Hover | Node scales to 1.2× via ForceGraph2D `nodeCanvasObject` highlight; cursor `pointer` |
 | Click | Opens DogPanel in edit mode (`editingDog` set to clicked dog, `panelOpen: true`) |
-| Label | Dog name only, 12px, `text-slate-800`, centred below node circle |
+| Label | Dog name only, 14px (Body role), `text-slate-800`, centred below node circle |
 
 ### Graph Edge
 
@@ -188,8 +190,8 @@ Status picker buttons: `variant="outline"` with a coloured left border matching 
 | Interaction | Behaviour |
 |-------------|-----------|
 | Select status | Highlights that button (ring); does NOT save yet |
-| Save | Calls `setCompatibility(idA, idB, selectedStatus)`; closes sheet |
-| Cancel | Discards selection; closes sheet |
+| Set compatibility | Calls `setCompatibility(idA, idB, selectedStatus)`; closes sheet |
+| Discard changes | Discards selection; closes sheet |
 | Remove | Calls `removeCompatibility(idA, idB)`; closes sheet; edge disappears from graph |
 
 Remove does not require AlertDialog confirmation — the action is reversible (user can re-add by clicking the node pair and setting a new status). Remove button uses `text-destructive` color, `variant="ghost"`.
@@ -206,8 +208,8 @@ Remove does not require AlertDialog confirmation — the action is reversible (u
 | Current status label | "Current status:" | default |
 | Status picker heading | "Set compatibility:" | default |
 | Status options | "Compatible" / "Neutral" / "Conflict" / "Unknown" | REQUIREMENTS.md COMPAT-01 |
-| Save button | "Save" | matches DogPanel pattern |
-| Cancel button | "Cancel" | matches DogPanel pattern |
+| Primary CTA button | "Set compatibility" | checker revision — specific verb + noun, replaces generic "Save" |
+| Cancel/dismiss button | "Discard changes" | checker revision — specific intent, replaces generic "Cancel" |
 | Remove button | "Remove relationship" | default — verb + noun, unambiguous |
 | Empty graph heading | "No compatibility data yet" | default |
 | Empty graph body | "Add dogs in the Dogs tab, then click any two dogs to set their compatibility." | default |
@@ -221,7 +223,7 @@ No destructive AlertDialog confirmation for Remove — see Interaction Contract 
 
 - All Sheet dialogs include `SheetTitle` (Radix requirement — established in Phase 1 per DogPanel)
 - Graph canvas (`<canvas>`) gets `aria-label="Dog compatibility graph"` and `role="img"` when no interactions are available
-- Edge-click Sheet is keyboard accessible: Tab order is Cancel → status buttons → Save → Remove
+- Edge-click Sheet is keyboard accessible: Tab order is Discard changes → status buttons → Set compatibility → Remove
 - Status buttons use `aria-pressed` to indicate selected state
 - CompatBadge includes status text alongside colour (colour alone is insufficient per WCAG 1.4.1)
 - Tab bar buttons use `aria-selected` and `role="tab"` / `role="tablist"` / `role="tabpanel"` pattern
