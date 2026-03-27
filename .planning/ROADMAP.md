@@ -19,7 +19,7 @@ Six phases take this project from a blank Vite scaffold to a fully working behav
 **Goal**: Establish the data model, Zustand store with LocalStorage persistence, schema versioning, and the TDD harness — so every subsequent phase has a tested, persistent foundation to build on.
 **Depends on**: Nothing
 **Requirements**: FOUND-01, FOUND-02, FOUND-03, FOUND-04, DOGS-01, DOGS-02, DOGS-03, DOGS-04
-**Plans:** 2 plans
+**Plans:** 1/2 plans executed
 **Success Criteria** (what must be TRUE):
   1. Dog can be added, edited, and archived — changes survive a page refresh
   2. LocalStorage data includes a `schemaVersion` field
@@ -27,7 +27,7 @@ Six phases take this project from a blank Vite scaffold to a fully working behav
   4. `npm run test` passes with no failures
 
 Plans:
-- [ ] 01-01-PLAN.md — Toolchain setup (Tailwind v3, shadcn/ui, Vitest, Zustand), domain types, store with persist + schema versioning, dogSlice with unit tests
+- [x] 01-01-PLAN.md — Toolchain setup (Tailwind v3, shadcn/ui, Vitest, Zustand), domain types, store with persist + schema versioning, dogSlice with unit tests
 - [ ] 01-02-PLAN.md — Dog Roster UI (card grid, add/edit slide-in panel, archive flow, archived toggle) wired to store, integration tests
 
 ### Phase 2: Compatibility System
@@ -108,7 +108,7 @@ Plans:
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Foundation | 0/2 | Planning complete | - |
+| 1. Foundation | 1/2 | In Progress|  |
 | 2. Compatibility System | 0/3 | Not started | - |
 | 3. Compatibility Graph | 0/2 | Not started | - |
 | 4. Group Builder | 0/2 | Not started | - |

@@ -7,10 +7,10 @@
 
 ### Foundation
 
-- [ ] **FOUND-01**: App state (dogs, compatibility, groups, schedule, walk history) persists to LocalStorage on every change
-- [ ] **FOUND-02**: App restores full state from LocalStorage on page load
-- [ ] **FOUND-03**: LocalStorage schema is versioned (`schemaVersion`) with a migration function to handle future changes without data loss
-- [ ] **FOUND-04**: Vitest + React Testing Library harness is configured and all features are developed test-first
+- [x] **FOUND-01**: App state (dogs, compatibility, groups, schedule, walk history) persists to LocalStorage on every change
+- [x] **FOUND-02**: App restores full state from LocalStorage on page load
+- [x] **FOUND-03**: LocalStorage schema is versioned (`schemaVersion`) with a migration function to handle future changes without data loss
+- [x] **FOUND-04**: Vitest + React Testing Library harness is configured and all features are developed test-first
 
 ### Dog Roster
 
@@ -96,10 +96,10 @@
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| FOUND-01 | Phase 1 | Pending |
-| FOUND-02 | Phase 1 | Pending |
-| FOUND-03 | Phase 1 | Pending |
-| FOUND-04 | Phase 1 | Pending |
+| FOUND-01 | Phase 1 | Complete |
+| FOUND-02 | Phase 1 | Complete |
+| FOUND-03 | Phase 1 | Complete |
+| FOUND-04 | Phase 1 | Complete |
 | DOGS-01 | Phase 2 | Pending |
 | DOGS-02 | Phase 2 | Pending |
 | DOGS-03 | Phase 2 | Pending |

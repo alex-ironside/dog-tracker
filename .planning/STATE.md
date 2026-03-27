@@ -2,14 +2,14 @@
 gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
-status: Executing Phase 01
-stopped_at: Phase 1 UI-SPEC approved
-last_updated: "2026-03-27T08:21:33.346Z"
+status: Ready to execute
+stopped_at: Completed 01-foundation/01-01-PLAN.md
+last_updated: "2026-03-27T08:32:35.211Z"
 progress:
   total_phases: 6
   completed_phases: 0
   total_plans: 2
-  completed_plans: 0
+  completed_plans: 1
 ---
 
 # Project State
@@ -24,7 +24,7 @@ See: .planning/PROJECT.md (updated 2026-03-26)
 ## Current Position
 
 Phase: 01 (foundation) — EXECUTING
-Plan: 1 of 2
+Plan: 2 of 2
 
 ## Performance Metrics
 
@@ -41,6 +41,7 @@ Plan: 1 of 2
 | - | - | - | - |
 
 *Updated after each plan completion*
+| Phase 01-foundation P01 | 9min | 2 tasks | 19 files |
 
 ## Accumulated Context
 
@@ -54,6 +55,9 @@ Recent decisions affecting current work:
 - Init: TDD with Vitest — tests written before/alongside implementation
 - Init: dnd-kit for drag-and-drop, react-force-graph for compatibility graph, Recharts for history charts
 - Init: Zustand with persist middleware; StorageAdapter interface for future Firebase swap
+- [Phase 01-foundation]: Vitest pinned to v2.x and jsdom to v24 for Node 20.9.0 compatibility (v4/v29 require Node 22+)
+- [Phase 01-foundation]: shadcn@2.3.0 init bypassed; components.json created manually due to ESM project tailwind config validation bug in CLI
+- [Phase 01-foundation]: crypto.randomUUID() used for Dog IDs (Web Crypto built-in, no extra dependency)
 
 ### Pending Todos
 
@@ -67,6 +71,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-03-26T20:55:11.073Z
-Stopped at: Phase 1 UI-SPEC approved
-Resume file: .planning/phases/01-foundation/01-UI-SPEC.md
+Last session: 2026-03-27T08:32:35.208Z
+Stopped at: Completed 01-foundation/01-01-PLAN.md
+Resume file: None
