@@ -1,7 +1,8 @@
 ---
 phase: 3
 slug: compatibility-graph
-status: draft
+status: approved
+reviewed_at: 2026-03-27
 shadcn_initialized: true
 preset: default / slate / cssVariables
 created: 2026-03-27
