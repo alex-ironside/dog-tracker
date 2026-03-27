@@ -39,7 +39,7 @@
 - [x] **SCORE-01**: A math function scores a proposed group as a number (0–100) based on all pairwise compatibility statuses
 - [x] **SCORE-02**: The scoring function treats Unknown pairs as a penalty (not as Compatible or Neutral)
 - [x] **SCORE-03**: The scoring function is a pure module in `src/lib/scoring.ts` with full unit test coverage
-- [ ] **SCORE-04**: A group auto-suggest function proposes optimal group compositions from available dogs, tested in isolation
+- [x] **SCORE-04**: A group auto-suggest function proposes optimal group compositions from available dogs, tested in isolation
 
 ### Calendar & Scheduling
 
@@ -111,7 +111,7 @@
 | SCORE-01 | Phase 3 | Complete |
 | SCORE-02 | Phase 3 | Complete |
 | SCORE-03 | Phase 3 | Complete |
-| SCORE-04 | Phase 3 | Pending |
+| SCORE-04 | Phase 3 | Complete |
 | GROUP-01 | Phase 4 | Pending |
 | GROUP-02 | Phase 4 | Pending |
 | GROUP-03 | Phase 4 | Pending |
