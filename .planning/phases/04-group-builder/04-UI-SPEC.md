@@ -1,7 +1,8 @@
 ---
 phase: 4
 slug: group-builder
-status: draft
+status: approved
+reviewed_at: 2026-03-27
 shadcn_initialized: true
 preset: default/slate/css-variables
 created: 2026-03-27
