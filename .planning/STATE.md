@@ -2,14 +2,14 @@
 gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
-status: Ready to execute
-stopped_at: Completed 01-foundation/01-01-PLAN.md
-last_updated: "2026-03-27T08:32:35.211Z"
+status: Phase complete — ready for verification
+stopped_at: Completed 01-foundation/01-02-PLAN.md
+last_updated: "2026-03-27T08:37:51.891Z"
 progress:
   total_phases: 6
-  completed_phases: 0
+  completed_phases: 1
   total_plans: 2
-  completed_plans: 1
+  completed_plans: 2
 ---
 
 # Project State
@@ -42,6 +42,7 @@ Plan: 2 of 2
 
 *Updated after each plan completion*
 | Phase 01-foundation P01 | 9min | 2 tasks | 19 files |
+| Phase 01-foundation P02 | 3min | 1 tasks | 7 files |
 
 ## Accumulated Context
 
@@ -58,6 +59,9 @@ Recent decisions affecting current work:
 - [Phase 01-foundation]: Vitest pinned to v2.x and jsdom to v24 for Node 20.9.0 compatibility (v4/v29 require Node 22+)
 - [Phase 01-foundation]: shadcn@2.3.0 init bypassed; components.json created manually due to ESM project tailwind config validation bug in CLI
 - [Phase 01-foundation]: crypto.randomUUID() used for Dog IDs (Web Crypto built-in, no extra dependency)
+- [Phase 01-foundation]: Named exports for all Dog Roster components — consistent with shadcn convention and test import pattern
+- [Phase 01-foundation]: useAppStore.getState() in save handlers — avoids stale closure trap when calling addDog/updateDog after async user input
+- [Phase 01-foundation]: SheetTitle (Radix-aware) in DogPanel header — resolves Radix DialogContent accessibility requirement for screen readers
 
 ### Pending Todos
 
@@ -71,6 +75,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-03-27T08:32:35.208Z
-Stopped at: Completed 01-foundation/01-01-PLAN.md
+Last session: 2026-03-27T08:37:51.888Z
+Stopped at: Completed 01-foundation/01-02-PLAN.md
 Resume file: None

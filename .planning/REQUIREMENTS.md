@@ -14,10 +14,10 @@
 
 ### Dog Roster
 
-- [ ] **DOGS-01**: Behaviorist can add a dog with name, breed, age, and optional notes
-- [ ] **DOGS-02**: Behaviorist can edit a dog's profile details
-- [ ] **DOGS-03**: Behaviorist can archive (soft-delete) a dog — archived dogs are hidden from active views but history is preserved
-- [ ] **DOGS-04**: Behaviorist can view the full roster of active dogs
+- [x] **DOGS-01**: Behaviorist can add a dog with name, breed, age, and optional notes
+- [x] **DOGS-02**: Behaviorist can edit a dog's profile details
+- [x] **DOGS-03**: Behaviorist can archive (soft-delete) a dog — archived dogs are hidden from active views but history is preserved
+- [x] **DOGS-04**: Behaviorist can view the full roster of active dogs
 
 ### Compatibility Graph
 
@@ -100,10 +100,10 @@
 | FOUND-02 | Phase 1 | Complete |
 | FOUND-03 | Phase 1 | Complete |
 | FOUND-04 | Phase 1 | Complete |
-| DOGS-01 | Phase 2 | Pending |
-| DOGS-02 | Phase 2 | Pending |
-| DOGS-03 | Phase 2 | Pending |
-| DOGS-04 | Phase 2 | Pending |
+| DOGS-01 | Phase 2 | Complete |
+| DOGS-02 | Phase 2 | Complete |
+| DOGS-03 | Phase 2 | Complete |
+| DOGS-04 | Phase 2 | Complete |
 | COMPAT-01 | Phase 3 | Pending |
 | COMPAT-02 | Phase 3 | Pending |
 | COMPAT-03 | Phase 3 | Pending |
