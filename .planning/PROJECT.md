@@ -18,7 +18,7 @@ A behaviorist can compose a safe, compatible group of dogs and slot them into a 
 - [x] Group auto-suggest — algorithm that suggests optimal group compositions from available dogs for a given time slot *(Validated in Phase 02: compatibility-system)*
 
 ### Active
-- [ ] Compatibility network graph — visual node graph showing which dogs get along (green edges) or conflict (red edges), editable per pair
+- [x] Compatibility network graph — visual node graph showing which dogs get along (green edges) or conflict (red edges), editable per pair *(Validated in Phase 03: compatibility-graph)*
 - [ ] Group builder — drag and drop dogs into named walk groups; groups are validated against compatibility scores
 - [ ] Calendar / time-slot scheduler — drag walk groups into hour slots on a weekly calendar view
 - [ ] Walk history per dog — log whether each walk went well or not, with notes; displayed as a graph/chart timeline
@@ -74,4 +74,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-03-27 — Phase 02 complete*
+*Last updated: 2026-03-27 — Phase 03 complete*
