@@ -2,14 +2,14 @@
 gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
-status: Ready to plan
-stopped_at: Completed 03-02-PLAN.md
-last_updated: "2026-03-27T14:34:39.186Z"
+status: Ready to execute
+stopped_at: Completed 04-group-builder plan 01
+last_updated: "2026-03-27T15:33:35.507Z"
 progress:
   total_phases: 6
   completed_phases: 3
-  total_plans: 7
-  completed_plans: 7
+  total_plans: 9
+  completed_plans: 8
 ---
 
 # Project State
@@ -19,12 +19,12 @@ progress:
 See: .planning/PROJECT.md (updated 2026-03-26)
 
 **Core value:** A behaviorist can compose a safe, compatible group of dogs and slot them into a walk in seconds.
-**Current focus:** Phase 03 — compatibility-graph
+**Current focus:** Phase 04 — group-builder
 
 ## Current Position
 
-Phase: 4
-Plan: Not started
+Phase: 04 (group-builder) — EXECUTING
+Plan: 2 of 2
 
 ## Performance Metrics
 
@@ -48,6 +48,7 @@ Plan: Not started
 | Phase 02-compatibility-system P03 | 2min | 2 tasks | 2 files |
 | Phase 03-compatibility-graph P01 | 4min | 2 tasks | 8 files |
 | Phase 03-compatibility-graph P02 | 4min | 2 tasks | 4 files |
+| Phase 04-group-builder P01 | 7min | 2 tasks | 9 files |
 
 ## Accumulated Context
 
@@ -78,6 +79,8 @@ Recent decisions affecting current work:
 - [Phase 03-compatibility-graph]: onLinkClick/onNodeClick are stubs in Plan 01 — Plan 02 will wire to EdgeSheet and DogPanel respectively
 - [Phase 03-compatibility-graph]: act() wrapping required when calling captured graph callbacks directly in tests — jsdom does not auto-batch React state updates triggered outside of user-event
 - [Phase 03-compatibility-graph]: EdgeSheet CompatBadge test uses getAllByText because status button and badge share label text
+- [Phase 04-group-builder]: useShallow selector in GroupBuilder to prevent Zustand re-render loop — filter/map selectors return new arrays each render, causing infinite update cycle in tests without shallow equality
+- [Phase 04-group-builder]: DnD testing via mocked DndContext capturing onDragEnd on window.__dndCallbacks with useSensors returning stable [] to avoid render loops
 
 ### Pending Todos
 
@@ -91,6 +94,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-03-27T14:28:52.520Z
-Stopped at: Completed 03-02-PLAN.md
+Last session: 2026-03-27T15:33:35.503Z
+Stopped at: Completed 04-group-builder plan 01
 Resume file: None
