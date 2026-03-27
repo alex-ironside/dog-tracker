@@ -1,6 +1,8 @@
-import { useMemo, useState, useEffect, useRef } from 'react'
+import { useMemo, useState, useEffect, useRef, useCallback } from 'react'
 import { ForceGraph2D } from 'react-force-graph'
 import { useAppStore } from '@/store'
+import { EdgeSheet } from '@/components/EdgeSheet'
+import { DogPanel } from '@/components/DogPanel'
 import type { Dog, CompatibilityEntry, CompatibilityStatus } from '@/types'
 
 type GraphNode = { id: string; name: string }
@@ -28,12 +30,14 @@ const STATUS_COLOR: Record<CompatibilityStatus, string> = {
 }
 
 export function CompatibilityGraph() {
-  const dogs = useAppStore((s) => s.dogs)
+  const allDogs = useAppStore((s) => s.dogs)
   const compatibilityEntries = useAppStore((s) => s.compatibilityEntries)
 
+  const activeDogs = useMemo(() => allDogs.filter((d) => !d.archived), [allDogs])
+
   const graphData = useMemo(
-    () => buildGraphData(dogs, compatibilityEntries),
-    [dogs, compatibilityEntries]
+    () => buildGraphData(allDogs, compatibilityEntries),
+    [allDogs, compatibilityEntries]
   )
 
   const containerRef = useRef<HTMLDivElement>(null)
@@ -55,6 +59,56 @@ export function CompatibilityGraph() {
     observer.observe(el)
     return () => observer.disconnect()
   }, [])
+
+  // EdgeSheet state
+  const [edgeSheet, setEdgeSheet] = useState<{
+    open: boolean
+    idA: string
+    idB: string
+    nameA: string
+    nameB: string
+    status: CompatibilityStatus
+  }>({ open: false, idA: '', idB: '', nameA: '', nameB: '', status: 'unknown' })
+
+  // DogPanel state
+  const [dogPanel, setDogPanel] = useState<{ open: boolean; dog: Dog | null }>({
+    open: false,
+    dog: null,
+  })
+
+  const handleLinkClick = useCallback(
+    (link: unknown) => {
+      const l = link as GraphLink & { source: unknown; target: unknown }
+      const sourceId =
+        typeof l.source === 'object' && l.source !== null
+          ? (l.source as GraphNode).id
+          : String(l.source)
+      const targetId =
+        typeof l.target === 'object' && l.target !== null
+          ? (l.target as GraphNode).id
+          : String(l.target)
+      const nameA = activeDogs.find((d) => d.id === sourceId)?.name ?? ''
+      const nameB = activeDogs.find((d) => d.id === targetId)?.name ?? ''
+      setEdgeSheet({
+        open: true,
+        idA: sourceId,
+        idB: targetId,
+        nameA,
+        nameB,
+        status: l.status ?? 'unknown',
+      })
+    },
+    [activeDogs]
+  )
+
+  const handleNodeClick = useCallback(
+    (node: unknown) => {
+      const n = node as GraphNode
+      const dog = allDogs.find((d) => d.id === n.id) ?? null
+      if (dog) setDogPanel({ open: true, dog })
+    },
+    [allDogs]
+  )
 
   if (graphData.nodes.length === 0) {
     return (
@@ -88,8 +142,30 @@ export function CompatibilityGraph() {
           ctx.fillText(label, node.x ?? 0, (node.y ?? 0) + 8 / globalScale)
         }}
         nodeCanvasObjectMode={() => 'after'}
-        onLinkClick={() => { /* Plan 02 will add EdgeSheet handler */ }}
-        onNodeClick={() => { /* Plan 02 will add DogPanel handler */ }}
+        onLinkClick={handleLinkClick}
+        onNodeClick={handleNodeClick}
+      />
+
+      <EdgeSheet
+        open={edgeSheet.open}
+        onOpenChange={(open) => setEdgeSheet((s) => ({ ...s, open }))}
+        dogNameA={edgeSheet.nameA}
+        dogNameB={edgeSheet.nameB}
+        currentStatus={edgeSheet.status}
+        onSetStatus={(status) => {
+          useAppStore.getState().setCompatibility(edgeSheet.idA, edgeSheet.idB, status)
+          setEdgeSheet((s) => ({ ...s, open: false }))
+        }}
+        onRemove={() => {
+          useAppStore.getState().removeCompatibility(edgeSheet.idA, edgeSheet.idB)
+          setEdgeSheet((s) => ({ ...s, open: false }))
+        }}
+      />
+
+      <DogPanel
+        open={dogPanel.open}
+        onOpenChange={(open) => setDogPanel((s) => ({ ...s, open }))}
+        editingDog={dogPanel.dog}
       />
     </div>
   )
