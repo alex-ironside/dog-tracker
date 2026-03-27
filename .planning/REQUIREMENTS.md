@@ -30,8 +30,8 @@
 
 - [x] **GROUP-01**: Behaviorist can create a named walk group and drag dogs from the roster into it
 - [x] **GROUP-02**: Each dog can only appear in one group at a time
-- [ ] **GROUP-03**: When a dog is dropped into a group, a compatibility badge shows the group's overall compatibility score
-- [ ] **GROUP-04**: Conflicts within a group are highlighted inline (not just as a summary warning)
+- [x] **GROUP-03**: When a dog is dropped into a group, a compatibility badge shows the group's overall compatibility score
+- [x] **GROUP-04**: Conflicts within a group are highlighted inline (not just as a summary warning)
 - [x] **GROUP-05**: Behaviorist can remove a dog from a group by dragging back or via a remove button
 
 ### Compatibility Scoring
@@ -114,8 +114,8 @@
 | SCORE-04 | Phase 3 | Complete |
 | GROUP-01 | Phase 4 | Complete |
 | GROUP-02 | Phase 4 | Complete |
-| GROUP-03 | Phase 4 | Pending |
-| GROUP-04 | Phase 4 | Pending |
+| GROUP-03 | Phase 4 | Complete |
+| GROUP-04 | Phase 4 | Complete |
 | GROUP-05 | Phase 4 | Complete |
 | CAL-01 | Phase 5 | Pending |
 | CAL-02 | Phase 5 | Pending |

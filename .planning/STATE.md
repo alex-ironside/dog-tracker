@@ -2,14 +2,14 @@
 gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
-status: Ready to execute
-stopped_at: Completed 04-group-builder plan 01
-last_updated: "2026-03-27T15:33:35.507Z"
+status: Phase complete — ready for verification
+stopped_at: Completed 04-group-builder plan 02
+last_updated: "2026-03-27T15:49:31.361Z"
 progress:
   total_phases: 6
-  completed_phases: 3
+  completed_phases: 4
   total_plans: 9
-  completed_plans: 8
+  completed_plans: 9
 ---
 
 # Project State
@@ -49,6 +49,7 @@ Plan: 2 of 2
 | Phase 03-compatibility-graph P01 | 4min | 2 tasks | 8 files |
 | Phase 03-compatibility-graph P02 | 4min | 2 tasks | 4 files |
 | Phase 04-group-builder P01 | 7min | 2 tasks | 9 files |
+| Phase 04-group-builder P02 | 25min | 2 tasks | 4 files |
 
 ## Accumulated Context
 
@@ -81,6 +82,8 @@ Recent decisions affecting current work:
 - [Phase 03-compatibility-graph]: EdgeSheet CompatBadge test uses getAllByText because status button and badge share label text
 - [Phase 04-group-builder]: useShallow selector in GroupBuilder to prevent Zustand re-render loop — filter/map selectors return new arrays each render, causing infinite update cycle in tests without shallow equality
 - [Phase 04-group-builder]: DnD testing via mocked DndContext capturing onDragEnd on window.__dndCallbacks with useSensors returning stable [] to avoid render loops
+- [Phase 04-group-builder]: ConflictOverlay refactored to pure render component; computeConflictLines() in GroupPanel useLayoutEffect fixes React ref timing (child effect fires before parent containerRef is set)
+- [Phase 04-group-builder]: D-04 enforced at computation level in computeConflictLines(): only status==='conflict' pairs draw SVG lines; unknown pairs never produce lines
 
 ### Pending Todos
 
@@ -94,6 +97,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-03-27T15:33:35.503Z
-Stopped at: Completed 04-group-builder plan 01
+Last session: 2026-03-27T15:49:31.357Z
+Stopped at: Completed 04-group-builder plan 02
 Resume file: None

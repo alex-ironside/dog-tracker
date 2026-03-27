@@ -9,7 +9,7 @@ Six phases take this project from a blank Vite scaffold to a fully working behav
 - [x] **Phase 1: Foundation** — Data layer, Zustand store, LocalStorage persistence, Vitest harness (completed 2026-03-27)
 - [ ] **Phase 2: Compatibility System** — Compatibility data entry, scoring algorithm, and auto-suggest logic
 - [x] **Phase 3: Compatibility Graph** — Interactive network graph UI with editable edges (completed 2026-03-27)
-- [ ] **Phase 4: Group Builder** — Drag-and-drop group composition with live compatibility feedback
+- [x] **Phase 4: Group Builder** — Drag-and-drop group composition with live compatibility feedback (completed 2026-03-27)
 - [ ] **Phase 5: Calendar Scheduler** — Weekly hour-slot calendar with drag-and-drop group scheduling
 - [ ] **Phase 6: Walk History** — Walk outcome logging and per-dog history chart
 
@@ -65,7 +65,7 @@ Plans:
 **Goal**: Let the behaviorist drag dogs from the roster into named walk groups, with live compatibility scoring and inline conflict highlighting on each drop.
 **Depends on**: Phase 3
 **Requirements**: GROUP-01, GROUP-02, GROUP-03, GROUP-04, GROUP-05
-**Plans:** 1/2 plans executed
+**Plans:** 2/2 plans complete
 **Success Criteria** (what must be TRUE):
   1. Behaviorist can drag a dog from the roster panel into a group panel
   2. A dog cannot appear in two groups simultaneously
@@ -75,7 +75,7 @@ Plans:
 
 Plans:
 - [x] 04-01-PLAN.md — Install dnd-kit; groupSlice TDD; GroupBuilder two-panel DnD layout with roster, group panels, drag interactions; Groups tab in App.tsx
-- [ ] 04-02-PLAN.md — ConflictOverlay SVG lines between conflicting dogs; EdgeSheet integration from conflict clicks; GroupPanel tests for score/conflict display
+- [x] 04-02-PLAN.md — ConflictOverlay SVG lines between conflicting dogs; EdgeSheet integration from conflict clicks; GroupPanel tests for score/conflict display
 
 ### Phase 5: Calendar Scheduler
 **Goal**: Display a weekly hour-slot grid and let the behaviorist drag walk groups into time slots to build a schedule.
@@ -114,6 +114,6 @@ Plans:
 | 1. Foundation | 2/2 | Complete   | 2026-03-27 |
 | 2. Compatibility System | 3/3 | Complete |  |
 | 3. Compatibility Graph | 2/2 | Complete   | 2026-03-27 |
-| 4. Group Builder | 1/2 | In Progress|  |
+| 4. Group Builder | 2/2 | Complete   | 2026-03-27 |
 | 5. Calendar Scheduler | 0/2 | Not started | - |
 | 6. Walk History | 0/2 | Not started | - |
