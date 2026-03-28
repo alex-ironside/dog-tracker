@@ -11,7 +11,7 @@ Six phases take this project from a blank Vite scaffold to a fully working behav
 - [x] **Phase 3: Compatibility Graph** — Interactive network graph UI with editable edges (completed 2026-03-27)
 - [x] **Phase 4: Group Builder** — Drag-and-drop group composition with live compatibility feedback (completed 2026-03-27)
 - [x] **Phase 5: Calendar Scheduler** — Weekly hour-slot calendar with drag-and-drop group scheduling (completed 2026-03-28)
-- [ ] **Phase 6: Walk History** — Walk outcome logging and per-dog history chart
+- [x] **Phase 6: Walk History** — Walk outcome logging and per-dog history chart (completed 2026-03-28)
 
 ## Phase Details
 
@@ -105,7 +105,7 @@ Plans:
 
 Plans:
 - [x] 06-01: Implement `walkSlice` — log walk session with outcome enum, notes, and dog snapshot; unit tests; persist via `LocalStorageAdapter`
-- [ ] 06-02: Install Recharts; build `WalkHistoryChart` component (outcome timeline per dog); integrate into dog profile view; chart rendering tests
+- [x] 06-02: Install Recharts; build `WalkHistoryChart` component (outcome timeline per dog); integrate into dog profile view; chart rendering tests
 
 ## Progress
 
@@ -116,4 +116,4 @@ Plans:
 | 3. Compatibility Graph | 2/2 | Complete   | 2026-03-27 |
 | 4. Group Builder | 2/2 | Complete   | 2026-03-27 |
 | 5. Calendar Scheduler | 2/2 | Complete   | 2026-03-28 |
-| 6. Walk History | 1/2 | In Progress|  |
+| 6. Walk History | 2/2 | Complete   | 2026-03-28 |
