@@ -4,10 +4,11 @@ import { createDogSlice, type DogActions } from './dogSlice'
 import { createCompatSlice, type CompatActions } from './compatSlice'
 import { createGroupSlice, type GroupActions } from './groupSlice'
 import { createScheduleSlice, type ScheduleActions } from './scheduleSlice'
+import { createWalkHistorySlice, type WalkHistoryActions } from './walkHistorySlice'
 import type { AppState } from '@/types'
 import { CURRENT_SCHEMA_VERSION, migrate } from './migrations'
 
-export type AppStore = AppState & DogActions & CompatActions & GroupActions & ScheduleActions
+export type AppStore = AppState & DogActions & CompatActions & GroupActions & ScheduleActions & WalkHistoryActions
 
 export const useAppStore = create<AppStore>()(
   persist(
@@ -17,10 +18,12 @@ export const useAppStore = create<AppStore>()(
       walkGroups: [],
       compatibilityEntries: [],
       walkSessions: [],
+      walkHistory: [],
       ...createDogSlice(...a),
       ...createCompatSlice(...a),
       ...createGroupSlice(...a),
       ...createScheduleSlice(...a),
+      ...createWalkHistorySlice(...a),
     }),
     {
       name: 'dogTracker-store',
@@ -33,6 +36,7 @@ export const useAppStore = create<AppStore>()(
         walkGroups: state.walkGroups,
         compatibilityEntries: state.compatibilityEntries,
         walkSessions: state.walkSessions,
+        walkHistory: state.walkHistory,
       }),
     }
   )
