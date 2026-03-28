@@ -3,10 +3,11 @@ import { persist, createJSONStorage } from 'zustand/middleware'
 import { createDogSlice, type DogActions } from './dogSlice'
 import { createCompatSlice, type CompatActions } from './compatSlice'
 import { createGroupSlice, type GroupActions } from './groupSlice'
+import { createScheduleSlice, type ScheduleActions } from './scheduleSlice'
 import type { AppState } from '@/types'
 import { CURRENT_SCHEMA_VERSION, migrate } from './migrations'
 
-export type AppStore = AppState & DogActions & CompatActions & GroupActions
+export type AppStore = AppState & DogActions & CompatActions & GroupActions & ScheduleActions
 
 export const useAppStore = create<AppStore>()(
   persist(
@@ -19,6 +20,7 @@ export const useAppStore = create<AppStore>()(
       ...createDogSlice(...a),
       ...createCompatSlice(...a),
       ...createGroupSlice(...a),
+      ...createScheduleSlice(...a),
     }),
     {
       name: 'dogTracker-store',
