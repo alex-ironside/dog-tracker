@@ -104,7 +104,7 @@ Plans:
   4. Walk log entries are persisted to LocalStorage
 
 Plans:
-- [ ] 06-01: Implement `walkSlice` — log walk session with outcome enum, notes, and dog snapshot; unit tests; persist via `LocalStorageAdapter`
+- [x] 06-01: Implement `walkSlice` — log walk session with outcome enum, notes, and dog snapshot; unit tests; persist via `LocalStorageAdapter`
 - [ ] 06-02: Install Recharts; build `WalkHistoryChart` component (outcome timeline per dog); integrate into dog profile view; chart rendering tests
 
 ## Progress
@@ -116,4 +116,4 @@ Plans:
 | 3. Compatibility Graph | 2/2 | Complete   | 2026-03-27 |
 | 4. Group Builder | 2/2 | Complete   | 2026-03-27 |
 | 5. Calendar Scheduler | 2/2 | Complete   | 2026-03-28 |
-| 6. Walk History | 0/2 | Not started | - |
+| 6. Walk History | 1/2 | In Progress|  |

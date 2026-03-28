@@ -2,14 +2,14 @@
 gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
-status: Ready to plan
-stopped_at: Completed 05-02-PLAN.md
-last_updated: "2026-03-28T16:50:33.596Z"
+status: Ready to execute
+stopped_at: Completed 06-walk-history 06-01-PLAN.md
+last_updated: "2026-03-28T20:14:52.705Z"
 progress:
   total_phases: 6
   completed_phases: 5
-  total_plans: 11
-  completed_plans: 11
+  total_plans: 13
+  completed_plans: 12
 ---
 
 # Project State
@@ -19,12 +19,12 @@ progress:
 See: .planning/PROJECT.md (updated 2026-03-26)
 
 **Core value:** A behaviorist can compose a safe, compatible group of dogs and slot them into a walk in seconds.
-**Current focus:** Phase 05 — calendar-scheduler
+**Current focus:** Phase 06 — walk-history
 
 ## Current Position
 
-Phase: 6
-Plan: Not started
+Phase: 06 (walk-history) — EXECUTING
+Plan: 2 of 2
 
 ## Performance Metrics
 
@@ -52,6 +52,7 @@ Plan: Not started
 | Phase 04-group-builder P02 | 25min | 2 tasks | 4 files |
 | Phase 05-calendar-scheduler P01 | 5min | 2 tasks | 11 files |
 | Phase 05-calendar-scheduler P02 | 4m | 2 tasks | 5 files |
+| Phase 06-walk-history P01 | 6min | 2 tasks | 6 files |
 
 ## Accumulated Context
 
@@ -91,6 +92,8 @@ Recent decisions affecting current work:
 - [Phase 05-calendar-scheduler]: scheduled-group- id prefix on ScheduledGroupCard to avoid collision with sidebar card ids
 - [Phase 05-calendar-scheduler]: compatMap passed down from CalendarScheduler to avoid rebuilding per slot cell
 - [Phase 05-calendar-scheduler]: Zustand setState without replace=true in tests preserves action functions while seeding data
+- [Phase 06-walk-history]: WalkLogEntry entries are immutable — addWalkLog only, no edit/delete (HIST-03)
+- [Phase 06-walk-history]: Schema migration uses version guard (if version < 2) for v1->v2, adding walkHistory: []
 
 ### Pending Todos
 
@@ -104,6 +107,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-03-28T16:46:20.235Z
-Stopped at: Completed 05-02-PLAN.md
+Last session: 2026-03-28T20:14:52.700Z
+Stopped at: Completed 06-walk-history 06-01-PLAN.md
 Resume file: None

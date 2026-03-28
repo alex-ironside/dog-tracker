@@ -52,9 +52,9 @@
 
 ### Walk History
 
-- [ ] **HIST-01**: After a walk, behaviorist can log an outcome: Great / Good / Neutral / Poor / Incident
-- [ ] **HIST-02**: Behaviorist can add free-text notes to a walk log entry
-- [ ] **HIST-03**: Each walk log entry records a snapshot of which dogs were present (immutable after save)
+- [x] **HIST-01**: After a walk, behaviorist can log an outcome: Great / Good / Neutral / Poor / Incident
+- [x] **HIST-02**: Behaviorist can add free-text notes to a walk log entry
+- [x] **HIST-03**: Each walk log entry records a snapshot of which dogs were present (immutable after save)
 - [ ] **HIST-04**: Each dog has a history view showing their walk outcomes over time as a chart
 - [ ] **HIST-05**: Walk history chart uses a dedicated charting library (Recharts) — not custom SVG
 
@@ -123,9 +123,9 @@
 | CAL-04 | Phase 5 | Complete |
 | CAL-05 | Phase 5 | Complete |
 | CAL-06 | Phase 5 | Complete |
-| HIST-01 | Phase 6 | Pending |
-| HIST-02 | Phase 6 | Pending |
-| HIST-03 | Phase 6 | Pending |
+| HIST-01 | Phase 6 | Complete |
+| HIST-02 | Phase 6 | Complete |
+| HIST-03 | Phase 6 | Complete |
 | HIST-04 | Phase 6 | Pending |
 | HIST-05 | Phase 6 | Pending |
 
