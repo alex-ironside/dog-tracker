@@ -90,7 +90,7 @@ Plans:
   6. Slots are stored as `{ dayOfWeek, hour, minute }` — not epoch timestamps
 
 Plans:
-- [ ] 05-01: Build CSS Grid weekly calendar component with hour-slot `Droppable` cells (second `DndContext` surface); implement DST-safe slot representation in `scheduleSlice`
+- [x] 05-01: Build CSS Grid weekly calendar component with hour-slot `Droppable` cells (second `DndContext` surface); implement DST-safe slot representation in `scheduleSlice`
 - [ ] 05-02: Wire group drag from builder panel to calendar slots; enforce one-group-per-slot constraint; display scheduled group cards; tests for schedule state and slot constraints
 
 ### Phase 6: Walk History
@@ -115,5 +115,5 @@ Plans:
 | 2. Compatibility System | 3/3 | Complete |  |
 | 3. Compatibility Graph | 2/2 | Complete   | 2026-03-27 |
 | 4. Group Builder | 2/2 | Complete   | 2026-03-27 |
-| 5. Calendar Scheduler | 0/2 | Not started | - |
+| 5. Calendar Scheduler | 1/2 | In Progress|  |
 | 6. Walk History | 0/2 | Not started | - |

@@ -3,13 +3,13 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: Ready to execute
-stopped_at: Phase 5 plans created and verified
-last_updated: "2026-03-28T00:00:00.000Z"
+stopped_at: Completed 05-01-PLAN.md
+last_updated: "2026-03-28T16:40:00.630Z"
 progress:
   total_phases: 6
   completed_phases: 4
-  total_plans: 9
-  completed_plans: 9
+  total_plans: 11
+  completed_plans: 10
 ---
 
 # Project State
@@ -19,12 +19,12 @@ progress:
 See: .planning/PROJECT.md (updated 2026-03-26)
 
 **Core value:** A behaviorist can compose a safe, compatible group of dogs and slot them into a walk in seconds.
-**Current focus:** Phase 04 — group-builder
+**Current focus:** Phase 05 — calendar-scheduler
 
 ## Current Position
 
-Phase: 5
-Plan: 05-01 (ready to execute)
+Phase: 05 (calendar-scheduler) — EXECUTING
+Plan: 2 of 2
 
 ## Performance Metrics
 
@@ -50,6 +50,7 @@ Plan: 05-01 (ready to execute)
 | Phase 03-compatibility-graph P02 | 4min | 2 tasks | 4 files |
 | Phase 04-group-builder P01 | 7min | 2 tasks | 9 files |
 | Phase 04-group-builder P02 | 25min | 2 tasks | 4 files |
+| Phase 05-calendar-scheduler P01 | 5min | 2 tasks | 11 files |
 
 ## Accumulated Context
 
@@ -84,6 +85,8 @@ Recent decisions affecting current work:
 - [Phase 04-group-builder]: DnD testing via mocked DndContext capturing onDragEnd on window.__dndCallbacks with useSensors returning stable [] to avoid render loops
 - [Phase 04-group-builder]: ConflictOverlay refactored to pure render component; computeConflictLines() in GroupPanel useLayoutEffect fixes React ref timing (child effect fires before parent containerRef is set)
 - [Phase 04-group-builder]: D-04 enforced at computation level in computeConflictLines(): only status==='conflict' pairs draw SVG lines; unknown pairs never produce lines
+- [Phase 05-calendar-scheduler]: onDragEnd in CalendarScheduler is a stub — Plan 02 wires occupied-slot guard and store actions
+- [Phase 05-calendar-scheduler]: scheduleGroup does not reject occupied slots — that guard lives in onDragEnd (Plan 02)
 
 ### Pending Todos
 
@@ -97,6 +100,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-03-27T21:14:38.201Z
-Stopped at: Phase 5 UI-SPEC approved
-Resume file: .planning/phases/05-calendar-scheduler/05-01-PLAN.md
+Last session: 2026-03-28T16:40:00.626Z
+Stopped at: Completed 05-01-PLAN.md
+Resume file: None
