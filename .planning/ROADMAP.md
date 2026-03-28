@@ -10,7 +10,7 @@ Six phases take this project from a blank Vite scaffold to a fully working behav
 - [ ] **Phase 2: Compatibility System** — Compatibility data entry, scoring algorithm, and auto-suggest logic
 - [x] **Phase 3: Compatibility Graph** — Interactive network graph UI with editable edges (completed 2026-03-27)
 - [x] **Phase 4: Group Builder** — Drag-and-drop group composition with live compatibility feedback (completed 2026-03-27)
-- [ ] **Phase 5: Calendar Scheduler** — Weekly hour-slot calendar with drag-and-drop group scheduling
+- [x] **Phase 5: Calendar Scheduler** — Weekly hour-slot calendar with drag-and-drop group scheduling (completed 2026-03-28)
 - [ ] **Phase 6: Walk History** — Walk outcome logging and per-dog history chart
 
 ## Phase Details
@@ -91,7 +91,7 @@ Plans:
 
 Plans:
 - [x] 05-01: Build CSS Grid weekly calendar component with hour-slot `Droppable` cells (second `DndContext` surface); implement DST-safe slot representation in `scheduleSlice`
-- [ ] 05-02: Wire group drag from builder panel to calendar slots; enforce one-group-per-slot constraint; display scheduled group cards; tests for schedule state and slot constraints
+- [x] 05-02: Wire group drag from builder panel to calendar slots; enforce one-group-per-slot constraint; display scheduled group cards; tests for schedule state and slot constraints
 
 ### Phase 6: Walk History
 **Goal**: Let the behaviorist log walk outcomes after each walk and view per-dog history as a chart timeline.
@@ -115,5 +115,5 @@ Plans:
 | 2. Compatibility System | 3/3 | Complete |  |
 | 3. Compatibility Graph | 2/2 | Complete   | 2026-03-27 |
 | 4. Group Builder | 2/2 | Complete   | 2026-03-27 |
-| 5. Calendar Scheduler | 1/2 | In Progress|  |
+| 5. Calendar Scheduler | 2/2 | Complete   | 2026-03-28 |
 | 6. Walk History | 0/2 | Not started | - |

@@ -44,8 +44,8 @@
 ### Calendar & Scheduling
 
 - [x] **CAL-01**: Behaviorist can view a weekly calendar grid with hour slots (e.g. 07:00–19:00)
-- [ ] **CAL-02**: Behaviorist can drag a walk group from the group builder into an hour slot on the calendar
-- [ ] **CAL-03**: A group can only occupy one slot at a time; the same slot can hold one group
+- [x] **CAL-02**: Behaviorist can drag a walk group from the group builder into an hour slot on the calendar
+- [x] **CAL-03**: A group can only occupy one slot at a time; the same slot can hold one group
 - [x] **CAL-04**: Scheduled slots display the group name and dog count
 - [x] **CAL-05**: Behaviorist can remove a group from a slot (unschedule it)
 - [x] **CAL-06**: Time slots are stored as logical `{ dayOfWeek, hour, minute }` values — not epoch timestamps — to avoid DST bugs
@@ -118,8 +118,8 @@
 | GROUP-04 | Phase 4 | Complete |
 | GROUP-05 | Phase 4 | Complete |
 | CAL-01 | Phase 5 | Complete |
-| CAL-02 | Phase 5 | Pending |
-| CAL-03 | Phase 5 | Pending |
+| CAL-02 | Phase 5 | Complete |
+| CAL-03 | Phase 5 | Complete |
 | CAL-04 | Phase 5 | Complete |
 | CAL-05 | Phase 5 | Complete |
 | CAL-06 | Phase 5 | Complete |

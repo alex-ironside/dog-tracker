@@ -2,14 +2,14 @@
 gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
-status: Ready to execute
-stopped_at: Completed 05-01-PLAN.md
-last_updated: "2026-03-28T16:40:00.630Z"
+status: Phase complete — ready for verification
+stopped_at: Completed 05-02-PLAN.md
+last_updated: "2026-03-28T16:46:20.241Z"
 progress:
   total_phases: 6
-  completed_phases: 4
+  completed_phases: 5
   total_plans: 11
-  completed_plans: 10
+  completed_plans: 11
 ---
 
 # Project State
@@ -51,6 +51,7 @@ Plan: 2 of 2
 | Phase 04-group-builder P01 | 7min | 2 tasks | 9 files |
 | Phase 04-group-builder P02 | 25min | 2 tasks | 4 files |
 | Phase 05-calendar-scheduler P01 | 5min | 2 tasks | 11 files |
+| Phase 05-calendar-scheduler P02 | 4m | 2 tasks | 5 files |
 
 ## Accumulated Context
 
@@ -87,6 +88,9 @@ Recent decisions affecting current work:
 - [Phase 04-group-builder]: D-04 enforced at computation level in computeConflictLines(): only status==='conflict' pairs draw SVG lines; unknown pairs never produce lines
 - [Phase 05-calendar-scheduler]: onDragEnd in CalendarScheduler is a stub — Plan 02 wires occupied-slot guard and store actions
 - [Phase 05-calendar-scheduler]: scheduleGroup does not reject occupied slots — that guard lives in onDragEnd (Plan 02)
+- [Phase 05-calendar-scheduler]: scheduled-group- id prefix on ScheduledGroupCard to avoid collision with sidebar card ids
+- [Phase 05-calendar-scheduler]: compatMap passed down from CalendarScheduler to avoid rebuilding per slot cell
+- [Phase 05-calendar-scheduler]: Zustand setState without replace=true in tests preserves action functions while seeding data
 
 ### Pending Todos
 
@@ -100,6 +104,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-03-28T16:40:00.626Z
-Stopped at: Completed 05-01-PLAN.md
+Last session: 2026-03-28T16:46:20.235Z
+Stopped at: Completed 05-02-PLAN.md
 Resume file: None
