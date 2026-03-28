@@ -1,0 +1,105 @@
+import { ChevronLeft, ChevronRight } from 'lucide-react'
+import { Button } from '@/components/ui/button'
+import { CalendarSlot } from '@/components/CalendarSlot'
+import {
+  getWeekDays,
+  getMondayOfWeek,
+  formatColumnHeader,
+  formatWeekLabel,
+  HOURS,
+} from '@/lib/calendarUtils'
+import type { TimeSlot, WalkSession, WalkGroup } from '@/types'
+
+type WeekCalendarProps = {
+  weekOffset: number
+  onPrevWeek: () => void
+  onNextWeek: () => void
+  sessionMap: Map<string, WalkSession>
+  walkGroups: WalkGroup[]
+}
+
+export function WeekCalendar({ weekOffset, onPrevWeek, onNextWeek, sessionMap, walkGroups }: WeekCalendarProps) {
+  const weekDays = getWeekDays(weekOffset)
+  const monday = getMondayOfWeek(weekOffset)
+
+  return (
+    <div className='flex flex-col flex-1 overflow-hidden'>
+      {/* Week navigation header */}
+      <div className='flex items-center gap-2 px-4 py-2 border-b border-slate-200 bg-white shrink-0'>
+        <Button
+          variant='ghost'
+          size='icon'
+          aria-label='Previous week'
+          onClick={onPrevWeek}
+        >
+          <ChevronLeft className='h-4 w-4' />
+        </Button>
+        <span className='text-sm font-semibold text-slate-700'>
+          {formatWeekLabel(monday)}
+        </span>
+        <Button
+          variant='ghost'
+          size='icon'
+          aria-label='Next week'
+          onClick={onNextWeek}
+        >
+          <ChevronRight className='h-4 w-4' />
+        </Button>
+      </div>
+
+      {/* Scrollable grid */}
+      <div className='overflow-auto flex-1'>
+        <div
+          role='grid'
+          style={{
+            display: 'grid',
+            gridTemplateColumns: '64px repeat(7, 1fr)',
+            gridTemplateRows: '40px repeat(13, 64px)',
+            minWidth: '600px',
+          }}
+        >
+          {/* Corner cell */}
+          <div className='sticky top-0 left-0 z-30 bg-white border-b border-r border-slate-200' />
+
+          {/* Day header cells */}
+          {weekDays.map((date, dayIndex) => (
+            <div
+              key={dayIndex}
+              className='sticky top-0 z-20 bg-slate-50 border-b border-r border-slate-200 flex items-center justify-center text-xs font-semibold text-slate-600'
+            >
+              {formatColumnHeader(date)}
+            </div>
+          ))}
+
+          {/* Hour rows */}
+          {HOURS.map((hour) => (
+            <>
+              {/* Hour label */}
+              <div
+                key={`label-${hour}`}
+                className='sticky left-0 z-10 bg-white border-b border-r border-slate-200 flex items-center justify-center text-xs text-slate-400'
+              >
+                {String(hour).padStart(2, '0')}:00
+              </div>
+
+              {/* Slot cells for this hour */}
+              {weekDays.map((date, dayIndex) => {
+                const dayOfWeek = date.getDay() as TimeSlot['dayOfWeek']
+                return (
+                  <CalendarSlot
+                    key={`${dayIndex}-${hour}`}
+                    dayOfWeek={dayOfWeek}
+                    hour={hour}
+                    minute={0}
+                    sessionMap={sessionMap}
+                    walkGroups={walkGroups}
+                  />
+                )
+              })}
+            </>
+          ))}
+        </div>
+      </div>
+    </div>
+  )
+}

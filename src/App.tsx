@@ -2,9 +2,10 @@ import { useState } from 'react'
 import { DogRoster } from '@/components/DogRoster'
 import { CompatibilityGraph } from '@/components/CompatibilityGraph'
 import { GroupBuilder } from '@/components/GroupBuilder'
+import { CalendarScheduler } from '@/components/CalendarScheduler'
 
 function App() {
-  const [activeTab, setActiveTab] = useState<'dogs' | 'compatibility' | 'groups'>('dogs')
+  const [activeTab, setActiveTab] = useState<'dogs' | 'compatibility' | 'groups' | 'calendar'>('dogs')
 
   return (
     <div className='flex flex-col min-h-screen'>
@@ -34,6 +35,14 @@ function App() {
         >
           Groups
         </button>
+        <button
+          role='tab'
+          aria-selected={activeTab === 'calendar'}
+          onClick={() => setActiveTab('calendar')}
+          className={`px-4 py-2 text-sm font-semibold ${activeTab === 'calendar' ? 'text-slate-900 border-b-2 border-primary' : 'text-slate-500 hover:text-slate-700'}`}
+        >
+          Calendar
+        </button>
       </div>
 
       {/* Tab panels */}
@@ -44,8 +53,10 @@ function App() {
           </div>
         ) : activeTab === 'compatibility' ? (
           <CompatibilityGraph />
-        ) : (
+        ) : activeTab === 'groups' ? (
           <GroupBuilder />
+        ) : (
+          <CalendarScheduler />
         )}
       </div>
     </div>
