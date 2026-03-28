@@ -12,16 +12,26 @@ import { useShallow } from 'zustand/react/shallow'
 import { useAppStore } from '@/store'
 import { GroupSidebar } from '@/components/GroupSidebar'
 import { WeekCalendar } from '@/components/WeekCalendar'
-import { slotKey } from '@/lib/calendarUtils'
+import { slotKey, parseSlotKey } from '@/lib/calendarUtils'
+import { buildCompatMap } from '@/lib/scoring'
 
 export function CalendarScheduler() {
   const [weekOffset, setWeekOffset] = useState(0)
   const [activeDragId, setActiveDragId] = useState<string | null>(null)
 
-  const { walkSessions, walkGroups, scheduleGroup, unscheduleGroup } = useAppStore(
+  const {
+    walkSessions,
+    walkGroups,
+    dogs,
+    compatibilityEntries,
+    scheduleGroup,
+    unscheduleGroup,
+  } = useAppStore(
     useShallow((s) => ({
       walkSessions: s.walkSessions,
       walkGroups: s.walkGroups,
+      dogs: s.dogs,
+      compatibilityEntries: s.compatibilityEntries,
       scheduleGroup: s.scheduleGroup,
       unscheduleGroup: s.unscheduleGroup,
     }))
@@ -42,6 +52,11 @@ export function CalendarScheduler() {
     [walkSessions]
   )
 
+  const compatMap = useMemo(
+    () => buildCompatMap(compatibilityEntries),
+    [compatibilityEntries]
+  )
+
   const activeDragGroup = activeDragId
     ? walkGroups.find((g) => g.id === activeDragId) ?? null
     : null
@@ -51,9 +66,34 @@ export function CalendarScheduler() {
     setActiveDragId(groupId ?? null)
   }
 
-  function handleDragEnd(_event: DragEndEvent) {
-    // STUB: Plan 02 wires the full onDragEnd logic
+  function handleDragEnd(event: DragEndEvent) {
     setActiveDragId(null)
+    const { active, over } = event
+    if (!over) return
+
+    const groupId = active.data.current?.groupId as string
+    const overId = over.id as string
+
+    if (overId === 'group-sidebar') {
+      // Drag back to sidebar = unschedule (D-09)
+      unscheduleGroup(groupId)
+      return
+    }
+
+    // overId is a slot key string
+    const targetSlot = parseSlotKey(overId)
+
+    // D-07: reject if slot is occupied by a DIFFERENT group
+    const existingSession = sessionMap.get(overId)
+    if (existingSession && existingSession.groupId !== groupId) {
+      // Slot occupied by another group — reject drop, no state change
+      return
+    }
+
+    // If dropping on own slot (no-op) or empty slot (schedule/move)
+    if (!existingSession || existingSession.groupId === groupId) {
+      scheduleGroup(groupId, targetSlot)
+    }
   }
 
   return (
@@ -73,12 +113,15 @@ export function CalendarScheduler() {
           onNextWeek={() => setWeekOffset((w) => w + 1)}
           sessionMap={sessionMap}
           walkGroups={walkGroups}
+          dogs={dogs}
+          compatMap={compatMap}
+          onUnschedule={unscheduleGroup}
         />
       </div>
 
       <DragOverlay>
         {activeDragGroup ? (
-          <div className='px-3 py-2 rounded-md bg-white border border-slate-200 text-sm text-slate-900 shadow-lg opacity-70'>
+          <div className='px-3 py-2 rounded-md bg-white shadow-lg opacity-70 text-sm'>
             {activeDragGroup.name} • {activeDragGroup.dogIds.length} dogs
           </div>
         ) : null}

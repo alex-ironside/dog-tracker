@@ -8,7 +8,7 @@ import {
   formatWeekLabel,
   HOURS,
 } from '@/lib/calendarUtils'
-import type { TimeSlot, WalkSession, WalkGroup } from '@/types'
+import type { TimeSlot, WalkSession, WalkGroup, Dog, CompatibilityStatus } from '@/types'
 
 type WeekCalendarProps = {
   weekOffset: number
@@ -16,9 +16,21 @@ type WeekCalendarProps = {
   onNextWeek: () => void
   sessionMap: Map<string, WalkSession>
   walkGroups: WalkGroup[]
+  dogs: Dog[]
+  compatMap: Map<string, CompatibilityStatus>
+  onUnschedule: (groupId: string) => void
 }
 
-export function WeekCalendar({ weekOffset, onPrevWeek, onNextWeek, sessionMap, walkGroups }: WeekCalendarProps) {
+export function WeekCalendar({
+  weekOffset,
+  onPrevWeek,
+  onNextWeek,
+  sessionMap,
+  walkGroups,
+  dogs,
+  compatMap,
+  onUnschedule,
+}: WeekCalendarProps) {
   const weekDays = getWeekDays(weekOffset)
   const monday = getMondayOfWeek(weekOffset)
 
@@ -93,6 +105,9 @@ export function WeekCalendar({ weekOffset, onPrevWeek, onNextWeek, sessionMap, w
                     minute={0}
                     sessionMap={sessionMap}
                     walkGroups={walkGroups}
+                    dogs={dogs}
+                    compatMap={compatMap}
+                    onUnschedule={onUnschedule}
                   />
                 )
               })}
