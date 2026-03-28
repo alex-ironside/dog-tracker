@@ -1,3 +1,4 @@
+import React from 'react'
 import { ChevronLeft, ChevronRight } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { CalendarSlot } from '@/components/CalendarSlot'
@@ -85,10 +86,9 @@ export function WeekCalendar({
 
           {/* Hour rows */}
           {HOURS.map((hour) => (
-            <>
+            <React.Fragment key={`row-${hour}`}>
               {/* Hour label */}
               <div
-                key={`label-${hour}`}
                 className='sticky left-0 z-10 bg-white border-b border-r border-slate-200 flex items-center justify-center text-xs text-slate-400'
               >
                 {String(hour).padStart(2, '0')}:00
@@ -111,7 +111,7 @@ export function WeekCalendar({
                   />
                 )
               })}
-            </>
+            </React.Fragment>
           ))}
         </div>
       </div>
