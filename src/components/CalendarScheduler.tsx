@@ -1,4 +1,5 @@
 import { useState, useMemo } from 'react'
+import { WalkLogSheet } from '@/components/WalkLogSheet'
 import {
   DndContext,
   PointerSensor,
@@ -18,6 +19,12 @@ import { buildCompatMap } from '@/lib/scoring'
 export function CalendarScheduler() {
   const [weekOffset, setWeekOffset] = useState(0)
   const [activeDragId, setActiveDragId] = useState<string | null>(null)
+  const [logSheet, setLogSheet] = useState<{
+    open: boolean
+    dogIds: string[]
+    groupId: string
+    groupName: string
+  }>({ open: false, dogIds: [], groupId: '', groupName: '' })
 
   const {
     walkSessions,
@@ -116,8 +123,19 @@ export function CalendarScheduler() {
           dogs={dogs}
           compatMap={compatMap}
           onUnschedule={unscheduleGroup}
+          onLog={(groupId, dogIds, groupName) =>
+            setLogSheet({ open: true, dogIds, groupId, groupName })
+          }
         />
       </div>
+
+      <WalkLogSheet
+        open={logSheet.open}
+        onOpenChange={(open) => setLogSheet((prev) => ({ ...prev, open }))}
+        title={`Log Walk — ${logSheet.groupName}`}
+        initialDogIds={logSheet.dogIds}
+        initialGroupId={logSheet.groupId}
+      />
 
       <DragOverlay>
         {activeDragGroup ? (

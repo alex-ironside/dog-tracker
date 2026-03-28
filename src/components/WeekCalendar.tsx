@@ -20,6 +20,7 @@ type WeekCalendarProps = {
   dogs: Dog[]
   compatMap: Map<string, CompatibilityStatus>
   onUnschedule: (groupId: string) => void
+  onLog: (groupId: string, dogIds: string[], groupName: string) => void
 }
 
 export function WeekCalendar({
@@ -31,6 +32,7 @@ export function WeekCalendar({
   dogs,
   compatMap,
   onUnschedule,
+  onLog,
 }: WeekCalendarProps) {
   const weekDays = getWeekDays(weekOffset)
   const monday = getMondayOfWeek(weekOffset)
@@ -108,6 +110,7 @@ export function WeekCalendar({
                     dogs={dogs}
                     compatMap={compatMap}
                     onUnschedule={onUnschedule}
+                    onLog={onLog}
                   />
                 )
               })}

@@ -6,12 +6,31 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { useAppStore } from '@/store'
 import { cn } from '@/lib/utils'
-import type { Dog } from '@/types'
+import { WalkHistoryChart } from '@/components/WalkHistoryChart'
+import { WalkLogSheet } from '@/components/WalkLogSheet'
+import type { Dog, WalkOutcome } from '@/types'
 
 type DogPanelProps = {
   open: boolean
   onOpenChange: (open: boolean) => void
   editingDog: Dog | null
+}
+
+const OUTCOME_BADGE: Record<WalkOutcome, { bg: string; text: string; label: string }> = {
+  great:    { bg: 'bg-green-100',  text: 'text-green-700',  label: 'Great' },
+  good:     { bg: 'bg-teal-100',   text: 'text-teal-700',   label: 'Good' },
+  neutral:  { bg: 'bg-slate-100',  text: 'text-slate-600',  label: 'Neutral' },
+  poor:     { bg: 'bg-amber-100',  text: 'text-amber-700',  label: 'Poor' },
+  incident: { bg: 'bg-red-100',    text: 'text-red-700',    label: 'Incident' },
+}
+
+function OutcomeBadge({ outcome }: { outcome: WalkOutcome }) {
+  const badge = OUTCOME_BADGE[outcome]
+  return (
+    <span className={cn('inline-flex px-2 py-0.5 rounded-full text-xs font-semibold', badge.bg, badge.text)}>
+      {badge.label}
+    </span>
+  )
 }
 
 export function DogPanel({ open, onOpenChange, editingDog }: DogPanelProps) {
@@ -20,6 +39,10 @@ export function DogPanel({ open, onOpenChange, editingDog }: DogPanelProps) {
   const [age, setAge] = useState('')
   const [notes, setNotes] = useState('')
   const [nameError, setNameError] = useState(false)
+  const [activeTab, setActiveTab] = useState<'profile' | 'history'>('profile')
+  const [logSheetOpen, setLogSheetOpen] = useState(false)
+
+  const walkHistory = useAppStore((s) => s.walkHistory)
 
   const nameId = useId()
   const breedId = useId()
@@ -41,6 +64,7 @@ export function DogPanel({ open, onOpenChange, editingDog }: DogPanelProps) {
         setNotes('')
       }
       setNameError(false)
+      setActiveTab('profile')
     }
   }, [open, editingDog])
 
@@ -77,6 +101,13 @@ export function DogPanel({ open, onOpenChange, editingDog }: DogPanelProps) {
 
   const title = editingDog ? 'Edit Dog' : 'Add Dog'
 
+  const recentEntries = editingDog
+    ? [...walkHistory]
+        .filter((e) => e.dogIds.includes(editingDog.id))
+        .sort((a, b) => b.date.localeCompare(a.date))
+        .slice(0, 10)
+    : []
+
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
       <SheetContent
@@ -96,95 +127,162 @@ export function DogPanel({ open, onOpenChange, editingDog }: DogPanelProps) {
           </Button>
         </div>
 
-        {/* Form */}
-        <div className="flex-1 overflow-y-auto px-6 py-4">
-          <div className="space-y-4">
-            {/* Name */}
-            <div>
-              <Label htmlFor={nameId} className="text-sm font-medium text-slate-700 leading-normal">
-                Name
-              </Label>
-              <Input
-                id={nameId}
-                placeholder="e.g. Rex"
-                value={name}
-                onChange={(e) => {
-                  setName(e.target.value)
-                  if (nameError && e.target.value.trim()) setNameError(false)
-                }}
-                className={cn(
-                  'mt-1',
-                  nameError && 'border-red-500 focus-visible:ring-red-500'
+        {/* Tab bar — only shown in edit mode */}
+        {editingDog && (
+          <div role="tablist" className="flex border-b border-slate-200 px-6">
+            <button
+              role="tab"
+              aria-selected={activeTab === 'profile'}
+              onClick={() => setActiveTab('profile')}
+              className={`py-2 text-sm font-semibold mr-4 ${
+                activeTab === 'profile'
+                  ? 'text-slate-900 border-b-2 border-primary'
+                  : 'text-slate-500 hover:text-slate-700'
+              }`}
+            >
+              Profile
+            </button>
+            <button
+              role="tab"
+              aria-selected={activeTab === 'history'}
+              onClick={() => setActiveTab('history')}
+              className={`py-2 text-sm font-semibold ${
+                activeTab === 'history'
+                  ? 'text-slate-900 border-b-2 border-primary'
+                  : 'text-slate-500 hover:text-slate-700'
+              }`}
+            >
+              History
+            </button>
+          </div>
+        )}
+
+        {/* Profile form */}
+        {activeTab === 'profile' && (
+          <div className="flex-1 overflow-y-auto px-6 py-4">
+            <div className="space-y-4">
+              {/* Name */}
+              <div>
+                <Label htmlFor={nameId} className="text-sm font-medium text-slate-700 leading-normal">
+                  Name
+                </Label>
+                <Input
+                  id={nameId}
+                  placeholder="e.g. Rex"
+                  value={name}
+                  onChange={(e) => {
+                    setName(e.target.value)
+                    if (nameError && e.target.value.trim()) setNameError(false)
+                  }}
+                  className={cn(
+                    'mt-1',
+                    nameError && 'border-red-500 focus-visible:ring-red-500'
+                  )}
+                />
+                {nameError && (
+                  <p className="text-sm text-red-600 mt-1" role="alert" aria-live="polite">
+                    Name is required.
+                  </p>
                 )}
-              />
-              {nameError && (
-                <p className="text-sm text-red-600 mt-1" role="alert" aria-live="polite">
-                  Name is required.
-                </p>
-              )}
-            </div>
+              </div>
 
-            {/* Breed */}
-            <div>
-              <Label htmlFor={breedId} className="text-sm font-medium text-slate-700 leading-normal">
-                Breed
-              </Label>
-              <Input
-                id={breedId}
-                placeholder="e.g. Labrador"
-                value={breed}
-                onChange={(e) => setBreed(e.target.value)}
-                className="mt-1"
-              />
-            </div>
+              {/* Breed */}
+              <div>
+                <Label htmlFor={breedId} className="text-sm font-medium text-slate-700 leading-normal">
+                  Breed
+                </Label>
+                <Input
+                  id={breedId}
+                  placeholder="e.g. Labrador"
+                  value={breed}
+                  onChange={(e) => setBreed(e.target.value)}
+                  className="mt-1"
+                />
+              </div>
 
-            {/* Age */}
-            <div>
-              <Label htmlFor={ageId} className="text-sm font-medium text-slate-700 leading-normal">
-                Age
-              </Label>
-              <Input
-                id={ageId}
-                type="number"
-                min={0}
-                placeholder="e.g. 3"
-                value={age}
-                onChange={(e) => setAge(e.target.value)}
-                className="mt-1"
-              />
-            </div>
+              {/* Age */}
+              <div>
+                <Label htmlFor={ageId} className="text-sm font-medium text-slate-700 leading-normal">
+                  Age
+                </Label>
+                <Input
+                  id={ageId}
+                  type="number"
+                  min={0}
+                  placeholder="e.g. 3"
+                  value={age}
+                  onChange={(e) => setAge(e.target.value)}
+                  className="mt-1"
+                />
+              </div>
 
-            {/* Notes */}
-            <div>
-              <Label htmlFor={notesId} className="text-sm font-medium text-slate-700 leading-normal">
-                Notes
-              </Label>
-              <textarea
-                id={notesId}
-                rows={3}
-                placeholder="Any notes about this dog..."
-                value={notes}
-                onChange={(e) => setNotes(e.target.value)}
-                className={cn(
-                  'mt-1 flex w-full rounded-md border border-input bg-background px-3 py-2 text-base',
-                  'ring-offset-background placeholder:text-muted-foreground',
-                  'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2',
-                  'disabled:cursor-not-allowed disabled:opacity-50 md:text-sm resize-none'
-                )}
-              />
+              {/* Notes */}
+              <div>
+                <Label htmlFor={notesId} className="text-sm font-medium text-slate-700 leading-normal">
+                  Notes
+                </Label>
+                <textarea
+                  id={notesId}
+                  rows={3}
+                  placeholder="Any notes about this dog..."
+                  value={notes}
+                  onChange={(e) => setNotes(e.target.value)}
+                  className={cn(
+                    'mt-1 flex w-full rounded-md border border-input bg-background px-3 py-2 text-base',
+                    'ring-offset-background placeholder:text-muted-foreground',
+                    'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2',
+                    'disabled:cursor-not-allowed disabled:opacity-50 md:text-sm resize-none'
+                  )}
+                />
+              </div>
             </div>
           </div>
-        </div>
+        )}
 
-        {/* Sticky Footer */}
-        <div className="sticky bottom-0 bg-white border-t border-slate-200 py-4 px-6 flex justify-between">
-          <Button variant="outline" onClick={handleDiscard}>
-            Discard
-          </Button>
-          <Button variant="default" onClick={handleSave}>
-            Save Dog
-          </Button>
-        </div>
+        {/* History tab body */}
+        {activeTab === 'history' && editingDog && (
+          <div className="flex-1 overflow-y-auto px-6 py-4">
+            <WalkHistoryChart dogId={editingDog.id} />
+            <Button
+              variant="default"
+              className="mt-4 w-full"
+              onClick={() => setLogSheetOpen(true)}
+            >
+              Log a walk for {editingDog.name}
+            </Button>
+            <div className="mt-4 space-y-2">
+              {recentEntries.map((entry) => (
+                <div key={entry.id} className="border border-slate-200 rounded-md px-3 py-2 bg-white">
+                  <div className="flex items-center gap-2">
+                    <span className="text-sm text-slate-500">{entry.date}</span>
+                    <OutcomeBadge outcome={entry.outcome} />
+                  </div>
+                  {entry.notes && (
+                    <p className="text-sm text-slate-500 mt-1 line-clamp-2">{entry.notes}</p>
+                  )}
+                </div>
+              ))}
+            </div>
+            <WalkLogSheet
+              open={logSheetOpen}
+              onOpenChange={setLogSheetOpen}
+              title={`Log Walk for ${editingDog.name}`}
+              initialDogIds={[editingDog.id]}
+            />
+          </div>
+        )}
+
+        {/* Sticky Footer — only shown on Profile tab (D-13) */}
+        {activeTab === 'profile' && (
+          <div className="sticky bottom-0 bg-white border-t border-slate-200 py-4 px-6 flex justify-between">
+            <Button variant="outline" onClick={handleDiscard}>
+              Discard
+            </Button>
+            <Button variant="default" onClick={handleSave}>
+              Save Dog
+            </Button>
+          </div>
+        )}
       </SheetContent>
     </Sheet>
   )

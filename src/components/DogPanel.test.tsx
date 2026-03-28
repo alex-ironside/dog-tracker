@@ -5,6 +5,15 @@ import { useAppStore } from '@/store'
 import { DogPanel } from './DogPanel'
 import type { Dog } from '@/types'
 
+// Mock recharts so WalkHistoryChart tests work in jsdom
+vi.mock('recharts', async () => {
+  const actual = await vi.importActual('recharts')
+  return {
+    ...actual,
+    ResponsiveContainer: ({ children }: any) => <div>{children}</div>,
+  }
+})
+
 const sampleDog: Dog = {
   id: 'test-id-1',
   name: 'Rex',
@@ -17,7 +26,7 @@ const sampleDog: Dog = {
 }
 
 beforeEach(() => {
-  useAppStore.setState({ dogs: [], walkGroups: [], compatibilityEntries: [], walkSessions: [] })
+  useAppStore.setState({ dogs: [], walkGroups: [], compatibilityEntries: [], walkSessions: [], walkHistory: [] }, false)
 })
 
 describe('DogPanel - Field rendering', () => {
@@ -95,5 +104,36 @@ describe('DogPanel - Save edit mode', () => {
     expect(updateDog).toHaveBeenCalledWith('test-id-1', expect.objectContaining({
       name: 'Max',
     }))
+  })
+})
+
+describe('DogPanel - History tab', () => {
+  it('renders Profile and History tab buttons when editing a dog', () => {
+    render(<DogPanel open={true} onOpenChange={vi.fn()} editingDog={sampleDog} />)
+    const tabs = screen.getAllByRole('tab')
+    const tabNames = tabs.map((t) => t.textContent)
+    expect(tabNames).toContain('Profile')
+    expect(tabNames).toContain('History')
+  })
+
+  it('defaults to Profile tab (Profile tab has aria-selected=true)', () => {
+    render(<DogPanel open={true} onOpenChange={vi.fn()} editingDog={sampleDog} />)
+    const profileTab = screen.getByRole('tab', { name: /profile/i })
+    expect(profileTab).toHaveAttribute('aria-selected', 'true')
+  })
+
+  it('clicking History tab shows "Log a walk for [name]" button', async () => {
+    const user = userEvent.setup()
+    render(<DogPanel open={true} onOpenChange={vi.fn()} editingDog={sampleDog} />)
+    await user.click(screen.getByRole('tab', { name: /history/i }))
+    expect(screen.getByRole('button', { name: /log a walk for rex/i })).toBeInTheDocument()
+  })
+
+  it('Profile tab footer (Save/Discard) is not visible when History tab is active (D-13)', async () => {
+    const user = userEvent.setup()
+    render(<DogPanel open={true} onOpenChange={vi.fn()} editingDog={sampleDog} />)
+    await user.click(screen.getByRole('tab', { name: /history/i }))
+    expect(screen.queryByRole('button', { name: /save dog/i })).not.toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: /^discard$/i })).not.toBeInTheDocument()
   })
 })

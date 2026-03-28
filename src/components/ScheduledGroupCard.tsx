@@ -7,6 +7,7 @@ type ScheduledGroupCardProps = {
   dogCount: number
   hasConflicts: boolean
   onRemove: () => void
+  onLog: () => void
   dayName: string
   hour: number
 }
@@ -17,6 +18,7 @@ export function ScheduledGroupCard({
   dogCount,
   hasConflicts,
   onRemove,
+  onLog,
   dayName,
   hour,
 }: ScheduledGroupCardProps) {
@@ -40,6 +42,16 @@ export function ScheduledGroupCard({
           <AlertTriangle size={12} className='text-amber-500 ml-1 inline shrink-0' />
         )}
       </span>
+      <button
+        onClick={(e) => {
+          e.stopPropagation()
+          onLog()
+        }}
+        aria-label={`Log walk for ${groupName} at ${dayName} ${hour}:00`}
+        className="text-xs text-slate-500 hover:text-slate-700 shrink-0"
+      >
+        Log
+      </button>
       <button
         onClick={(e) => {
           e.stopPropagation()

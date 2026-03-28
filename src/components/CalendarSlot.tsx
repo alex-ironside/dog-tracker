@@ -15,6 +15,7 @@ type CalendarSlotProps = {
   dogs: Dog[]
   compatMap: Map<string, CompatibilityStatus>
   onUnschedule: (groupId: string) => void
+  onLog: (groupId: string, dogIds: string[], groupName: string) => void
 }
 
 export function CalendarSlot({
@@ -26,6 +27,7 @@ export function CalendarSlot({
   dogs,
   compatMap,
   onUnschedule,
+  onLog,
 }: CalendarSlotProps) {
   const slotKeyStr = slotKey({ dayOfWeek, hour, minute })
   const { setNodeRef, isOver } = useDroppable({ id: slotKeyStr })
@@ -63,6 +65,7 @@ export function CalendarSlot({
           dogCount={group.dogIds.length}
           hasConflicts={hasConflicts}
           onRemove={() => onUnschedule(session.groupId)}
+          onLog={() => onLog(session.groupId, group.dogIds, group.name)}
           dayName={dayName}
           hour={hour}
         />
