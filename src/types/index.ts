@@ -35,10 +35,22 @@ export type WalkSession = {
   slot: TimeSlot
 }
 
+export type WalkOutcome = 'great' | 'good' | 'neutral' | 'poor' | 'incident'
+
+export type WalkLogEntry = {
+  id: string
+  date: string
+  outcome: WalkOutcome
+  notes: string
+  dogIds: string[]
+  groupId?: string
+}
+
 export type AppState = {
   schemaVersion: number
   dogs: Dog[]
   walkGroups: WalkGroup[]
   compatibilityEntries: CompatibilityEntry[]
   walkSessions: WalkSession[]
+  walkHistory: WalkLogEntry[]
 }
