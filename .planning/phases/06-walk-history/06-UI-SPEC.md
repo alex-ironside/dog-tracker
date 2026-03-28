@@ -58,11 +58,11 @@ All sizes from existing codebase patterns (DogPanel.tsx, EdgeSheet.tsx, App.tsx)
 | Role | Size | Weight | Line Height | Usage |
 |------|------|--------|-------------|-------|
 | Body | 14px (text-sm) | 400 (regular) | 1.5 | Log entry list text, form field values, dog name lists, chart tooltip content |
-| Label | 14px (text-sm) | 500 (medium) | normal | Form labels (`font-medium text-slate-700`), section headings inside Sheet body |
+| Label | 14px (text-sm) | 400 (regular) | normal | Form labels, section headings inside Sheet body |
 | Heading | 18px (text-lg) | 600 (semibold) | normal | Sheet titles (SheetTitle), panel headers (`text-lg font-semibold text-slate-900`) |
 | Display | 12px (text-xs) | 600 (semibold) | normal | Outcome badge labels, dog count in ScheduledGroupCard, tab bar labels |
 
-Only 2 weights in use: regular (400) and semibold (600). `font-medium` (500) on labels is a Tailwind convenience that maps to the `--foreground` label style — acceptable as a Label-only exception. Heading and Display use `font-semibold` (600).
+Only 2 weights declared: regular (400) and semibold (600). Labels are differentiated from body text by color (`text-slate-700`) and size context, not weight. `font-medium` (500) is not declared as a design contract weight — implementation may use it as a Tailwind convenience class but it does not constitute a third weight in this contract.
 
 ---
 
@@ -139,7 +139,7 @@ SheetContent side="right" className="w-full max-w-md p-0 flex flex-col overflow-
 ├── Body: flex-1 overflow-y-auto px-6 py-4
 │   └── [form fields, space-y-4]
 └── Footer (WalkLogSheet only): sticky bottom-0 bg-white border-t border-slate-200 py-4 px-6
-    ├── Left: Button variant="outline" — "Cancel"
+    ├── Left: Button variant="outline" — "Discard"
     └── Right: Button variant="default" — "Save Walk Log"
 ```
 
@@ -252,7 +252,7 @@ Log entry row: `border border-slate-200 rounded-md px-4 py-3 bg-white` containin
 | Primary CTA — DogPanel History tab | "Log a walk for [dog name]" | D-04 |
 | Primary CTA — CalendarSlot | "Log" | D-02 (compact, fits card) |
 | Sheet save button | "Save Walk Log" | Consistent with "Save Dog" pattern in DogPanel |
-| Sheet cancel button | "Cancel" | Standard; no pending changes at cancel risk (immutable after save) |
+| Sheet cancel button | "Discard" | Consistent with DogPanel footer vocabulary (D-13); per D-13 the Profile tab footer uses Save / Discard |
 | History tab heading | "Walk History" | Tab label + section heading |
 | Empty state heading (History tab — no entries) | "No walks logged yet" | Direct, actionable |
 | Empty state body (History tab) | "Log your first walk to start tracking outcomes." | Tells user the next step |
