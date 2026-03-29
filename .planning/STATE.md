@@ -114,9 +114,10 @@ None yet.
 | # | Description | Date | Commit | Status | Directory |
 |---|-------------|------|--------|--------|-----------|
 | 260329-obb | fix graph relations from history, fix compatibility score bug, add per-dog relation in history view, remove duplicate close button in drawer | 2026-03-29 | 8229989 | Verified | [260329-obb-fix-graph-relations-from-history-fix-com](./quick/260329-obb-fix-graph-relations-from-history-fix-com/) |
+| 260329-ow7 | fix graph node label overflow (canvas replace mode + pill), add per-dog-pair outcome logging and display | 2026-03-29 | 8097c79 | Done | [260329-ow7-fix-graph-node-label-overflow-and-add-pe](./quick/260329-ow7-fix-graph-node-label-overflow-and-add-pe/) |
 
 ## Session Continuity
 
-Last session: 2026-03-29T15:30:22.647Z
-Stopped at: Completed quick task 260329-obb: fix graph relations from history, fix compatibility score bug, add per-dog relation in history view, remove duplicate close button in drawer
+Last session: 2026-03-29T16:01:58Z
+Stopped at: Completed quick task 260329-ow7: fix graph node label overflow and add per-pair walk outcomes
 Resume file: None
