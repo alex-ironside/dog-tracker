@@ -37,6 +37,11 @@ export type WalkSession = {
 
 export type WalkOutcome = 'great' | 'good' | 'neutral' | 'poor' | 'incident'
 
+export type GroupContext = {
+  groupA: string[]  // dog IDs in group A
+  groupB: string[]  // dog IDs in group B
+}
+
 export type WalkLogEntry = {
   id: string
   date: string
@@ -45,6 +50,7 @@ export type WalkLogEntry = {
   dogIds: string[]
   groupId?: string
   pairOutcomes?: Record<string, WalkOutcome>  // key = pairKey(idA, idB), value = outcome for that pair
+  groupContext?: GroupContext  // only present when user used group mode
 }
 
 export type AppState = {

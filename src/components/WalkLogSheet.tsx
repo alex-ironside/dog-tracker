@@ -24,6 +24,9 @@ const OUTCOME_OPTIONS: { value: WalkOutcome; label: string; textColor: string }[
   { value: 'incident', label: 'Incident', textColor: 'text-red-700' },
 ]
 
+type GroupMode = 'together' | 'groups'
+type GroupAssignment = 'A' | 'B' | null
+
 export function WalkLogSheet({
   open,
   onOpenChange,
@@ -42,10 +45,14 @@ export function WalkLogSheet({
   const [selectedDogIds, setSelectedDogIds] = useState<string[]>(initialDogIds ?? [])
   const [notes, setNotes] = useState('')
   const [pairOutcomes, setPairOutcomes] = useState<Record<string, WalkOutcome>>({})
+  const [groupMode, setGroupMode] = useState<GroupMode>('together')
+  // Map of dogId -> 'A' | 'B' | null
+  const [groupAssignments, setGroupAssignments] = useState<Record<string, GroupAssignment>>({})
 
   const [outcomeError, setOutcomeError] = useState(false)
   const [dogsError, setDogsError] = useState(false)
   const [dateError, setDateError] = useState(false)
+  const [groupError, setGroupError] = useState<string | null>(null)
 
   // Reset form when sheet opens
   useEffect(() => {
@@ -55,27 +62,47 @@ export function WalkLogSheet({
       setSelectedDogIds(initialDogIds ?? [])
       setNotes('')
       setPairOutcomes({})
+      setGroupMode('together')
+      setGroupAssignments({})
       setOutcomeError(false)
       setDogsError(false)
       setDateError(false)
+      setGroupError(null)
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [open])
 
+  // Derived group lists from assignments
+  const groupA = useMemo(
+    () => activeDogs.filter((d) => groupAssignments[d.id] === 'A').map((d) => d.id),
+    [activeDogs, groupAssignments]
+  )
+  const groupB = useMemo(
+    () => activeDogs.filter((d) => groupAssignments[d.id] === 'B').map((d) => d.id),
+    [activeDogs, groupAssignments]
+  )
+
+  // In group mode, selectedDogIds = union of A + B
+  const effectiveSelectedDogIds = useMemo(() => {
+    if (groupMode === 'groups') return [...groupA, ...groupB]
+    return selectedDogIds
+  }, [groupMode, groupA, groupB, selectedDogIds])
+
   // Compute all pairs from selected dogs
   const dogPairs = useMemo(() => {
     const pairs: { idA: string; idB: string; nameA: string; nameB: string; key: string }[] = []
-    for (let i = 0; i < selectedDogIds.length; i++) {
-      for (let j = i + 1; j < selectedDogIds.length; j++) {
-        const idA = selectedDogIds[i]
-        const idB = selectedDogIds[j]
+    const ids = effectiveSelectedDogIds
+    for (let i = 0; i < ids.length; i++) {
+      for (let j = i + 1; j < ids.length; j++) {
+        const idA = ids[i]
+        const idB = ids[j]
         const nameA = dogs.find((d) => d.id === idA)?.name ?? 'Unknown'
         const nameB = dogs.find((d) => d.id === idB)?.name ?? 'Unknown'
         pairs.push({ idA, idB, nameA, nameB, key: pairKey(idA, idB) })
       }
     }
     return pairs
-  }, [selectedDogIds, dogs])
+  }, [effectiveSelectedDogIds, dogs])
 
   // All pairs have explicit pairOutcome → walk-level outcome is optional
   const allPairsCovered =
@@ -86,6 +113,21 @@ export function WalkLogSheet({
       prev.includes(dogId) ? prev.filter((id) => id !== dogId) : [...prev, dogId]
     )
     if (dogsError) setDogsError(false)
+  }
+
+  function handleGroupAssign(dogId: string, group: 'A' | 'B') {
+    setGroupAssignments((prev) => {
+      const current = prev[dogId]
+      // Toggle off if same group selected
+      if (current === group) {
+        const next = { ...prev }
+        delete next[dogId]
+        return next
+      }
+      return { ...prev, [dogId]: group }
+    })
+    if (dogsError) setDogsError(false)
+    if (groupError) setGroupError(null)
   }
 
   function handleSave() {
@@ -106,11 +148,33 @@ export function WalkLogSheet({
       setOutcomeError(false)
     }
 
-    if (selectedDogIds.length === 0) {
-      setDogsError(true)
-      valid = false
+    if (groupMode === 'together') {
+      if (selectedDogIds.length === 0) {
+        setDogsError(true)
+        valid = false
+      } else {
+        setDogsError(false)
+      }
     } else {
-      setDogsError(false)
+      // In group mode, both groups must have at least 1 dog
+      if (groupA.length === 0 || groupB.length === 0) {
+        setGroupError(
+          groupA.length === 0 && groupB.length === 0
+            ? 'Assign at least one dog to each group.'
+            : groupA.length === 0
+            ? 'Group A must have at least one dog.'
+            : 'Group B must have at least one dog.'
+        )
+        valid = false
+      } else {
+        setGroupError(null)
+      }
+      if (groupA.length + groupB.length === 0) {
+        setDogsError(true)
+        valid = false
+      } else {
+        setDogsError(false)
+      }
     }
 
     if (!valid) return
@@ -119,13 +183,17 @@ export function WalkLogSheet({
     const resolvedOutcome = outcome ?? 'neutral'
     const pairOutcomesPayload = Object.keys(pairOutcomes).length > 0 ? pairOutcomes : undefined
 
+    const groupContextPayload =
+      groupMode === 'groups' ? { groupA, groupB } : undefined
+
     useAppStore.getState().addWalkLog({
       date,
       outcome: resolvedOutcome,
       notes,
-      dogIds: selectedDogIds,
+      dogIds: effectiveSelectedDogIds,
       groupId: initialGroupId,
       pairOutcomes: pairOutcomesPayload,
+      groupContext: groupContextPayload,
     })
 
     onOpenChange(false)
@@ -212,29 +280,126 @@ export function WalkLogSheet({
 
             {/* Dogs present */}
             <div>
-              <label className="text-sm font-medium text-slate-700 leading-normal block mb-1">
-                Dogs present
-              </label>
-              <div className="max-h-48 overflow-y-auto border border-input rounded-md px-3 py-2">
-                {activeDogs.length === 0 ? (
-                  <p className="text-sm text-slate-400">No active dogs</p>
-                ) : (
-                  activeDogs.map((dog) => (
-                    <label key={dog.id} className="flex items-center gap-2 py-1 cursor-pointer">
-                      <input
-                        type="checkbox"
-                        checked={selectedDogIds.includes(dog.id)}
-                        onChange={() => handleDogToggle(dog.id)}
-                      />
-                      <span className="text-sm text-slate-700">{dog.name}</span>
-                    </label>
-                  ))
-                )}
+              <div className="flex items-center justify-between mb-2">
+                <label className="text-sm font-medium text-slate-700 leading-normal">
+                  Dogs present
+                </label>
+                {/* Group mode toggle */}
+                <div className="flex rounded-md border border-slate-200 overflow-hidden text-xs">
+                  <button
+                    type="button"
+                    className={cn(
+                      'px-3 py-1 font-medium transition-colors',
+                      groupMode === 'together'
+                        ? 'bg-slate-800 text-white'
+                        : 'bg-white text-slate-600 hover:bg-slate-50'
+                    )}
+                    onClick={() => setGroupMode('together')}
+                  >
+                    All together
+                  </button>
+                  <button
+                    type="button"
+                    className={cn(
+                      'px-3 py-1 font-medium border-l border-slate-200 transition-colors',
+                      groupMode === 'groups'
+                        ? 'bg-slate-800 text-white'
+                        : 'bg-white text-slate-600 hover:bg-slate-50'
+                    )}
+                    onClick={() => setGroupMode('groups')}
+                  >
+                    Two groups
+                  </button>
+                </div>
               </div>
-              {dogsError && (
-                <p className="text-sm text-red-600 mt-1" role="alert">
-                  Select at least one dog.
-                </p>
+
+              {groupMode === 'together' ? (
+                <>
+                  <div className="max-h-48 overflow-y-auto border border-input rounded-md px-3 py-2">
+                    {activeDogs.length === 0 ? (
+                      <p className="text-sm text-slate-400">No active dogs</p>
+                    ) : (
+                      activeDogs.map((dog) => (
+                        <label key={dog.id} className="flex items-center gap-2 py-1 cursor-pointer">
+                          <input
+                            type="checkbox"
+                            checked={selectedDogIds.includes(dog.id)}
+                            onChange={() => handleDogToggle(dog.id)}
+                          />
+                          <span className="text-sm text-slate-700">{dog.name}</span>
+                        </label>
+                      ))
+                    )}
+                  </div>
+                  {dogsError && (
+                    <p className="text-sm text-red-600 mt-1" role="alert">
+                      Select at least one dog.
+                    </p>
+                  )}
+                </>
+              ) : (
+                <>
+                  {activeDogs.length === 0 ? (
+                    <p className="text-sm text-slate-400">No active dogs</p>
+                  ) : (
+                    <div className="border border-input rounded-md overflow-hidden">
+                      {/* Column headers */}
+                      <div className="grid grid-cols-3 text-xs font-semibold border-b border-slate-200">
+                        <div className="px-3 py-1.5 text-slate-500">Dog</div>
+                        <div className="px-3 py-1.5 bg-blue-50 text-blue-700 text-center">Group A</div>
+                        <div className="px-3 py-1.5 bg-amber-50 text-amber-700 text-center">Group B</div>
+                      </div>
+                      <div className="max-h-48 overflow-y-auto">
+                        {activeDogs.map((dog) => {
+                          const assignment = groupAssignments[dog.id] ?? null
+                          return (
+                            <div
+                              key={dog.id}
+                              className="grid grid-cols-3 items-center border-b border-slate-100 last:border-b-0"
+                            >
+                              <span className="px-3 py-1.5 text-sm text-slate-700 truncate">
+                                {dog.name}
+                              </span>
+                              <div className="flex justify-center py-1">
+                                <button
+                                  type="button"
+                                  onClick={() => handleGroupAssign(dog.id, 'A')}
+                                  className={cn(
+                                    'w-7 h-7 rounded-full text-xs font-bold transition-colors',
+                                    assignment === 'A'
+                                      ? 'bg-blue-500 text-white'
+                                      : 'bg-blue-50 text-blue-400 hover:bg-blue-100'
+                                  )}
+                                >
+                                  A
+                                </button>
+                              </div>
+                              <div className="flex justify-center py-1">
+                                <button
+                                  type="button"
+                                  onClick={() => handleGroupAssign(dog.id, 'B')}
+                                  className={cn(
+                                    'w-7 h-7 rounded-full text-xs font-bold transition-colors',
+                                    assignment === 'B'
+                                      ? 'bg-amber-500 text-white'
+                                      : 'bg-amber-50 text-amber-400 hover:bg-amber-100'
+                                  )}
+                                >
+                                  B
+                                </button>
+                              </div>
+                            </div>
+                          )
+                        })}
+                      </div>
+                    </div>
+                  )}
+                  {groupError && (
+                    <p className="text-sm text-red-600 mt-1" role="alert">
+                      {groupError}
+                    </p>
+                  )}
+                </>
               )}
             </div>
 
