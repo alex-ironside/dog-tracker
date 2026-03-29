@@ -42,12 +42,15 @@ export function inferStatusFromHistory(
     (e) => e.dogIds.includes(dogIdA) && e.dogIds.includes(dogIdB)
   )
   if (pairWalks.length === 0) return null
-  if (pairWalks.some((e) => e.outcome === 'incident')) return 'conflict'
-  if (pairWalks.some((e) => e.outcome === 'poor')) return 'neutral'
-  const goodCount = pairWalks.filter(
-    (e) => e.outcome === 'great' || e.outcome === 'good'
-  ).length
-  return goodCount / pairWalks.length >= 0.5 ? 'compatible' : 'neutral'
+
+  // Resolve per-walk outcome: use pairOutcomes[pairKey] if available, else walk-level outcome
+  const key = pairKey(dogIdA, dogIdB)
+  const resolvedOutcomes = pairWalks.map((e) => e.pairOutcomes?.[key] ?? e.outcome)
+
+  if (resolvedOutcomes.some((o) => o === 'incident')) return 'conflict'
+  if (resolvedOutcomes.some((o) => o === 'poor')) return 'neutral'
+  const goodCount = resolvedOutcomes.filter((o) => o === 'great' || o === 'good').length
+  return goodCount / resolvedOutcomes.length >= 0.5 ? 'compatible' : 'neutral'
 }
 
 export function getConflictsInGroup(dogIds: string[], compatMap: Map<string, CompatibilityStatus>): ConflictingPair[] {

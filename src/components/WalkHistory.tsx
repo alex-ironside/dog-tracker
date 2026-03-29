@@ -63,15 +63,31 @@ function WalkLogEntryRow({
       )}
       {pairs.length > 0 && (
         <div className="mt-2 flex flex-wrap gap-1">
-          {pairs.map(({ idA, idB, nameA, nameB, status }) => (
-            <button
-              key={`${idA}-${idB}`}
-              onClick={() => onPairClick(idA, idB, nameA, nameB, status)}
-              className="text-xs rounded px-2 py-0.5 border border-slate-200 hover:border-slate-400 bg-slate-50 hover:bg-slate-100 text-slate-700"
-            >
-              {nameA} &amp; {nameB}
-            </button>
-          ))}
+          {pairs.map(({ idA, idB, nameA, nameB, status }) => {
+            const pk = pairKey(idA, idB)
+            const pairSpecificOutcome = entry.pairOutcomes?.[pk]
+            const showBadge = pairSpecificOutcome !== undefined && pairSpecificOutcome !== entry.outcome
+            return (
+              <button
+                key={`${idA}-${idB}`}
+                onClick={() => onPairClick(idA, idB, nameA, nameB, status)}
+                className="inline-flex items-center gap-1 text-xs rounded px-2 py-0.5 border border-slate-200 hover:border-slate-400 bg-slate-50 hover:bg-slate-100 text-slate-700"
+              >
+                {nameA} &amp; {nameB}
+                {showBadge && (
+                  <span
+                    className={cn(
+                      'inline-flex px-1.5 py-px rounded-full text-xs font-semibold leading-tight',
+                      OUTCOME_BADGE[pairSpecificOutcome].bg,
+                      OUTCOME_BADGE[pairSpecificOutcome].text
+                    )}
+                  >
+                    {OUTCOME_BADGE[pairSpecificOutcome].label}
+                  </span>
+                )}
+              </button>
+            )
+          })}
         </div>
       )}
     </div>
