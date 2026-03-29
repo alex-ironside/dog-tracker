@@ -9,8 +9,8 @@ import App from '@/App'
 let capturedOnLinkClick: ((link: unknown) => void) | undefined
 let capturedOnNodeClick: ((node: unknown) => void) | undefined
 
-vi.mock('react-force-graph', () => ({
-  ForceGraph2D: (props: Record<string, unknown>) => {
+vi.mock('react-force-graph-2d', () => ({
+  default: (props: Record<string, unknown>) => {
     capturedOnLinkClick = props.onLinkClick as typeof capturedOnLinkClick
     capturedOnNodeClick = props.onNodeClick as typeof capturedOnNodeClick
     return (
@@ -69,7 +69,7 @@ const entry2: CompatibilityEntry = {
 }
 
 beforeEach(() => {
-  useAppStore.setState({ dogs: [], walkGroups: [], compatibilityEntries: [], walkSessions: [] })
+  useAppStore.setState({ dogs: [], walkGroups: [], compatibilityEntries: [], walkSessions: [], walkHistory: [] })
   capturedOnLinkClick = undefined
   capturedOnNodeClick = undefined
 })

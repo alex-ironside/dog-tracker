@@ -1,4 +1,4 @@
-import type { CompatibilityStatus, CompatibilityEntry } from '@/types'
+import type { CompatibilityStatus, CompatibilityEntry, WalkLogEntry } from '@/types'
 
 export type ConflictingPair = { idA: string; idB: string; status: 'conflict' | 'unknown' }
 
@@ -31,6 +31,23 @@ export function scoreGroup(dogIds: string[], compatMap: Map<string, Compatibilit
   }
 
   return Math.round((sum / totalPairs) * 100)
+}
+
+export function inferStatusFromHistory(
+  dogIdA: string,
+  dogIdB: string,
+  walkHistory: WalkLogEntry[]
+): CompatibilityStatus | null {
+  const pairWalks = walkHistory.filter(
+    (e) => e.dogIds.includes(dogIdA) && e.dogIds.includes(dogIdB)
+  )
+  if (pairWalks.length === 0) return null
+  if (pairWalks.some((e) => e.outcome === 'incident')) return 'conflict'
+  if (pairWalks.some((e) => e.outcome === 'poor')) return 'neutral'
+  const goodCount = pairWalks.filter(
+    (e) => e.outcome === 'great' || e.outcome === 'good'
+  ).length
+  return goodCount / pairWalks.length >= 0.5 ? 'compatible' : 'neutral'
 }
 
 export function getConflictsInGroup(dogIds: string[], compatMap: Map<string, CompatibilityStatus>): ConflictingPair[] {

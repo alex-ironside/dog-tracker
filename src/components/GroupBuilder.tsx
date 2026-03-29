@@ -15,7 +15,7 @@ import { RosterRow } from '@/components/RosterRow'
 import { GroupPanel } from '@/components/GroupPanel'
 import { EdgeSheet } from '@/components/EdgeSheet'
 import { useAppStore } from '@/store'
-import { scoreGroup, getConflictsInGroup, buildCompatMap, pairKey } from '@/lib/scoring'
+import { scoreGroup, getConflictsInGroup, buildCompatMap, pairKey, inferStatusFromHistory } from '@/lib/scoring'
 
 function RosterPanel() {
   const { setNodeRef, isOver } = useDroppable({ id: 'roster' })
@@ -60,11 +60,12 @@ type EdgeSheetState = {
 }
 
 export function GroupBuilder() {
-  const { dogs, walkGroups, compatibilityEntries, addGroup, renameGroup, deleteGroup, addDogToGroup, removeDogFromGroup, setCompatibility, removeCompatibility } = useAppStore(
+  const { dogs, walkGroups, compatibilityEntries, walkHistory, addGroup, renameGroup, deleteGroup, addDogToGroup, removeDogFromGroup, setCompatibility, removeCompatibility } = useAppStore(
     useShallow((s) => ({
       dogs: s.dogs,
       walkGroups: s.walkGroups,
       compatibilityEntries: s.compatibilityEntries,
+      walkHistory: s.walkHistory,
       addGroup: s.addGroup,
       renameGroup: s.renameGroup,
       deleteGroup: s.deleteGroup,
@@ -117,7 +118,20 @@ export function GroupBuilder() {
     }
   }
 
-  const compatMap = useMemo(() => buildCompatMap(compatibilityEntries), [compatibilityEntries])
+  const compatMap = useMemo(() => {
+    const map = buildCompatMap(compatibilityEntries)
+    const activeDogIds = dogs.filter((d) => !d.archived).map((d) => d.id)
+    for (let i = 0; i < activeDogIds.length; i++) {
+      for (let j = i + 1; j < activeDogIds.length; j++) {
+        const key = pairKey(activeDogIds[i], activeDogIds[j])
+        if (!map.has(key)) {
+          const inferred = inferStatusFromHistory(activeDogIds[i], activeDogIds[j], walkHistory)
+          if (inferred) map.set(key, inferred)
+        }
+      }
+    }
+    return map
+  }, [compatibilityEntries, dogs, walkHistory])
 
   return (
     <>
