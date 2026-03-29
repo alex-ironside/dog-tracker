@@ -150,7 +150,6 @@ export function CompatibilityGraph() {
         graphData={graphData}
         width={dimensions.width}
         height={dimensions.height}
-        nodeRelSize={6}
         d3VelocityDecay={0.4}
         cooldownTicks={100}
         linkColor={(link) => STATUS_COLOR[(link as GraphLink).status]}
@@ -161,14 +160,65 @@ export function CompatibilityGraph() {
           return l.status === 'unknown' ? [5, 5] : []
         }}
         nodeCanvasObject={(node, ctx, globalScale) => {
+          const x = node.x ?? 0
+          const y = node.y ?? 0
+          const radius = 6
+
+          // Draw node circle
+          ctx.beginPath()
+          ctx.arc(x, y, radius, 0, Math.PI * 2)
+          ctx.fillStyle = '#3b82f6'
+          ctx.fill()
+          ctx.strokeStyle = '#ffffff'
+          ctx.lineWidth = 1.5
+          ctx.stroke()
+
+          // Draw label with background pill below circle
           const label = (node as GraphNode).name
-          const fontSize = 14 / globalScale
+          const fontSize = Math.max(10, 14 / globalScale)
           ctx.font = `${fontSize}px sans-serif`
+          const textWidth = ctx.measureText(label).width
+          const paddingH = 2
+          const paddingV = 1
+          const pillWidth = textWidth + paddingH * 2
+          const pillHeight = fontSize + paddingV * 2
+          const labelY = y + radius + 4 / globalScale + fontSize / 2
+
+          // Background pill
+          const pillX = x - pillWidth / 2
+          const pillY = labelY - fontSize / 2 - paddingV
+          ctx.globalAlpha = 0.7
+          ctx.fillStyle = '#ffffff'
+          const r = 3
+          ctx.beginPath()
+          ctx.moveTo(pillX + r, pillY)
+          ctx.lineTo(pillX + pillWidth - r, pillY)
+          ctx.quadraticCurveTo(pillX + pillWidth, pillY, pillX + pillWidth, pillY + r)
+          ctx.lineTo(pillX + pillWidth, pillY + pillHeight - r)
+          ctx.quadraticCurveTo(pillX + pillWidth, pillY + pillHeight, pillX + pillWidth - r, pillY + pillHeight)
+          ctx.lineTo(pillX + r, pillY + pillHeight)
+          ctx.quadraticCurveTo(pillX, pillY + pillHeight, pillX, pillY + pillHeight - r)
+          ctx.lineTo(pillX, pillY + r)
+          ctx.quadraticCurveTo(pillX, pillY, pillX + r, pillY)
+          ctx.closePath()
+          ctx.fill()
+          ctx.globalAlpha = 1
+
+          // Label text
           ctx.fillStyle = '#1e293b'
           ctx.textAlign = 'center'
-          ctx.fillText(label, node.x ?? 0, (node.y ?? 0) + 8 / globalScale)
+          ctx.textBaseline = 'middle'
+          ctx.fillText(label, x, labelY)
         }}
-        nodeCanvasObjectMode={() => 'after'}
+        nodeCanvasObjectMode={() => 'replace'}
+        nodePointerAreaPaint={(node, color, ctx) => {
+          const x = node.x ?? 0
+          const y = node.y ?? 0
+          ctx.fillStyle = color
+          ctx.beginPath()
+          ctx.arc(x, y, 6, 0, Math.PI * 2)
+          ctx.fill()
+        }}
         onLinkClick={handleLinkClick}
         onNodeClick={handleNodeClick}
       />
