@@ -1,9 +1,11 @@
-import { useState } from 'react'
+import { useState, useMemo } from 'react'
 import { useAppStore } from '@/store'
 import { Button } from '@/components/ui/button'
 import { WalkLogSheet } from '@/components/WalkLogSheet'
+import { EdgeSheet } from '@/components/EdgeSheet'
+import { buildCompatMap, pairKey } from '@/lib/scoring'
 import { cn } from '@/lib/utils'
-import type { WalkLogEntry, WalkOutcome } from '@/types'
+import type { WalkLogEntry, WalkOutcome, Dog, CompatibilityStatus } from '@/types'
 
 const OUTCOME_BADGE: Record<WalkOutcome, { bg: string; text: string; label: string }> = {
   great:    { bg: 'bg-green-100',  text: 'text-green-700',  label: 'Great' },
@@ -22,15 +24,32 @@ function OutcomeBadge({ outcome }: { outcome: WalkOutcome }) {
   )
 }
 
-function WalkLogEntryRow({ entry }: { entry: WalkLogEntry }) {
-  const dogs = useAppStore((s) => s.dogs)
-
+function WalkLogEntryRow({
+  entry,
+  dogs,
+  compatMap,
+  onPairClick,
+}: {
+  entry: WalkLogEntry
+  dogs: Dog[]
+  compatMap: Map<string, CompatibilityStatus>
+  onPairClick: (idA: string, idB: string, nameA: string, nameB: string, status: CompatibilityStatus) => void
+}) {
   const dogNames = entry.dogIds
-    .map((id) => {
-      const dog = dogs.find((d) => d.id === id)
-      return dog ? dog.name : 'Unknown'
-    })
+    .map((id) => dogs.find((d) => d.id === id)?.name ?? 'Unknown')
     .join(', ')
+
+  const pairs: { idA: string; idB: string; nameA: string; nameB: string; status: CompatibilityStatus }[] = []
+  for (let i = 0; i < entry.dogIds.length; i++) {
+    for (let j = i + 1; j < entry.dogIds.length; j++) {
+      const idA = entry.dogIds[i]
+      const idB = entry.dogIds[j]
+      const nameA = dogs.find((d) => d.id === idA)?.name ?? 'Unknown'
+      const nameB = dogs.find((d) => d.id === idB)?.name ?? 'Unknown'
+      const status = compatMap.get(pairKey(idA, idB)) ?? 'unknown'
+      pairs.push({ idA, idB, nameA, nameB, status })
+    }
+  }
 
   return (
     <div className="border border-slate-200 rounded-md px-4 py-3 bg-white">
@@ -42,15 +61,38 @@ function WalkLogEntryRow({ entry }: { entry: WalkLogEntry }) {
       {entry.notes && (
         <p className="text-sm text-slate-500 mt-1 line-clamp-2">{entry.notes}</p>
       )}
+      {pairs.length > 0 && (
+        <div className="mt-2 flex flex-wrap gap-1">
+          {pairs.map(({ idA, idB, nameA, nameB, status }) => (
+            <button
+              key={`${idA}-${idB}`}
+              onClick={() => onPairClick(idA, idB, nameA, nameB, status)}
+              className="text-xs rounded px-2 py-0.5 border border-slate-200 hover:border-slate-400 bg-slate-50 hover:bg-slate-100 text-slate-700"
+            >
+              {nameA} &amp; {nameB}
+            </button>
+          ))}
+        </div>
+      )}
     </div>
   )
 }
 
 export function WalkHistory() {
   const walkHistory = useAppStore((s) => s.walkHistory)
+  const dogs = useAppStore((s) => s.dogs)
+  const compatibilityEntries = useAppStore((s) => s.compatibilityEntries)
   const [sheetOpen, setSheetOpen] = useState(false)
+  const [edgeSheet, setEdgeSheet] = useState<{
+    open: boolean; idA: string; idB: string; nameA: string; nameB: string; status: CompatibilityStatus
+  }>({ open: false, idA: '', idB: '', nameA: '', nameB: '', status: 'unknown' })
 
+  const compatMap = useMemo(() => buildCompatMap(compatibilityEntries), [compatibilityEntries])
   const sortedEntries = [...walkHistory].sort((a, b) => b.date.localeCompare(a.date))
+
+  function handlePairClick(idA: string, idB: string, nameA: string, nameB: string, status: CompatibilityStatus) {
+    setEdgeSheet({ open: true, idA, idB, nameA, nameB, status })
+  }
 
   return (
     <div className="px-4 py-6 md:px-8 md:py-8">
@@ -71,12 +113,34 @@ export function WalkHistory() {
       ) : (
         <div className="space-y-3">
           {sortedEntries.map((entry) => (
-            <WalkLogEntryRow key={entry.id} entry={entry} />
+            <WalkLogEntryRow
+              key={entry.id}
+              entry={entry}
+              dogs={dogs}
+              compatMap={compatMap}
+              onPairClick={handlePairClick}
+            />
           ))}
         </div>
       )}
 
       <WalkLogSheet open={sheetOpen} onOpenChange={setSheetOpen} />
+
+      <EdgeSheet
+        open={edgeSheet.open}
+        onOpenChange={(open) => setEdgeSheet((s) => ({ ...s, open }))}
+        dogNameA={edgeSheet.nameA}
+        dogNameB={edgeSheet.nameB}
+        currentStatus={edgeSheet.status}
+        onSetStatus={(status) => {
+          useAppStore.getState().setCompatibility(edgeSheet.idA, edgeSheet.idB, status)
+          setEdgeSheet((s) => ({ ...s, open: false }))
+        }}
+        onRemove={() => {
+          useAppStore.getState().removeCompatibility(edgeSheet.idA, edgeSheet.idB)
+          setEdgeSheet((s) => ({ ...s, open: false }))
+        }}
+      />
     </div>
   )
 }
