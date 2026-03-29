@@ -109,8 +109,14 @@ None yet.
 - react-force-graph TypeScript types need verification before Phase 3
 - Compatibility scale (3-point enum vs numeric 1-10) to decide before Phase 2
 
+### Quick Tasks Completed
+
+| # | Description | Date | Commit | Status | Directory |
+|---|-------------|------|--------|--------|-----------|
+| 260329-obb | fix graph relations from history, fix compatibility score bug, add per-dog relation in history view, remove duplicate close button in drawer | 2026-03-29 | 8229989 | Verified | [260329-obb-fix-graph-relations-from-history-fix-com](./quick/260329-obb-fix-graph-relations-from-history-fix-com/) |
+
 ## Session Continuity
 
-Last session: 2026-03-28T20:24:39.332Z
-Stopped at: Completed 06-walk-history 06-02-PLAN.md
+Last session: 2026-03-29T15:30:22.647Z
+Stopped at: Completed quick task 260329-obb: fix graph relations from history, fix compatibility score bug, add per-dog relation in history view, remove duplicate close button in drawer
 Resume file: None
