@@ -39,7 +39,15 @@ function WalkLogEntryRow({
     .map((id) => dogs.find((d) => d.id === id)?.name ?? 'Unknown')
     .join(', ')
 
-  const pairs: { idA: string; idB: string; nameA: string; nameB: string; status: CompatibilityStatus }[] = []
+  // Derive group name lists when groupContext is present
+  const groupANames = entry.groupContext
+    ? entry.groupContext.groupA.map((id) => dogs.find((d) => d.id === id)?.name ?? 'Unknown')
+    : null
+  const groupBNames = entry.groupContext
+    ? entry.groupContext.groupB.map((id) => dogs.find((d) => d.id === id)?.name ?? 'Unknown')
+    : null
+
+  const pairs: { idA: string; idB: string; nameA: string; nameB: string; status: CompatibilityStatus; crossGroup: boolean }[] = []
   for (let i = 0; i < entry.dogIds.length; i++) {
     for (let j = i + 1; j < entry.dogIds.length; j++) {
       const idA = entry.dogIds[i]
@@ -47,8 +55,41 @@ function WalkLogEntryRow({
       const nameA = dogs.find((d) => d.id === idA)?.name ?? 'Unknown'
       const nameB = dogs.find((d) => d.id === idB)?.name ?? 'Unknown'
       const status = compatMap.get(pairKey(idA, idB)) ?? 'unknown'
-      pairs.push({ idA, idB, nameA, nameB, status })
+      const crossGroup = entry.groupContext
+        ? (entry.groupContext.groupA.includes(idA) && entry.groupContext.groupB.includes(idB)) ||
+          (entry.groupContext.groupB.includes(idA) && entry.groupContext.groupA.includes(idB))
+        : false
+      pairs.push({ idA, idB, nameA, nameB, status, crossGroup })
     }
+  }
+
+  const crossGroupPairs = pairs.filter((p) => p.crossGroup)
+  const intraGroupPairs = pairs.filter((p) => !p.crossGroup)
+
+  function renderPairButton(pair: typeof pairs[0]) {
+    const pk = pairKey(pair.idA, pair.idB)
+    const pairSpecificOutcome = entry.pairOutcomes?.[pk]
+    const showBadge = pairSpecificOutcome !== undefined && pairSpecificOutcome !== entry.outcome
+    return (
+      <button
+        key={`${pair.idA}-${pair.idB}`}
+        onClick={() => onPairClick(pair.idA, pair.idB, pair.nameA, pair.nameB, pair.status)}
+        className="inline-flex items-center gap-1 text-xs rounded px-2 py-0.5 border border-slate-200 hover:border-slate-400 bg-slate-50 hover:bg-slate-100 text-slate-700"
+      >
+        {pair.nameA} &amp; {pair.nameB}
+        {showBadge && pairSpecificOutcome && (
+          <span
+            className={cn(
+              'inline-flex px-1.5 py-px rounded-full text-xs font-semibold leading-tight',
+              OUTCOME_BADGE[pairSpecificOutcome].bg,
+              OUTCOME_BADGE[pairSpecificOutcome].text
+            )}
+          >
+            {OUTCOME_BADGE[pairSpecificOutcome].label}
+          </span>
+        )}
+      </button>
+    )
   }
 
   return (
@@ -56,40 +97,45 @@ function WalkLogEntryRow({
       <div className="flex items-center gap-2 flex-wrap">
         <span className="text-sm text-slate-500">{entry.date}</span>
         <OutcomeBadge outcome={entry.outcome} />
-        <span className="text-sm text-slate-700">{dogNames}</span>
+        {entry.groupContext && groupANames && groupBNames ? (
+          <span className="text-sm text-slate-700">
+            <span className="text-blue-700 font-medium">Group A:</span>{' '}
+            {groupANames.join(', ')}
+            <span className="mx-2 text-slate-300">|</span>
+            <span className="text-amber-700 font-medium">Group B:</span>{' '}
+            {groupBNames.join(', ')}
+          </span>
+        ) : (
+          <span className="text-sm text-slate-700">{dogNames}</span>
+        )}
       </div>
       {entry.notes && (
         <p className="text-sm text-slate-500 mt-1 line-clamp-2">{entry.notes}</p>
       )}
-      {pairs.length > 0 && (
-        <div className="mt-2 flex flex-wrap gap-1">
-          {pairs.map(({ idA, idB, nameA, nameB, status }) => {
-            const pk = pairKey(idA, idB)
-            const pairSpecificOutcome = entry.pairOutcomes?.[pk]
-            const showBadge = pairSpecificOutcome !== undefined && pairSpecificOutcome !== entry.outcome
-            return (
-              <button
-                key={`${idA}-${idB}`}
-                onClick={() => onPairClick(idA, idB, nameA, nameB, status)}
-                className="inline-flex items-center gap-1 text-xs rounded px-2 py-0.5 border border-slate-200 hover:border-slate-400 bg-slate-50 hover:bg-slate-100 text-slate-700"
-              >
-                {nameA} &amp; {nameB}
-                {showBadge && (
-                  <span
-                    className={cn(
-                      'inline-flex px-1.5 py-px rounded-full text-xs font-semibold leading-tight',
-                      OUTCOME_BADGE[pairSpecificOutcome].bg,
-                      OUTCOME_BADGE[pairSpecificOutcome].text
-                    )}
-                  >
-                    {OUTCOME_BADGE[pairSpecificOutcome].label}
-                  </span>
-                )}
-              </button>
-            )
-          })}
+      {pairs.length > 0 && entry.groupContext ? (
+        <div className="mt-2 space-y-1">
+          {crossGroupPairs.length > 0 && (
+            <div>
+              <span className="text-xs text-slate-400 font-medium mr-1">Cross-group:</span>
+              <span className="inline-flex flex-wrap gap-1">
+                {crossGroupPairs.map(renderPairButton)}
+              </span>
+            </div>
+          )}
+          {intraGroupPairs.length > 0 && (
+            <div>
+              <span className="text-xs text-slate-400 font-medium mr-1">Within group:</span>
+              <span className="inline-flex flex-wrap gap-1">
+                {intraGroupPairs.map(renderPairButton)}
+              </span>
+            </div>
+          )}
         </div>
-      )}
+      ) : pairs.length > 0 ? (
+        <div className="mt-2 flex flex-wrap gap-1">
+          {pairs.map(renderPairButton)}
+        </div>
+      ) : null}
     </div>
   )
 }

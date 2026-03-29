@@ -53,6 +53,66 @@ export function inferStatusFromHistory(
   return goodCount / resolvedOutcomes.length >= 0.5 ? 'compatible' : 'neutral'
 }
 
+export function inferGroupContextConflicts(
+  walkHistory: WalkLogEntry[]
+): { triggerIds: string[]; targetId: string; status: CompatibilityStatus }[] {
+  // Collect all cross-group conflict incidents keyed by sorted triggerIds + targetId
+  // Key format: sorted(triggerIds).join('|') + '->' + targetId
+  const conflictMap = new Map<string, { triggerIds: string[]; targetId: string; worstStatus: CompatibilityStatus }>()
+
+  const statusRank: Record<CompatibilityStatus, number> = {
+    conflict: 3,
+    neutral: 2,
+    compatible: 1,
+    unknown: 0,
+  }
+
+  for (const entry of walkHistory) {
+    if (!entry.groupContext || !entry.pairOutcomes) continue
+
+    const { groupA, groupB } = entry.groupContext
+    // Only interested in cross-group pairs with incident or poor
+    for (const idA of groupA) {
+      for (const idB of groupB) {
+        const pk = pairKey(idA, idB)
+        const outcome = entry.pairOutcomes[pk] ?? entry.outcome
+        if (outcome !== 'incident' && outcome !== 'poor') continue
+
+        // The trigger group is the one with 2+ dogs (the group-context source)
+        // If groupA has 2+ dogs, A dogs are triggers and B dog is the target
+        // If groupB has 2+ dogs, B dogs are triggers and A dog is the target
+        // If both have 2+, emit both directions
+        if (groupA.length >= 2) {
+          const triggerIds = [...groupA].sort()
+          const targetId = idB
+          const key = triggerIds.join('|') + '->' + targetId
+          const inferred: CompatibilityStatus = outcome === 'incident' ? 'conflict' : 'neutral'
+          const existing = conflictMap.get(key)
+          if (!existing || statusRank[inferred] > statusRank[existing.worstStatus]) {
+            conflictMap.set(key, { triggerIds, targetId, worstStatus: inferred })
+          }
+        }
+        if (groupB.length >= 2) {
+          const triggerIds = [...groupB].sort()
+          const targetId = idA
+          const key = triggerIds.join('|') + '->' + targetId
+          const inferred: CompatibilityStatus = outcome === 'incident' ? 'conflict' : 'neutral'
+          const existing = conflictMap.get(key)
+          if (!existing || statusRank[inferred] > statusRank[existing.worstStatus]) {
+            conflictMap.set(key, { triggerIds, targetId, worstStatus: inferred })
+          }
+        }
+      }
+    }
+  }
+
+  return Array.from(conflictMap.values()).map(({ triggerIds, targetId, worstStatus }) => ({
+    triggerIds,
+    targetId,
+    status: worstStatus,
+  }))
+}
+
 export function getConflictsInGroup(dogIds: string[], compatMap: Map<string, CompatibilityStatus>): ConflictingPair[] {
   const n = dogIds.length
   const result: ConflictingPair[] = []

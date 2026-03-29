@@ -3,11 +3,11 @@ import ForceGraph2D from 'react-force-graph-2d'
 import { useAppStore } from '@/store'
 import { EdgeSheet } from '@/components/EdgeSheet'
 import { DogPanel } from '@/components/DogPanel'
-import { pairKey, inferStatusFromHistory } from '@/lib/scoring'
+import { pairKey, inferStatusFromHistory, inferGroupContextConflicts } from '@/lib/scoring'
 import type { Dog, CompatibilityEntry, CompatibilityStatus } from '@/types'
 
-type GraphNode = { id: string; name: string }
-type GraphLink = { source: string; target: string; status: CompatibilityStatus; fromHistory?: boolean }
+type GraphNode = { id: string; name: string; isGroupNode?: boolean }
+type GraphLink = { source: string; target: string; status: CompatibilityStatus; fromHistory?: boolean; isGroupEdge?: boolean; isGroupTarget?: boolean }
 
 export function buildGraphData(dogs: Dog[], entries: CompatibilityEntry[]) {
   const nodes: GraphNode[] = dogs
@@ -60,7 +60,43 @@ export function CompatibilityGraph() {
         }
       }
     }
-    return { nodes: base.nodes, links: [...base.links, ...historyLinks] }
+
+    // Hyperedge nodes for group-context conflicts
+    const groupConflicts = inferGroupContextConflicts(walkHistory)
+    const groupNodes: GraphNode[] = []
+    const groupLinks: GraphLink[] = []
+
+    for (const { triggerIds, targetId } of groupConflicts) {
+      const groupNodeId = 'group_' + triggerIds.join('|')
+      const triggerNames = triggerIds
+        .map((id) => allDogs.find((d) => d.id === id)?.name ?? id)
+        .join(', ')
+      // Avoid duplicate group nodes
+      if (!groupNodes.find((n) => n.id === groupNodeId)) {
+        groupNodes.push({ id: groupNodeId, name: triggerNames, isGroupNode: true })
+      }
+      // Links from each trigger dog to the group node (thin, dashed, gray)
+      for (const triggerId of triggerIds) {
+        groupLinks.push({
+          source: triggerId,
+          target: groupNodeId,
+          status: 'unknown',
+          isGroupEdge: true,
+        })
+      }
+      // Link from group node to target dog (thick, red)
+      groupLinks.push({
+        source: groupNodeId,
+        target: targetId,
+        status: 'conflict',
+        isGroupTarget: true,
+      })
+    }
+
+    return {
+      nodes: [...base.nodes, ...groupNodes],
+      links: [...base.links, ...historyLinks, ...groupLinks],
+    }
   }, [allDogs, compatibilityEntries, walkHistory])
 
   const containerRef = useRef<HTMLDivElement>(null)
@@ -127,6 +163,8 @@ export function CompatibilityGraph() {
   const handleNodeClick = useCallback(
     (node: unknown) => {
       const n = node as GraphNode
+      // Group nodes are synthetic — clicking is a no-op
+      if (n.isGroupNode) return
       const dog = allDogs.find((d) => d.id === n.id) ?? null
       if (dog) setDogPanel({ open: true, dog })
     },
@@ -152,16 +190,81 @@ export function CompatibilityGraph() {
         height={dimensions.height}
         d3VelocityDecay={0.4}
         cooldownTicks={100}
-        linkColor={(link) => STATUS_COLOR[(link as GraphLink).status]}
-        linkWidth={(link) => (link as GraphLink).status === 'conflict' ? 3 : 2}
+        linkColor={(link) => {
+          const l = link as GraphLink
+          if (l.isGroupEdge) return '#94a3b8'
+          if (l.isGroupTarget) return '#ef4444'
+          return STATUS_COLOR[l.status]
+        }}
+        linkWidth={(link) => {
+          const l = link as GraphLink
+          if (l.isGroupEdge) return 1
+          if (l.isGroupTarget) return 3
+          return l.status === 'conflict' ? 3 : 2
+        }}
         linkLineDash={(link) => {
           const l = link as GraphLink
+          if (l.isGroupEdge) return [4, 4]
           if (l.fromHistory) return [3, 3]
           return l.status === 'unknown' ? [5, 5] : []
         }}
         nodeCanvasObject={(node, ctx, globalScale) => {
           const x = node.x ?? 0
           const y = node.y ?? 0
+          const n = node as GraphNode
+
+          if (n.isGroupNode) {
+            // Draw diamond shape for group nodes
+            const size = 5
+            ctx.beginPath()
+            ctx.moveTo(x, y - size)
+            ctx.lineTo(x + size, y)
+            ctx.lineTo(x, y + size)
+            ctx.lineTo(x - size, y)
+            ctx.closePath()
+            ctx.fillStyle = '#f97316'
+            ctx.fill()
+            ctx.strokeStyle = '#ffffff'
+            ctx.lineWidth = 1.5
+            ctx.stroke()
+
+            // Small label below diamond
+            const label = n.name
+            const fontSize = Math.max(8, 11 / globalScale)
+            ctx.font = `${fontSize}px sans-serif`
+            const textWidth = ctx.measureText(label).width
+            const paddingH = 2
+            const paddingV = 1
+            const pillWidth = textWidth + paddingH * 2
+            const pillHeight = fontSize + paddingV * 2
+            const labelY = y + size + 3 / globalScale + fontSize / 2
+
+            const pillX = x - pillWidth / 2
+            const pillY = labelY - fontSize / 2 - paddingV
+            ctx.globalAlpha = 0.7
+            ctx.fillStyle = '#ffffff'
+            const r = 2
+            ctx.beginPath()
+            ctx.moveTo(pillX + r, pillY)
+            ctx.lineTo(pillX + pillWidth - r, pillY)
+            ctx.quadraticCurveTo(pillX + pillWidth, pillY, pillX + pillWidth, pillY + r)
+            ctx.lineTo(pillX + pillWidth, pillY + pillHeight - r)
+            ctx.quadraticCurveTo(pillX + pillWidth, pillY + pillHeight, pillX + pillWidth - r, pillY + pillHeight)
+            ctx.lineTo(pillX + r, pillY + pillHeight)
+            ctx.quadraticCurveTo(pillX, pillY + pillHeight, pillX, pillY + pillHeight - r)
+            ctx.lineTo(pillX, pillY + r)
+            ctx.quadraticCurveTo(pillX, pillY, pillX + r, pillY)
+            ctx.closePath()
+            ctx.fill()
+            ctx.globalAlpha = 1
+
+            ctx.fillStyle = '#ea580c'
+            ctx.textAlign = 'center'
+            ctx.textBaseline = 'middle'
+            ctx.fillText(label, x, labelY)
+            return
+          }
+
           const radius = 6
 
           // Draw node circle
@@ -174,7 +277,7 @@ export function CompatibilityGraph() {
           ctx.stroke()
 
           // Draw label with background pill below circle
-          const label = (node as GraphNode).name
+          const label = n.name
           const fontSize = Math.max(10, 14 / globalScale)
           ctx.font = `${fontSize}px sans-serif`
           const textWidth = ctx.measureText(label).width
@@ -214,10 +317,22 @@ export function CompatibilityGraph() {
         nodePointerAreaPaint={(node, color, ctx) => {
           const x = node.x ?? 0
           const y = node.y ?? 0
+          const n = node as GraphNode
           ctx.fillStyle = color
-          ctx.beginPath()
-          ctx.arc(x, y, 6, 0, Math.PI * 2)
-          ctx.fill()
+          if (n.isGroupNode) {
+            const size = 5
+            ctx.beginPath()
+            ctx.moveTo(x, y - size)
+            ctx.lineTo(x + size, y)
+            ctx.lineTo(x, y + size)
+            ctx.lineTo(x - size, y)
+            ctx.closePath()
+            ctx.fill()
+          } else {
+            ctx.beginPath()
+            ctx.arc(x, y, 6, 0, Math.PI * 2)
+            ctx.fill()
+          }
         }}
         onLinkClick={handleLinkClick}
         onNodeClick={handleNodeClick}
