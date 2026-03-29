@@ -44,6 +44,7 @@ export type WalkLogEntry = {
   notes: string
   dogIds: string[]
   groupId?: string
+  pairOutcomes?: Record<string, WalkOutcome>  // key = pairKey(idA, idB), value = outcome for that pair
 }
 
 export type AppState = {

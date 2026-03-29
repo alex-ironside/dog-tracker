@@ -1,9 +1,10 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useMemo } from 'react'
 import { X } from 'lucide-react'
 import { Sheet, SheetContent, SheetTitle } from '@/components/ui/sheet'
 import { Button } from '@/components/ui/button'
 import { useAppStore } from '@/store'
 import { cn } from '@/lib/utils'
+import { pairKey } from '@/lib/scoring'
 import type { WalkOutcome } from '@/types'
 
 type WalkLogSheetProps = {
@@ -40,6 +41,7 @@ export function WalkLogSheet({
   const [outcome, setOutcome] = useState<WalkOutcome | null>(null)
   const [selectedDogIds, setSelectedDogIds] = useState<string[]>(initialDogIds ?? [])
   const [notes, setNotes] = useState('')
+  const [pairOutcomes, setPairOutcomes] = useState<Record<string, WalkOutcome>>({})
 
   const [outcomeError, setOutcomeError] = useState(false)
   const [dogsError, setDogsError] = useState(false)
@@ -52,12 +54,32 @@ export function WalkLogSheet({
       setOutcome(null)
       setSelectedDogIds(initialDogIds ?? [])
       setNotes('')
+      setPairOutcomes({})
       setOutcomeError(false)
       setDogsError(false)
       setDateError(false)
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [open])
+
+  // Compute all pairs from selected dogs
+  const dogPairs = useMemo(() => {
+    const pairs: { idA: string; idB: string; nameA: string; nameB: string; key: string }[] = []
+    for (let i = 0; i < selectedDogIds.length; i++) {
+      for (let j = i + 1; j < selectedDogIds.length; j++) {
+        const idA = selectedDogIds[i]
+        const idB = selectedDogIds[j]
+        const nameA = dogs.find((d) => d.id === idA)?.name ?? 'Unknown'
+        const nameB = dogs.find((d) => d.id === idB)?.name ?? 'Unknown'
+        pairs.push({ idA, idB, nameA, nameB, key: pairKey(idA, idB) })
+      }
+    }
+    return pairs
+  }, [selectedDogIds, dogs])
+
+  // All pairs have explicit pairOutcome → walk-level outcome is optional
+  const allPairsCovered =
+    dogPairs.length >= 1 && dogPairs.every((p) => pairOutcomes[p.key] !== undefined)
 
   function handleDogToggle(dogId: string) {
     setSelectedDogIds((prev) =>
@@ -76,7 +98,8 @@ export function WalkLogSheet({
       setDateError(false)
     }
 
-    if (outcome === null) {
+    // Walk-level outcome is optional only when every pair has an explicit pairOutcome
+    if (outcome === null && !allPairsCovered) {
       setOutcomeError(true)
       valid = false
     } else {
@@ -92,12 +115,17 @@ export function WalkLogSheet({
 
     if (!valid) return
 
+    // Use 'neutral' as walk-level fallback when allPairsCovered and no outcome selected
+    const resolvedOutcome = outcome ?? 'neutral'
+    const pairOutcomesPayload = Object.keys(pairOutcomes).length > 0 ? pairOutcomes : undefined
+
     useAppStore.getState().addWalkLog({
       date,
-      outcome: outcome!,
+      outcome: resolvedOutcome,
       notes,
       dogIds: selectedDogIds,
       groupId: initialGroupId,
+      pairOutcomes: pairOutcomesPayload,
     })
 
     onOpenChange(false)
@@ -209,6 +237,58 @@ export function WalkLogSheet({
                 </p>
               )}
             </div>
+
+            {/* Per-pair outcomes */}
+            {dogPairs.length >= 1 && (
+              <div>
+                <label className="text-sm font-medium text-slate-700 leading-normal block mb-0.5">
+                  Per-pair outcomes <span className="font-normal text-slate-400">(optional)</span>
+                </label>
+                <p className="text-xs text-slate-400 mb-2">
+                  Override the default outcome for specific pairs.
+                </p>
+                <div className="space-y-2">
+                  {dogPairs.map(({ idA, idB, nameA, nameB, key }) => (
+                    <div key={key}>
+                      <span className="text-sm text-slate-600 block mb-1">
+                        {nameA} &amp; {nameB}
+                      </span>
+                      <div className="flex flex-wrap gap-1">
+                        {OUTCOME_OPTIONS.map(({ value, label, textColor }) => {
+                          const selected = pairOutcomes[key] === value
+                          return (
+                            <Button
+                              key={value}
+                              variant="outline"
+                              size="sm"
+                              aria-pressed={selected}
+                              className={cn(
+                                textColor,
+                                'text-xs h-7 px-2',
+                                selected ? 'ring-2 ring-offset-1 ring-slate-500' : ''
+                              )}
+                              onClick={() => {
+                                setPairOutcomes((prev) => {
+                                  if (prev[key] === value) {
+                                    // Toggle off — clear override
+                                    const next = { ...prev }
+                                    delete next[key]
+                                    return next
+                                  }
+                                  return { ...prev, [key]: value }
+                                })
+                              }}
+                            >
+                              {label}
+                            </Button>
+                          )
+                        })}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
 
             {/* Notes */}
             <div>
