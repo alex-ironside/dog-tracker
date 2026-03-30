@@ -40,8 +40,7 @@ export type WalkOutcome = 'great' | 'good' | 'neutral' | 'poor' | 'incident'
 export type GroupContext = {
   groupA: string[]  // dog IDs in group A
   groupB: string[]  // dog IDs in group B
-  groupAOutcome?: WalkOutcome
-  groupBOutcome?: WalkOutcome
+  groupOutcome?: WalkOutcome  // single outcome for the Group A vs Group B encounter
 }
 
 export type WalkLogEntry = {
