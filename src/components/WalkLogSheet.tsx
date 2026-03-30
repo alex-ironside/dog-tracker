@@ -1,10 +1,66 @@
 import { useState, useEffect, useMemo } from 'react'
 import { X } from 'lucide-react'
+import {
+  DndContext,
+  DragOverlay,
+  PointerSensor,
+  KeyboardSensor,
+  useSensor,
+  useSensors,
+  useDroppable,
+  useDraggable,
+  type DragEndEvent,
+} from '@dnd-kit/core'
+import { CSS } from '@dnd-kit/utilities'
 import { Sheet, SheetContent, SheetTitle } from '@/components/ui/sheet'
 import { Button } from '@/components/ui/button'
 import { useAppStore } from '@/store'
 import { cn } from '@/lib/utils'
-import type { WalkOutcome } from '@/types'
+import type { Dog, WalkOutcome } from '@/types'
+
+function DraggableChip({ dog, className, onRemove }: {
+  dog: Dog; className: string; onRemove?: () => void
+}) {
+  const { attributes, listeners, setNodeRef, transform, isDragging } = useDraggable({ id: dog.id })
+  const style = transform ? { transform: CSS.Translate.toString(transform) } : undefined
+  return (
+    <div
+      ref={setNodeRef}
+      style={{ ...style, opacity: isDragging ? 0.4 : 1 }}
+      {...attributes}
+      {...listeners}
+      className={cn('inline-flex items-center gap-1 px-3 py-1 rounded-full text-sm font-medium cursor-grab', className)}
+    >
+      {dog.name}
+      {onRemove && (
+        <button
+          type="button"
+          onPointerDown={(e) => e.stopPropagation()}
+          onClick={(e) => { e.stopPropagation(); onRemove() }}
+          className="ml-0.5 focus:outline-none"
+          aria-label={`Remove ${dog.name}`}
+        >
+          <X size={12} />
+        </button>
+      )}
+    </div>
+  )
+}
+
+function DroppableBox({ id, children, className }: {
+  id: string; children: React.ReactNode; className?: string
+}) {
+  const { setNodeRef, isOver } = useDroppable({ id })
+  const overRing =
+    id === 'group-a' ? 'ring-blue-400' :
+    id === 'group-b' ? 'ring-amber-400' :
+    'ring-slate-300'
+  return (
+    <div ref={setNodeRef} className={cn(className, isOver && `ring-2 ring-inset ${overRing}`)}>
+      {children}
+    </div>
+  )
+}
 
 type WalkLogSheetProps = {
   open: boolean
@@ -48,6 +104,13 @@ export function WalkLogSheet({
   const [groupAssignments, setGroupAssignments] = useState<Record<string, GroupAssignment>>({})
   const [groupAOutcome, setGroupAOutcome] = useState<WalkOutcome | null>(null)
   const [groupBOutcome, setGroupBOutcome] = useState<WalkOutcome | null>(null)
+
+  const [activeDragId, setActiveDragId] = useState<string | null>(null)
+
+  const sensors = useSensors(
+    useSensor(PointerSensor, { activationConstraint: { distance: 8 } }),
+    useSensor(KeyboardSensor)
+  )
 
   const [outcomeError, setOutcomeError] = useState(false)
   const [dogsError, setDogsError] = useState(false)
@@ -96,19 +159,26 @@ export function WalkLogSheet({
     if (dogsError) setDogsError(false)
   }
 
-  // Pool chip click: cycles unassigned -> A -> B -> unassigned
-  function handlePoolDogClick(dogId: string) {
-    setGroupAssignments((prev) => {
-      const current = prev[dogId]
-      if (!current) return { ...prev, [dogId]: 'A' as const }
-      if (current === 'A') return { ...prev, [dogId]: 'B' as const }
-      // current === 'B' -> remove
-      const next = { ...prev }
-      delete next[dogId]
-      return next
-    })
-    if (dogsError) setDogsError(false)
-    if (groupError) setGroupError(null)
+  function handleDragEnd(event: DragEndEvent) {
+    const dogId = event.active.id as string
+    const overId = event.over?.id as string | undefined
+    setActiveDragId(null)
+    if (!overId) return
+    if (overId === 'group-a') {
+      setGroupAssignments((prev) => ({ ...prev, [dogId]: 'A' as const }))
+      if (dogsError) setDogsError(false)
+      if (groupError) setGroupError(null)
+    } else if (overId === 'group-b') {
+      setGroupAssignments((prev) => ({ ...prev, [dogId]: 'B' as const }))
+      if (dogsError) setDogsError(false)
+      if (groupError) setGroupError(null)
+    } else if (overId === 'pool') {
+      setGroupAssignments((prev) => {
+        const next = { ...prev }
+        delete next[dogId]
+        return next
+      })
+    }
   }
 
   // Group chip click: removes dog back to pool
@@ -341,134 +411,139 @@ export function WalkLogSheet({
                   {activeDogs.length === 0 ? (
                     <p className="text-sm text-slate-400">No active dogs</p>
                   ) : (
-                    <div className="space-y-3">
-                      {/* Pool — unassigned dogs */}
-                      {activeDogs.some((d) => !groupAssignments[d.id]) && (
-                        <div className="border border-slate-200 rounded-md p-3">
-                          <p className="text-xs font-medium text-slate-500 mb-2">
-                            Unassigned — click to assign to A, then B, then remove
-                          </p>
-                          <div className="flex flex-wrap gap-2">
-                            {activeDogs
-                              .filter((d) => !groupAssignments[d.id])
-                              .map((dog) => (
-                                <button
-                                  key={dog.id}
-                                  type="button"
-                                  onClick={() => handlePoolDogClick(dog.id)}
-                                  className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-slate-100 text-slate-700 hover:bg-slate-200 transition-colors"
+                    <DndContext
+                      sensors={sensors}
+                      onDragStart={(e) => setActiveDragId(e.active.id as string)}
+                      onDragEnd={handleDragEnd}
+                    >
+                      <div className="space-y-3">
+                        {/* Pool — unassigned dogs */}
+                        {activeDogs.some((d) => !groupAssignments[d.id]) && (
+                          <DroppableBox id="pool" className="border border-slate-200 rounded-md p-3">
+                            <p className="text-xs font-medium text-slate-500 mb-2">
+                              Drag dogs into Group A or Group B
+                            </p>
+                            <div className="flex flex-wrap gap-2">
+                              {activeDogs
+                                .filter((d) => !groupAssignments[d.id])
+                                .map((dog) => (
+                                  <DraggableChip
+                                    key={dog.id}
+                                    dog={dog}
+                                    className="bg-slate-100 text-slate-700 hover:bg-slate-200"
+                                  />
+                                ))}
+                            </div>
+                          </DroppableBox>
+                        )}
+
+                        {/* Group A box */}
+                        <DroppableBox id="group-a" className="border-2 border-blue-200 rounded-md overflow-hidden">
+                          <div className="bg-blue-50 px-3 py-2 flex items-center justify-between">
+                            <span className="text-sm font-semibold text-blue-700">Group A</span>
+                            {groupA.length === 0 && (
+                              <span className="text-xs text-blue-400">No dogs assigned</span>
+                            )}
+                          </div>
+                          {groupA.length > 0 && (
+                            <div className="px-3 py-2 flex flex-wrap gap-2">
+                              {groupA.map((id) => {
+                                const dog = activeDogs.find((d) => d.id === id)
+                                return dog ? (
+                                  <DraggableChip
+                                    key={id}
+                                    dog={dog}
+                                    className="bg-blue-100 text-blue-700"
+                                    onRemove={() => handleRemoveFromGroup(id)}
+                                  />
+                                ) : null
+                              })}
+                            </div>
+                          )}
+                          <div className="px-3 pb-3">
+                            <p className="text-xs font-medium text-slate-500 mb-1.5">Group A outcome</p>
+                            <div className="flex flex-wrap gap-1.5">
+                              {OUTCOME_OPTIONS.map(({ value, label, textColor }) => (
+                                <Button
+                                  key={value}
+                                  variant="outline"
+                                  size="sm"
+                                  aria-pressed={groupAOutcome === value}
+                                  className={cn(
+                                    textColor,
+                                    'text-xs h-7 px-2',
+                                    groupAOutcome === value ? 'ring-2 ring-offset-1 ring-slate-500' : ''
+                                  )}
+                                  onClick={() => {
+                                    setGroupAOutcome(value)
+                                    if (groupError) setGroupError(null)
+                                  }}
                                 >
-                                  {dog.name}
-                                </button>
+                                  {label}
+                                </Button>
                               ))}
+                            </div>
                           </div>
-                        </div>
-                      )}
+                        </DroppableBox>
 
-                      {/* Group A box */}
-                      <div className="border-2 border-blue-200 rounded-md overflow-hidden">
-                        <div className="bg-blue-50 px-3 py-2 flex items-center justify-between">
-                          <span className="text-sm font-semibold text-blue-700">Group A</span>
-                          {groupA.length === 0 && (
-                            <span className="text-xs text-blue-400">No dogs assigned</span>
+                        {/* Group B box */}
+                        <DroppableBox id="group-b" className="border-2 border-amber-200 rounded-md overflow-hidden">
+                          <div className="bg-amber-50 px-3 py-2 flex items-center justify-between">
+                            <span className="text-sm font-semibold text-amber-700">Group B</span>
+                            {groupB.length === 0 && (
+                              <span className="text-xs text-amber-400">No dogs assigned</span>
+                            )}
+                          </div>
+                          {groupB.length > 0 && (
+                            <div className="px-3 py-2 flex flex-wrap gap-2">
+                              {groupB.map((id) => {
+                                const dog = activeDogs.find((d) => d.id === id)
+                                return dog ? (
+                                  <DraggableChip
+                                    key={id}
+                                    dog={dog}
+                                    className="bg-amber-100 text-amber-700"
+                                    onRemove={() => handleRemoveFromGroup(id)}
+                                  />
+                                ) : null
+                              })}
+                            </div>
                           )}
-                        </div>
-                        {groupA.length > 0 && (
-                          <div className="px-3 py-2 flex flex-wrap gap-2">
-                            {groupA.map((id) => {
-                              const dog = activeDogs.find((d) => d.id === id)
-                              return dog ? (
-                                <button
-                                  key={id}
-                                  type="button"
-                                  onClick={() => handleRemoveFromGroup(id)}
-                                  className="inline-flex items-center gap-1 px-3 py-1 rounded-full text-sm font-medium bg-blue-100 text-blue-700 hover:bg-blue-200 transition-colors"
+                          <div className="px-3 pb-3">
+                            <p className="text-xs font-medium text-slate-500 mb-1.5">Group B outcome</p>
+                            <div className="flex flex-wrap gap-1.5">
+                              {OUTCOME_OPTIONS.map(({ value, label, textColor }) => (
+                                <Button
+                                  key={value}
+                                  variant="outline"
+                                  size="sm"
+                                  aria-pressed={groupBOutcome === value}
+                                  className={cn(
+                                    textColor,
+                                    'text-xs h-7 px-2',
+                                    groupBOutcome === value ? 'ring-2 ring-offset-1 ring-slate-500' : ''
+                                  )}
+                                  onClick={() => {
+                                    setGroupBOutcome(value)
+                                    if (groupError) setGroupError(null)
+                                  }}
                                 >
-                                  {dog.name}
-                                  <X size={12} />
-                                </button>
-                              ) : null
-                            })}
+                                  {label}
+                                </Button>
+                              ))}
+                            </div>
                           </div>
-                        )}
-                        <div className="px-3 pb-3">
-                          <p className="text-xs font-medium text-slate-500 mb-1.5">Group A outcome</p>
-                          <div className="flex flex-wrap gap-1.5">
-                            {OUTCOME_OPTIONS.map(({ value, label, textColor }) => (
-                              <Button
-                                key={value}
-                                variant="outline"
-                                size="sm"
-                                aria-pressed={groupAOutcome === value}
-                                className={cn(
-                                  textColor,
-                                  'text-xs h-7 px-2',
-                                  groupAOutcome === value ? 'ring-2 ring-offset-1 ring-slate-500' : ''
-                                )}
-                                onClick={() => {
-                                  setGroupAOutcome(value)
-                                  if (groupError) setGroupError(null)
-                                }}
-                              >
-                                {label}
-                              </Button>
-                            ))}
-                          </div>
-                        </div>
+                        </DroppableBox>
                       </div>
 
-                      {/* Group B box */}
-                      <div className="border-2 border-amber-200 rounded-md overflow-hidden">
-                        <div className="bg-amber-50 px-3 py-2 flex items-center justify-between">
-                          <span className="text-sm font-semibold text-amber-700">Group B</span>
-                          {groupB.length === 0 && (
-                            <span className="text-xs text-amber-400">No dogs assigned</span>
-                          )}
-                        </div>
-                        {groupB.length > 0 && (
-                          <div className="px-3 py-2 flex flex-wrap gap-2">
-                            {groupB.map((id) => {
-                              const dog = activeDogs.find((d) => d.id === id)
-                              return dog ? (
-                                <button
-                                  key={id}
-                                  type="button"
-                                  onClick={() => handleRemoveFromGroup(id)}
-                                  className="inline-flex items-center gap-1 px-3 py-1 rounded-full text-sm font-medium bg-amber-100 text-amber-700 hover:bg-amber-200 transition-colors"
-                                >
-                                  {dog.name}
-                                  <X size={12} />
-                                </button>
-                              ) : null
-                            })}
+                      <DragOverlay>
+                        {activeDragId ? (
+                          <div className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-slate-800 text-white shadow-lg cursor-grabbing">
+                            {activeDogs.find((d) => d.id === activeDragId)?.name ?? ''}
                           </div>
-                        )}
-                        <div className="px-3 pb-3">
-                          <p className="text-xs font-medium text-slate-500 mb-1.5">Group B outcome</p>
-                          <div className="flex flex-wrap gap-1.5">
-                            {OUTCOME_OPTIONS.map(({ value, label, textColor }) => (
-                              <Button
-                                key={value}
-                                variant="outline"
-                                size="sm"
-                                aria-pressed={groupBOutcome === value}
-                                className={cn(
-                                  textColor,
-                                  'text-xs h-7 px-2',
-                                  groupBOutcome === value ? 'ring-2 ring-offset-1 ring-slate-500' : ''
-                                )}
-                                onClick={() => {
-                                  setGroupBOutcome(value)
-                                  if (groupError) setGroupError(null)
-                                }}
-                              >
-                                {label}
-                              </Button>
-                            ))}
-                          </div>
-                        </div>
-                      </div>
-                    </div>
+                        ) : null}
+                      </DragOverlay>
+                    </DndContext>
                   )}
                   {groupError && (
                     <p className="text-sm text-red-600 mt-1" role="alert">
