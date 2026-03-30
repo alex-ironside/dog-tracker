@@ -67,9 +67,6 @@ function WalkLogEntryRow({
   const intraGroupPairs = pairs.filter((p) => !p.crossGroup)
 
   function renderPairButton(pair: typeof pairs[0]) {
-    const pk = pairKey(pair.idA, pair.idB)
-    const pairSpecificOutcome = entry.pairOutcomes?.[pk]
-    const showBadge = pairSpecificOutcome !== undefined && pairSpecificOutcome !== entry.outcome
     return (
       <button
         key={`${pair.idA}-${pair.idB}`}
@@ -77,33 +74,31 @@ function WalkLogEntryRow({
         className="inline-flex items-center gap-1 text-xs rounded px-2 py-0.5 border border-slate-200 hover:border-slate-400 bg-slate-50 hover:bg-slate-100 text-slate-700"
       >
         {pair.nameA} &amp; {pair.nameB}
-        {showBadge && pairSpecificOutcome && (
-          <span
-            className={cn(
-              'inline-flex px-1.5 py-px rounded-full text-xs font-semibold leading-tight',
-              OUTCOME_BADGE[pairSpecificOutcome].bg,
-              OUTCOME_BADGE[pairSpecificOutcome].text
-            )}
-          >
-            {OUTCOME_BADGE[pairSpecificOutcome].label}
-          </span>
-        )}
       </button>
     )
   }
+
+  const hasPerGroupOutcomes = !!(entry.groupContext?.groupAOutcome || entry.groupContext?.groupBOutcome)
 
   return (
     <div className="border border-slate-200 rounded-md px-4 py-3 bg-white">
       <div className="flex items-center gap-2 flex-wrap">
         <span className="text-sm text-slate-500">{entry.date}</span>
-        <OutcomeBadge outcome={entry.outcome} />
+        {/* Show walk-level badge only when no per-group outcomes are present */}
+        {!hasPerGroupOutcomes && <OutcomeBadge outcome={entry.outcome} />}
         {entry.groupContext && groupANames && groupBNames ? (
           <span className="text-sm text-slate-700">
             <span className="text-blue-700 font-medium">Group A:</span>{' '}
             {groupANames.join(', ')}
+            {entry.groupContext.groupAOutcome && (
+              <>{' '}<OutcomeBadge outcome={entry.groupContext.groupAOutcome} /></>
+            )}
             <span className="mx-2 text-slate-300">|</span>
             <span className="text-amber-700 font-medium">Group B:</span>{' '}
             {groupBNames.join(', ')}
+            {entry.groupContext.groupBOutcome && (
+              <>{' '}<OutcomeBadge outcome={entry.groupContext.groupBOutcome} /></>
+            )}
           </span>
         ) : (
           <span className="text-sm text-slate-700">{dogNames}</span>

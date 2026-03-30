@@ -116,9 +116,10 @@ None yet.
 | 260329-obb | fix graph relations from history, fix compatibility score bug, add per-dog relation in history view, remove duplicate close button in drawer | 2026-03-29 | 8229989 | Verified | [260329-obb-fix-graph-relations-from-history-fix-com](./quick/260329-obb-fix-graph-relations-from-history-fix-com/) |
 | 260329-ow7 | fix graph node label overflow (canvas replace mode + pill), add per-dog-pair outcome logging and display | 2026-03-29 | 8097c79 | Verified | [260329-ow7-fix-graph-node-label-overflow-and-add-pe](./quick/260329-ow7-fix-graph-node-label-overflow-and-add-pe/) |
 | 260329-p9k | group-context walk logging with two-group A/B assignment, group history display, graph hyperedge nodes (orange diamonds) for group-context conflicts | 2026-03-29 | d720d27 | Awaiting Verification | [260329-p9k-group-walk-compatibility-select-multi-do](./quick/260329-p9k-group-walk-compatibility-select-multi-do/) |
+| 260330-gxb | redesign two-groups walk logger: pool+group-box UI, per-group outcomes (groupAOutcome/groupBOutcome), remove pairOutcomes from all layers | 2026-03-30 | cc263d7 | Complete | [260330-gxb-redesign-walk-logger-two-group-drop-fiel](./quick/260330-gxb-redesign-walk-logger-two-group-drop-fiel/) |
 
 ## Session Continuity
 
-Last session: 2026-03-29T16:01:58Z
-Stopped at: Completed quick task 260329-p9k tasks 1-2, awaiting human verification at checkpoint
+Last session: 2026-03-30T00:12:00Z
+Stopped at: Completed quick task 260330-gxb (all tasks)
 Resume file: None

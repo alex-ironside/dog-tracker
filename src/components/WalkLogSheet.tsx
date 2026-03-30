@@ -4,7 +4,6 @@ import { Sheet, SheetContent, SheetTitle } from '@/components/ui/sheet'
 import { Button } from '@/components/ui/button'
 import { useAppStore } from '@/store'
 import { cn } from '@/lib/utils'
-import { pairKey } from '@/lib/scoring'
 import type { WalkOutcome } from '@/types'
 
 type WalkLogSheetProps = {
@@ -44,10 +43,11 @@ export function WalkLogSheet({
   const [outcome, setOutcome] = useState<WalkOutcome | null>(null)
   const [selectedDogIds, setSelectedDogIds] = useState<string[]>(initialDogIds ?? [])
   const [notes, setNotes] = useState('')
-  const [pairOutcomes, setPairOutcomes] = useState<Record<string, WalkOutcome>>({})
   const [groupMode, setGroupMode] = useState<GroupMode>('together')
   // Map of dogId -> 'A' | 'B' | null
   const [groupAssignments, setGroupAssignments] = useState<Record<string, GroupAssignment>>({})
+  const [groupAOutcome, setGroupAOutcome] = useState<WalkOutcome | null>(null)
+  const [groupBOutcome, setGroupBOutcome] = useState<WalkOutcome | null>(null)
 
   const [outcomeError, setOutcomeError] = useState(false)
   const [dogsError, setDogsError] = useState(false)
@@ -61,9 +61,10 @@ export function WalkLogSheet({
       setOutcome(null)
       setSelectedDogIds(initialDogIds ?? [])
       setNotes('')
-      setPairOutcomes({})
       setGroupMode('together')
       setGroupAssignments({})
+      setGroupAOutcome(null)
+      setGroupBOutcome(null)
       setOutcomeError(false)
       setDogsError(false)
       setDateError(false)
@@ -88,26 +89,6 @@ export function WalkLogSheet({
     return selectedDogIds
   }, [groupMode, groupA, groupB, selectedDogIds])
 
-  // Compute all pairs from selected dogs
-  const dogPairs = useMemo(() => {
-    const pairs: { idA: string; idB: string; nameA: string; nameB: string; key: string }[] = []
-    const ids = effectiveSelectedDogIds
-    for (let i = 0; i < ids.length; i++) {
-      for (let j = i + 1; j < ids.length; j++) {
-        const idA = ids[i]
-        const idB = ids[j]
-        const nameA = dogs.find((d) => d.id === idA)?.name ?? 'Unknown'
-        const nameB = dogs.find((d) => d.id === idB)?.name ?? 'Unknown'
-        pairs.push({ idA, idB, nameA, nameB, key: pairKey(idA, idB) })
-      }
-    }
-    return pairs
-  }, [effectiveSelectedDogIds, dogs])
-
-  // All pairs have explicit pairOutcome → walk-level outcome is optional
-  const allPairsCovered =
-    dogPairs.length >= 1 && dogPairs.every((p) => pairOutcomes[p.key] !== undefined)
-
   function handleDogToggle(dogId: string) {
     setSelectedDogIds((prev) =>
       prev.includes(dogId) ? prev.filter((id) => id !== dogId) : [...prev, dogId]
@@ -115,19 +96,28 @@ export function WalkLogSheet({
     if (dogsError) setDogsError(false)
   }
 
-  function handleGroupAssign(dogId: string, group: 'A' | 'B') {
+  // Pool chip click: cycles unassigned -> A -> B -> unassigned
+  function handlePoolDogClick(dogId: string) {
     setGroupAssignments((prev) => {
       const current = prev[dogId]
-      // Toggle off if same group selected
-      if (current === group) {
-        const next = { ...prev }
-        delete next[dogId]
-        return next
-      }
-      return { ...prev, [dogId]: group }
+      if (!current) return { ...prev, [dogId]: 'A' as const }
+      if (current === 'A') return { ...prev, [dogId]: 'B' as const }
+      // current === 'B' -> remove
+      const next = { ...prev }
+      delete next[dogId]
+      return next
     })
     if (dogsError) setDogsError(false)
     if (groupError) setGroupError(null)
+  }
+
+  // Group chip click: removes dog back to pool
+  function handleRemoveFromGroup(dogId: string) {
+    setGroupAssignments((prev) => {
+      const next = { ...prev }
+      delete next[dogId]
+      return next
+    })
   }
 
   function handleSave() {
@@ -140,15 +130,15 @@ export function WalkLogSheet({
       setDateError(false)
     }
 
-    // Walk-level outcome is optional only when every pair has an explicit pairOutcome
-    if (outcome === null && !allPairsCovered) {
-      setOutcomeError(true)
-      valid = false
-    } else {
-      setOutcomeError(false)
-    }
-
     if (groupMode === 'together') {
+      // Walk-level outcome required in together mode
+      if (outcome === null) {
+        setOutcomeError(true)
+        valid = false
+      } else {
+        setOutcomeError(false)
+      }
+
       if (selectedDogIds.length === 0) {
         setDogsError(true)
         valid = false
@@ -169,6 +159,13 @@ export function WalkLogSheet({
       } else {
         setGroupError(null)
       }
+      // Both groups need an outcome in groups mode
+      if (groupAOutcome === null || groupBOutcome === null) {
+        setGroupError((prev) =>
+          prev ?? 'Select an outcome for each group.'
+        )
+        valid = false
+      }
       if (groupA.length + groupB.length === 0) {
         setDogsError(true)
         valid = false
@@ -179,12 +176,13 @@ export function WalkLogSheet({
 
     if (!valid) return
 
-    // Use 'neutral' as walk-level fallback when allPairsCovered and no outcome selected
-    const resolvedOutcome = outcome ?? 'neutral'
-    const pairOutcomesPayload = Object.keys(pairOutcomes).length > 0 ? pairOutcomes : undefined
-
     const groupContextPayload =
-      groupMode === 'groups' ? { groupA, groupB } : undefined
+      groupMode === 'groups'
+        ? { groupA, groupB, groupAOutcome: groupAOutcome!, groupBOutcome: groupBOutcome! }
+        : undefined
+
+    // Walk-level outcome: use selected in together mode, groupAOutcome as primary fallback in groups mode
+    const resolvedOutcome = groupMode === 'groups' ? groupAOutcome! : outcome!
 
     useAppStore.getState().addWalkLog({
       date,
@@ -192,7 +190,6 @@ export function WalkLogSheet({
       notes,
       dogIds: effectiveSelectedDogIds,
       groupId: initialGroupId,
-      pairOutcomes: pairOutcomesPayload,
       groupContext: groupContextPayload,
     })
 
@@ -247,36 +244,38 @@ export function WalkLogSheet({
               )}
             </div>
 
-            {/* Outcome */}
-            <div>
-              <label className="text-sm font-medium text-slate-700 leading-normal block mb-1">
-                Outcome
-              </label>
-              <div className="flex flex-wrap gap-2">
-                {OUTCOME_OPTIONS.map(({ value, label, textColor }) => (
-                  <Button
-                    key={value}
-                    variant="outline"
-                    aria-pressed={outcome === value}
-                    className={cn(
-                      textColor,
-                      outcome === value ? 'ring-2 ring-offset-1 ring-slate-500' : ''
-                    )}
-                    onClick={() => {
-                      setOutcome(value)
-                      if (outcomeError) setOutcomeError(false)
-                    }}
-                  >
-                    {label}
-                  </Button>
-                ))}
+            {/* Outcome — hidden in groups mode (per-group outcomes shown inside each group box) */}
+            {groupMode === 'together' && (
+              <div>
+                <label className="text-sm font-medium text-slate-700 leading-normal block mb-1">
+                  Outcome
+                </label>
+                <div className="flex flex-wrap gap-2">
+                  {OUTCOME_OPTIONS.map(({ value, label, textColor }) => (
+                    <Button
+                      key={value}
+                      variant="outline"
+                      aria-pressed={outcome === value}
+                      className={cn(
+                        textColor,
+                        outcome === value ? 'ring-2 ring-offset-1 ring-slate-500' : ''
+                      )}
+                      onClick={() => {
+                        setOutcome(value)
+                        if (outcomeError) setOutcomeError(false)
+                      }}
+                    >
+                      {label}
+                    </Button>
+                  ))}
+                </div>
+                {outcomeError && (
+                  <p className="text-sm text-red-600 mt-1" role="alert">
+                    Please select an outcome.
+                  </p>
+                )}
               </div>
-              {outcomeError && (
-                <p className="text-sm text-red-600 mt-1" role="alert">
-                  Please select an outcome.
-                </p>
-              )}
-            </div>
+            )}
 
             {/* Dogs present */}
             <div>
@@ -342,55 +341,132 @@ export function WalkLogSheet({
                   {activeDogs.length === 0 ? (
                     <p className="text-sm text-slate-400">No active dogs</p>
                   ) : (
-                    <div className="border border-input rounded-md overflow-hidden">
-                      {/* Column headers */}
-                      <div className="grid grid-cols-3 text-xs font-semibold border-b border-slate-200">
-                        <div className="px-3 py-1.5 text-slate-500">Dog</div>
-                        <div className="px-3 py-1.5 bg-blue-50 text-blue-700 text-center">Group A</div>
-                        <div className="px-3 py-1.5 bg-amber-50 text-amber-700 text-center">Group B</div>
+                    <div className="space-y-3">
+                      {/* Pool — unassigned dogs */}
+                      {activeDogs.some((d) => !groupAssignments[d.id]) && (
+                        <div className="border border-slate-200 rounded-md p-3">
+                          <p className="text-xs font-medium text-slate-500 mb-2">
+                            Unassigned — click to assign to A, then B, then remove
+                          </p>
+                          <div className="flex flex-wrap gap-2">
+                            {activeDogs
+                              .filter((d) => !groupAssignments[d.id])
+                              .map((dog) => (
+                                <button
+                                  key={dog.id}
+                                  type="button"
+                                  onClick={() => handlePoolDogClick(dog.id)}
+                                  className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-slate-100 text-slate-700 hover:bg-slate-200 transition-colors"
+                                >
+                                  {dog.name}
+                                </button>
+                              ))}
+                          </div>
+                        </div>
+                      )}
+
+                      {/* Group A box */}
+                      <div className="border-2 border-blue-200 rounded-md overflow-hidden">
+                        <div className="bg-blue-50 px-3 py-2 flex items-center justify-between">
+                          <span className="text-sm font-semibold text-blue-700">Group A</span>
+                          {groupA.length === 0 && (
+                            <span className="text-xs text-blue-400">No dogs assigned</span>
+                          )}
+                        </div>
+                        {groupA.length > 0 && (
+                          <div className="px-3 py-2 flex flex-wrap gap-2">
+                            {groupA.map((id) => {
+                              const dog = activeDogs.find((d) => d.id === id)
+                              return dog ? (
+                                <button
+                                  key={id}
+                                  type="button"
+                                  onClick={() => handleRemoveFromGroup(id)}
+                                  className="inline-flex items-center gap-1 px-3 py-1 rounded-full text-sm font-medium bg-blue-100 text-blue-700 hover:bg-blue-200 transition-colors"
+                                >
+                                  {dog.name}
+                                  <X size={12} />
+                                </button>
+                              ) : null
+                            })}
+                          </div>
+                        )}
+                        <div className="px-3 pb-3">
+                          <p className="text-xs font-medium text-slate-500 mb-1.5">Group A outcome</p>
+                          <div className="flex flex-wrap gap-1.5">
+                            {OUTCOME_OPTIONS.map(({ value, label, textColor }) => (
+                              <Button
+                                key={value}
+                                variant="outline"
+                                size="sm"
+                                aria-pressed={groupAOutcome === value}
+                                className={cn(
+                                  textColor,
+                                  'text-xs h-7 px-2',
+                                  groupAOutcome === value ? 'ring-2 ring-offset-1 ring-slate-500' : ''
+                                )}
+                                onClick={() => {
+                                  setGroupAOutcome(value)
+                                  if (groupError) setGroupError(null)
+                                }}
+                              >
+                                {label}
+                              </Button>
+                            ))}
+                          </div>
+                        </div>
                       </div>
-                      <div className="max-h-48 overflow-y-auto">
-                        {activeDogs.map((dog) => {
-                          const assignment = groupAssignments[dog.id] ?? null
-                          return (
-                            <div
-                              key={dog.id}
-                              className="grid grid-cols-3 items-center border-b border-slate-100 last:border-b-0"
-                            >
-                              <span className="px-3 py-1.5 text-sm text-slate-700 truncate">
-                                {dog.name}
-                              </span>
-                              <div className="flex justify-center py-1">
+
+                      {/* Group B box */}
+                      <div className="border-2 border-amber-200 rounded-md overflow-hidden">
+                        <div className="bg-amber-50 px-3 py-2 flex items-center justify-between">
+                          <span className="text-sm font-semibold text-amber-700">Group B</span>
+                          {groupB.length === 0 && (
+                            <span className="text-xs text-amber-400">No dogs assigned</span>
+                          )}
+                        </div>
+                        {groupB.length > 0 && (
+                          <div className="px-3 py-2 flex flex-wrap gap-2">
+                            {groupB.map((id) => {
+                              const dog = activeDogs.find((d) => d.id === id)
+                              return dog ? (
                                 <button
+                                  key={id}
                                   type="button"
-                                  onClick={() => handleGroupAssign(dog.id, 'A')}
-                                  className={cn(
-                                    'w-7 h-7 rounded-full text-xs font-bold transition-colors',
-                                    assignment === 'A'
-                                      ? 'bg-blue-500 text-white'
-                                      : 'bg-blue-50 text-blue-400 hover:bg-blue-100'
-                                  )}
+                                  onClick={() => handleRemoveFromGroup(id)}
+                                  className="inline-flex items-center gap-1 px-3 py-1 rounded-full text-sm font-medium bg-amber-100 text-amber-700 hover:bg-amber-200 transition-colors"
                                 >
-                                  A
+                                  {dog.name}
+                                  <X size={12} />
                                 </button>
-                              </div>
-                              <div className="flex justify-center py-1">
-                                <button
-                                  type="button"
-                                  onClick={() => handleGroupAssign(dog.id, 'B')}
-                                  className={cn(
-                                    'w-7 h-7 rounded-full text-xs font-bold transition-colors',
-                                    assignment === 'B'
-                                      ? 'bg-amber-500 text-white'
-                                      : 'bg-amber-50 text-amber-400 hover:bg-amber-100'
-                                  )}
-                                >
-                                  B
-                                </button>
-                              </div>
-                            </div>
-                          )
-                        })}
+                              ) : null
+                            })}
+                          </div>
+                        )}
+                        <div className="px-3 pb-3">
+                          <p className="text-xs font-medium text-slate-500 mb-1.5">Group B outcome</p>
+                          <div className="flex flex-wrap gap-1.5">
+                            {OUTCOME_OPTIONS.map(({ value, label, textColor }) => (
+                              <Button
+                                key={value}
+                                variant="outline"
+                                size="sm"
+                                aria-pressed={groupBOutcome === value}
+                                className={cn(
+                                  textColor,
+                                  'text-xs h-7 px-2',
+                                  groupBOutcome === value ? 'ring-2 ring-offset-1 ring-slate-500' : ''
+                                )}
+                                onClick={() => {
+                                  setGroupBOutcome(value)
+                                  if (groupError) setGroupError(null)
+                                }}
+                              >
+                                {label}
+                              </Button>
+                            ))}
+                          </div>
+                        </div>
                       </div>
                     </div>
                   )}
@@ -402,58 +478,6 @@ export function WalkLogSheet({
                 </>
               )}
             </div>
-
-            {/* Per-pair outcomes */}
-            {dogPairs.length >= 1 && (
-              <div>
-                <label className="text-sm font-medium text-slate-700 leading-normal block mb-0.5">
-                  Per-pair outcomes <span className="font-normal text-slate-400">(optional)</span>
-                </label>
-                <p className="text-xs text-slate-400 mb-2">
-                  Override the default outcome for specific pairs.
-                </p>
-                <div className="space-y-2">
-                  {dogPairs.map(({ idA, idB, nameA, nameB, key }) => (
-                    <div key={key}>
-                      <span className="text-sm text-slate-600 block mb-1">
-                        {nameA} &amp; {nameB}
-                      </span>
-                      <div className="flex flex-wrap gap-1">
-                        {OUTCOME_OPTIONS.map(({ value, label, textColor }) => {
-                          const selected = pairOutcomes[key] === value
-                          return (
-                            <Button
-                              key={value}
-                              variant="outline"
-                              size="sm"
-                              aria-pressed={selected}
-                              className={cn(
-                                textColor,
-                                'text-xs h-7 px-2',
-                                selected ? 'ring-2 ring-offset-1 ring-slate-500' : ''
-                              )}
-                              onClick={() => {
-                                setPairOutcomes((prev) => {
-                                  if (prev[key] === value) {
-                                    // Toggle off — clear override
-                                    const next = { ...prev }
-                                    delete next[key]
-                                    return next
-                                  }
-                                  return { ...prev, [key]: value }
-                                })
-                              }}
-                            >
-                              {label}
-                            </Button>
-                          )
-                        })}
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
 
             {/* Notes */}
             <div>
