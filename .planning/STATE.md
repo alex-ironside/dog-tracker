@@ -118,7 +118,7 @@ None yet.
 | 260329-p9k | group-context walk logging with two-group A/B assignment, group history display, graph hyperedge nodes (orange diamonds) for group-context conflicts | 2026-03-29 | d720d27 | Awaiting Verification | [260329-p9k-group-walk-compatibility-select-multi-do](./quick/260329-p9k-group-walk-compatibility-select-multi-do/) |
 | 260330-gxb | redesign two-groups walk logger: pool+group-box UI, per-group outcomes (groupAOutcome/groupBOutcome), remove pairOutcomes from all layers | 2026-03-30 | cc263d7 | Verified | [260330-gxb-redesign-walk-logger-two-group-drop-fiel](./quick/260330-gxb-redesign-walk-logger-two-group-drop-fiel/) |
 | 260330-i59 | add dnd-kit DnD to Two Groups walk logger (replace click-cycle UX), make entire RosterRow div the drag handle | 2026-03-30 | 4d4f140 | Verified | [260330-i59-drag-and-drop-for-two-groups-walk-loggin](./quick/260330-i59-drag-and-drop-for-two-groups-walk-loggin/) |
-| 260330-pey | replace per-group outcomes (groupAOutcome/groupBOutcome) with single groupOutcome for the Group A vs B encounter; schema v4 migration; simplified scoring; single encounter outcome picker in WalkLogSheet; single badge in WalkHistory | 2026-03-30 | b2d3dd4 | Awaiting Verification | [260330-pey-fix-walk-logging-group-relationship-grou](./quick/260330-pey-fix-walk-logging-group-relationship-grou/) |
+| 260330-pey | replace per-group outcomes (groupAOutcome/groupBOutcome) with single groupOutcome for the Group A vs B encounter; schema v4 migration; simplified scoring; single encounter outcome picker in WalkLogSheet; single badge in WalkHistory | 2026-03-30 | b2d3dd4 | Verified | [260330-pey-fix-walk-logging-group-relationship-grou](./quick/260330-pey-fix-walk-logging-group-relationship-grou/) |
 
 ## Session Continuity
 
