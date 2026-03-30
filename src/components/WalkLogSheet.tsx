@@ -102,8 +102,7 @@ export function WalkLogSheet({
   const [groupMode, setGroupMode] = useState<GroupMode>('together')
   // Map of dogId -> 'A' | 'B' | null
   const [groupAssignments, setGroupAssignments] = useState<Record<string, GroupAssignment>>({})
-  const [groupAOutcome, setGroupAOutcome] = useState<WalkOutcome | null>(null)
-  const [groupBOutcome, setGroupBOutcome] = useState<WalkOutcome | null>(null)
+  const [groupOutcome, setGroupOutcome] = useState<WalkOutcome | null>(null)
 
   const [activeDragId, setActiveDragId] = useState<string | null>(null)
 
@@ -126,8 +125,7 @@ export function WalkLogSheet({
       setNotes('')
       setGroupMode('together')
       setGroupAssignments({})
-      setGroupAOutcome(null)
-      setGroupBOutcome(null)
+      setGroupOutcome(null)
       setOutcomeError(false)
       setDogsError(false)
       setDateError(false)
@@ -229,10 +227,10 @@ export function WalkLogSheet({
       } else {
         setGroupError(null)
       }
-      // Both groups need an outcome in groups mode
-      if (groupAOutcome === null || groupBOutcome === null) {
+      // Encounter outcome required in groups mode
+      if (groupOutcome === null) {
         setGroupError((prev) =>
-          prev ?? 'Select an outcome for each group.'
+          prev ?? 'Select an encounter outcome.'
         )
         valid = false
       }
@@ -248,11 +246,11 @@ export function WalkLogSheet({
 
     const groupContextPayload =
       groupMode === 'groups'
-        ? { groupA, groupB, groupAOutcome: groupAOutcome!, groupBOutcome: groupBOutcome! }
+        ? { groupA, groupB, groupOutcome: groupOutcome! }
         : undefined
 
-    // Walk-level outcome: use selected in together mode, groupAOutcome as primary fallback in groups mode
-    const resolvedOutcome = groupMode === 'groups' ? groupAOutcome! : outcome!
+    // Walk-level outcome: use selected in together mode, groupOutcome for group encounter
+    const resolvedOutcome = groupMode === 'groups' ? groupOutcome! : outcome!
 
     useAppStore.getState().addWalkLog({
       date,
@@ -460,30 +458,6 @@ export function WalkLogSheet({
                               })}
                             </div>
                           )}
-                          <div className="px-3 pb-3">
-                            <p className="text-xs font-medium text-slate-500 mb-1.5">Group A outcome</p>
-                            <div className="flex flex-wrap gap-1.5">
-                              {OUTCOME_OPTIONS.map(({ value, label, textColor }) => (
-                                <Button
-                                  key={value}
-                                  variant="outline"
-                                  size="sm"
-                                  aria-pressed={groupAOutcome === value}
-                                  className={cn(
-                                    textColor,
-                                    'text-xs h-7 px-2',
-                                    groupAOutcome === value ? 'ring-2 ring-offset-1 ring-slate-500' : ''
-                                  )}
-                                  onClick={() => {
-                                    setGroupAOutcome(value)
-                                    if (groupError) setGroupError(null)
-                                  }}
-                                >
-                                  {label}
-                                </Button>
-                              ))}
-                            </div>
-                          </div>
                         </DroppableBox>
 
                         {/* Group B box */}
@@ -509,31 +483,34 @@ export function WalkLogSheet({
                               })}
                             </div>
                           )}
-                          <div className="px-3 pb-3">
-                            <p className="text-xs font-medium text-slate-500 mb-1.5">Group B outcome</p>
-                            <div className="flex flex-wrap gap-1.5">
-                              {OUTCOME_OPTIONS.map(({ value, label, textColor }) => (
-                                <Button
-                                  key={value}
-                                  variant="outline"
-                                  size="sm"
-                                  aria-pressed={groupBOutcome === value}
-                                  className={cn(
-                                    textColor,
-                                    'text-xs h-7 px-2',
-                                    groupBOutcome === value ? 'ring-2 ring-offset-1 ring-slate-500' : ''
-                                  )}
-                                  onClick={() => {
-                                    setGroupBOutcome(value)
-                                    if (groupError) setGroupError(null)
-                                  }}
-                                >
-                                  {label}
-                                </Button>
-                              ))}
-                            </div>
-                          </div>
                         </DroppableBox>
+
+                        {/* Shared encounter outcome picker */}
+                        <div className="border border-slate-200 rounded-md px-3 py-3">
+                          <p className="text-sm font-medium text-slate-700 mb-0.5">Encounter outcome</p>
+                          <p className="text-xs text-slate-500 mb-2">How did the groups interact?</p>
+                          <div className="flex flex-wrap gap-1.5">
+                            {OUTCOME_OPTIONS.map(({ value, label, textColor }) => (
+                              <Button
+                                key={value}
+                                variant="outline"
+                                size="sm"
+                                aria-pressed={groupOutcome === value}
+                                className={cn(
+                                  textColor,
+                                  'text-xs h-7 px-2',
+                                  groupOutcome === value ? 'ring-2 ring-offset-1 ring-slate-500' : ''
+                                )}
+                                onClick={() => {
+                                  setGroupOutcome(value)
+                                  if (groupError) setGroupError(null)
+                                }}
+                              >
+                                {label}
+                              </Button>
+                            ))}
+                          </div>
+                        </div>
                       </div>
 
                       <DragOverlay>

@@ -78,27 +78,24 @@ function WalkLogEntryRow({
     )
   }
 
-  const hasPerGroupOutcomes = !!(entry.groupContext?.groupAOutcome || entry.groupContext?.groupBOutcome)
+  const hasGroupOutcome = !!entry.groupContext?.groupOutcome
 
   return (
     <div className="border border-slate-200 rounded-md px-4 py-3 bg-white">
       <div className="flex items-center gap-2 flex-wrap">
         <span className="text-sm text-slate-500">{entry.date}</span>
-        {/* Show walk-level badge only when no per-group outcomes are present */}
-        {!hasPerGroupOutcomes && <OutcomeBadge outcome={entry.outcome} />}
+        {/* Show walk-level badge when no group encounter outcome is present */}
+        {!hasGroupOutcome && <OutcomeBadge outcome={entry.outcome} />}
         {entry.groupContext && groupANames && groupBNames ? (
           <span className="text-sm text-slate-700">
+            {hasGroupOutcome && (
+              <>{' '}<OutcomeBadge outcome={entry.groupContext.groupOutcome!} />{' '}</>
+            )}
             <span className="text-blue-700 font-medium">Group A:</span>{' '}
             {groupANames.join(', ')}
-            {entry.groupContext.groupAOutcome && (
-              <>{' '}<OutcomeBadge outcome={entry.groupContext.groupAOutcome} /></>
-            )}
             <span className="mx-2 text-slate-300">|</span>
             <span className="text-amber-700 font-medium">Group B:</span>{' '}
             {groupBNames.join(', ')}
-            {entry.groupContext.groupBOutcome && (
-              <>{' '}<OutcomeBadge outcome={entry.groupContext.groupBOutcome} /></>
-            )}
           </span>
         ) : (
           <span className="text-sm text-slate-700">{dogNames}</span>
