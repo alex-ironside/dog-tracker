@@ -1,4 +1,4 @@
-import type { CompatibilityStatus, CompatibilityEntry, WalkLogEntry } from '@/types'
+import type { CompatibilityStatus, CompatibilityEntry, WalkLogEntry, WalkOutcome } from '@/types'
 
 export type ConflictingPair = { idA: string; idB: string; status: 'conflict' | 'unknown' }
 
@@ -43,9 +43,24 @@ export function inferStatusFromHistory(
   )
   if (pairWalks.length === 0) return null
 
-  // Resolve per-walk outcome: use pairOutcomes[pairKey] if available, else walk-level outcome
-  const key = pairKey(dogIdA, dogIdB)
-  const resolvedOutcomes = pairWalks.map((e) => e.pairOutcomes?.[key] ?? e.outcome)
+  // Resolve per-walk outcome using per-group outcomes when available
+  const resolvedOutcomes = pairWalks.map((e) => {
+    if (e.groupContext?.groupAOutcome && e.groupContext?.groupBOutcome) {
+      const { groupA, groupB, groupAOutcome, groupBOutcome } = e.groupContext
+      const inA_A = groupA.includes(dogIdA)
+      const inA_B = groupA.includes(dogIdB)
+      // Both in group A -> use group A outcome
+      if (inA_A && inA_B) return groupAOutcome
+      const inB_A = groupB.includes(dogIdA)
+      const inB_B = groupB.includes(dogIdB)
+      // Both in group B -> use group B outcome
+      if (inB_A && inB_B) return groupBOutcome
+      // Cross-group -> use the worse outcome
+      const outcomeRank: Record<WalkOutcome, number> = { incident: 4, poor: 3, neutral: 2, good: 1, great: 0 }
+      return outcomeRank[groupAOutcome] >= outcomeRank[groupBOutcome] ? groupAOutcome : groupBOutcome
+    }
+    return e.outcome
+  })
 
   if (resolvedOutcomes.some((o) => o === 'incident')) return 'conflict'
   if (resolvedOutcomes.some((o) => o === 'poor')) return 'neutral'
@@ -68,15 +83,24 @@ export function inferGroupContextConflicts(
   }
 
   for (const entry of walkHistory) {
-    if (!entry.groupContext || !entry.pairOutcomes) continue
+    if (!entry.groupContext) continue
 
-    const { groupA, groupB } = entry.groupContext
-    // Only interested in cross-group pairs with incident or poor
+    const { groupA, groupB, groupAOutcome, groupBOutcome } = entry.groupContext
+    if (!groupAOutcome && !groupBOutcome) continue
+
+    // Derive cross-group outcome: worst of the two group outcomes
+    const outcomeRank: Record<string, number> = { incident: 4, poor: 3, neutral: 2, good: 1, great: 0 }
+    const crossOutcome = (() => {
+      const outcomes = [groupAOutcome, groupBOutcome].filter(Boolean) as WalkOutcome[]
+      if (outcomes.length === 0) return null
+      return outcomes.reduce((worst, o) => outcomeRank[o] > outcomeRank[worst] ? o : worst)
+    })()
+    if (!crossOutcome || (crossOutcome !== 'incident' && crossOutcome !== 'poor')) continue
+
+    // All cross-group pairs share the derived outcome
     for (const idA of groupA) {
       for (const idB of groupB) {
-        const pk = pairKey(idA, idB)
-        const outcome = entry.pairOutcomes[pk] ?? entry.outcome
-        if (outcome !== 'incident' && outcome !== 'poor') continue
+        const outcome = crossOutcome
 
         // The trigger group is the one with 2+ dogs (the group-context source)
         // If groupA has 2+ dogs, A dogs are triggers and B dog is the target
