@@ -6,7 +6,15 @@
       "Skill(gsd:discuss-phase)",
       "Skill(gsd:discuss-phase:*)",
       "Skill(gsd:plan-phase)",
-      "WebSearch"
+      "WebSearch",
+      "Bash(node:*)",
+      "Bash(npx vitest:*)",
+      "Bash(npm run:*)",
+      "mcp__stitch__create_project",
+      "mcp__stitch__generate_screen_from_text",
+      "mcp__stitch__list_screens",
+      "mcp__stitch__get_project",
+      "Skill(gsd:ui-phase)"
     ]
   }
 }

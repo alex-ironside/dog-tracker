@@ -55,8 +55,8 @@
 - [x] **HIST-01**: After a walk, behaviorist can log an outcome: Great / Good / Neutral / Poor / Incident
 - [x] **HIST-02**: Behaviorist can add free-text notes to a walk log entry
 - [x] **HIST-03**: Each walk log entry records a snapshot of which dogs were present (immutable after save)
-- [ ] **HIST-04**: Each dog has a history view showing their walk outcomes over time as a chart
-- [ ] **HIST-05**: Walk history chart uses a dedicated charting library (Recharts) — not custom SVG
+- [x] **HIST-04**: Each dog has a history view showing their walk outcomes over time as a chart
+- [x] **HIST-05**: Walk history chart uses a dedicated charting library (Recharts) — not custom SVG
 
 ## v2 Requirements
 
@@ -126,8 +126,8 @@
 | HIST-01 | Phase 6 | Complete |
 | HIST-02 | Phase 6 | Complete |
 | HIST-03 | Phase 6 | Complete |
-| HIST-04 | Phase 6 | Pending |
-| HIST-05 | Phase 6 | Pending |
+| HIST-04 | Phase 6 | Complete |
+| HIST-05 | Phase 6 | Complete |
 
 **Coverage:**
 - v1 requirements: 32 total
