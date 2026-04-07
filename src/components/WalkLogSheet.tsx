@@ -15,6 +15,7 @@ import {
 import { CSS } from '@dnd-kit/utilities'
 import { Sheet, SheetContent, SheetTitle } from '@/components/ui/sheet'
 import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
 import { useAppStore } from '@/store'
 import { cn } from '@/lib/utils'
 import { useDogSearch, DogSearchInput } from './SearchableDogPicker'
@@ -114,6 +115,73 @@ export function WalkLogSheet({
   const [groupOutcome, setGroupOutcome] = useState<WalkOutcome | null>(null)
 
   const [activeDragId, setActiveDragId] = useState<string | null>(null)
+  const [addMode, setAddMode] = useState(false)
+  const [newDogName, setNewDogName] = useState('')
+
+  function handleAddDog() {
+    const trimmed = newDogName.trim()
+    if (!trimmed) return
+    const beforeIds = new Set(useAppStore.getState().dogs.map((d) => d.id))
+    useAppStore.getState().addDog({ name: trimmed, breed: '', age: null, notes: '' })
+    const created = useAppStore.getState().dogs.find((d) => !beforeIds.has(d.id))
+    if (created) {
+      setSelectedDogIds((prev) => (prev.includes(created.id) ? prev : [...prev, created.id]))
+      if (dogsError) setDogsError(false)
+    }
+    setNewDogName('')
+    setAddMode(false)
+    setDogQuery('')
+  }
+
+  function cancelAddDog() {
+    setNewDogName('')
+    setAddMode(false)
+  }
+
+  const renderAddDog = () => (
+    <div className="mb-2">
+      {!addMode ? (
+        <Button
+          type="button"
+          variant="outline"
+          size="sm"
+          onClick={() => setAddMode(true)}
+        >
+          {t('walkLog.addNewDog')}
+        </Button>
+      ) : (
+        <div className="flex items-center gap-2">
+          <Input
+            value={newDogName}
+            onChange={(e) => setNewDogName(e.target.value)}
+            placeholder={t('walkLog.newDogNamePlaceholder')}
+            autoFocus
+            onKeyDown={(e) => {
+              if (e.key === 'Enter') {
+                e.preventDefault()
+                handleAddDog()
+              } else if (e.key === 'Escape') {
+                e.preventDefault()
+                cancelAddDog()
+              }
+            }}
+            className="h-8"
+          />
+          <Button
+            type="button"
+            size="sm"
+            onClick={handleAddDog}
+            disabled={!newDogName.trim()}
+          >
+            {t('walkLog.saveNewDog')}
+          </Button>
+          <Button type="button" variant="outline" size="sm" onClick={cancelAddDog}>
+            {t('walkLog.cancelNewDog')}
+          </Button>
+        </div>
+      )}
+    </div>
+  )
 
   const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 8 } }),
@@ -421,6 +489,7 @@ export function WalkLogSheet({
                   {activeDogs.length > 0 && (
                     <DogSearchInput value={dogQuery} onChange={setDogQuery} className="mb-2" />
                   )}
+                  {renderAddDog()}
                   <div className="max-h-48 overflow-y-auto border border-input rounded-md px-3 py-2">
                     {activeDogs.length === 0 ? (
                       <p className="text-sm text-muted-foreground/70">{t('walkLog.noActiveDogs')}</p>
@@ -465,6 +534,7 @@ export function WalkLogSheet({
                                 {t('walkLog.dragHint')}
                               </p>
                               <DogSearchInput value={dogQuery} onChange={setDogQuery} className="mb-2" />
+                              {renderAddDog()}
                               {poolDogs.length === 0 ? (
                                 <p className="text-sm text-muted-foreground/70">{t('picker.noMatches')}</p>
                               ) : (
