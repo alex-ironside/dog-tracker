@@ -159,7 +159,11 @@
     "neutralOutcome": "Neutral",
     "tense": "Tense",
     "conflict": "Conflict",
-    "discard": "Discard"
+    "discard": "Discard",
+    "addNewDog": "+ New dog",
+    "newDogNamePlaceholder": "Dog name",
+    "saveNewDog": "Save",
+    "cancelNewDog": "Cancel"
   },
   "picker": {
     "searchPlaceholder": "Search dogs…",

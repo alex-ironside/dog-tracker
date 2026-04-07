@@ -161,7 +161,11 @@
     "neutralOutcome": "Neutralnie",
     "tense": "Napięcie",
     "conflict": "Konflikt",
-    "discard": "Odrzuć"
+    "discard": "Odrzuć",
+    "addNewDog": "+ Nowy pies",
+    "newDogNamePlaceholder": "Imię psa",
+    "saveNewDog": "Zapisz",
+    "cancelNewDog": "Anuluj"
   },
   "picker": {
     "searchPlaceholder": "Szukaj psów…",
