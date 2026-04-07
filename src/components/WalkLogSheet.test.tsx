@@ -132,3 +132,45 @@ describe('WalkLogSheet - Save', () => {
     expect(onOpenChange).toHaveBeenCalledWith(false)
   })
 })
+
+describe('WalkLogSheet - inline add dog', () => {
+  it('clicking "+ New dog" reveals the name input', async () => {
+    const user = userEvent.setup()
+    render(<WalkLogSheet open={true} onOpenChange={vi.fn()} />)
+    expect(screen.queryByPlaceholderText('Dog name')).not.toBeInTheDocument()
+    await user.click(screen.getByRole('button', { name: '+ New dog' }))
+    expect(screen.getByPlaceholderText('Dog name')).toBeInTheDocument()
+  })
+
+  it('typing a name and clicking Save adds the dog and auto-selects it', async () => {
+    const user = userEvent.setup()
+    render(<WalkLogSheet open={true} onOpenChange={vi.fn()} />)
+    await user.click(screen.getByRole('button', { name: '+ New dog' }))
+    await user.type(screen.getByPlaceholderText('Dog name'), 'Rex')
+    await user.click(screen.getByRole('button', { name: 'Save' }))
+    expect(useAppStore.getState().dogs.some((d) => d.name === 'Rex')).toBe(true)
+    const checkbox = screen.getByLabelText(/rex/i) as HTMLInputElement
+    expect(checkbox).toBeChecked()
+  })
+
+  it('Save is disabled when name is empty or whitespace', async () => {
+    const user = userEvent.setup()
+    render(<WalkLogSheet open={true} onOpenChange={vi.fn()} />)
+    await user.click(screen.getByRole('button', { name: '+ New dog' }))
+    const saveBtn = screen.getByRole('button', { name: 'Save' })
+    expect(saveBtn).toBeDisabled()
+    await user.type(screen.getByPlaceholderText('Dog name'), '   ')
+    expect(saveBtn).toBeDisabled()
+  })
+
+  it('Cancel hides the form and does not add a dog', async () => {
+    const user = userEvent.setup()
+    render(<WalkLogSheet open={true} onOpenChange={vi.fn()} />)
+    const before = useAppStore.getState().dogs.length
+    await user.click(screen.getByRole('button', { name: '+ New dog' }))
+    await user.type(screen.getByPlaceholderText('Dog name'), 'Ghost')
+    await user.click(screen.getByRole('button', { name: 'Cancel' }))
+    expect(screen.queryByPlaceholderText('Dog name')).not.toBeInTheDocument()
+    expect(useAppStore.getState().dogs.length).toBe(before)
+  })
+})
