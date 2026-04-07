@@ -20,7 +20,7 @@ describe('DogRoster - Empty state', () => {
 
   it('renders empty state body text', () => {
     renderRoster()
-    expect(screen.getByText('Add your first dog to get started.')).toBeInTheDocument()
+    expect(screen.getByText(/Add your first dog/i)).toBeInTheDocument()
   })
 
   it('renders an "Add Dog" button', () => {

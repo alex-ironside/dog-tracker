@@ -1,5 +1,6 @@
 import { useState, useEffect, useMemo } from 'react'
 import { X } from 'lucide-react'
+import { useTranslation } from 'react-i18next'
 import {
   DndContext,
   DragOverlay,
@@ -92,11 +93,12 @@ export function WalkLogSheet({
   initialGroupId,
   editEntry,
 }: WalkLogSheetProps) {
+  const { t } = useTranslation()
   const dogs = useAppStore((s) => s.dogs)
   const activeDogs = dogs.filter((d) => !d.archived)
 
   const isEditing = !!editEntry
-  const sheetTitle = title ?? (isEditing ? 'Edit Walk Log' : 'Log a Walk')
+  const sheetTitle = title ?? (isEditing ? t('walkLog.editTitle', { defaultValue: 'Edit Walk Log' }) : t('walkLog.addTitle', { defaultValue: 'Log a Walk' }))
 
   const todayStr = new Date().toISOString().split('T')[0]
 

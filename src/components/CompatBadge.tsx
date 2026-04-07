@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next'
 import type { CompatibilityStatus } from '@/types'
 
 const BADGE_STYLES: Record<CompatibilityStatus, string> = {
@@ -8,9 +9,12 @@ const BADGE_STYLES: Record<CompatibilityStatus, string> = {
 }
 
 export function CompatBadge({ status }: { status: CompatibilityStatus }) {
+  const { t } = useTranslation()
   return (
-    <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${BADGE_STYLES[status]}`}>
-      {status.charAt(0).toUpperCase() + status.slice(1)}
+    <span
+      className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${BADGE_STYLES[status]}`}
+    >
+      {t(`compat.status.${status}`)}
     </span>
   )
 }

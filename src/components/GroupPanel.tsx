@@ -1,5 +1,6 @@
 import { useState, useRef, useLayoutEffect } from 'react'
 import { useDroppable } from '@dnd-kit/core'
+import { useTranslation } from 'react-i18next'
 import { AlertTriangle, Trash2 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { MiniDogCard } from '@/components/MiniDogCard'
@@ -26,6 +27,7 @@ function scoreBadgeClasses(score: number): string {
 }
 
 export function GroupPanel({ group, dogs, onRename, onDelete, onRemoveDog, score, hasConflicts, conflicts, onConflictClick }: GroupPanelProps) {
+  const { t } = useTranslation()
   const { setNodeRef, isOver } = useDroppable({ id: group.id })
   const containerRef = useRef<HTMLDivElement>(null)
   const cardRefs = useRef<Map<string, HTMLElement>>(new Map())
@@ -100,7 +102,7 @@ export function GroupPanel({ group, dogs, onRename, onDelete, onRemoveDog, score
         <Button
           variant='ghost'
           size='icon'
-          aria-label={`Delete ${group.name}`}
+          aria-label={t('groups.deleteGroupAria', { name: group.name, defaultValue: `Delete ${group.name}` })}
           onClick={onDelete}
         >
           <Trash2 size={14} className='text-destructive' />

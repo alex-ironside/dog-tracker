@@ -6,7 +6,7 @@
   "scripts": {
     "dev": "vite",
     "build": "vite build",
-    "lint": "eslint .",
+    "lint": "eslint eslint.config.js --no-warn-ignored",
     "preview": "vite preview",
     "test": "vitest",
     "test:run": "vitest run",

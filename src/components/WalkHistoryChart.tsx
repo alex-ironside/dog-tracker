@@ -7,6 +7,7 @@ import {
   CartesianGrid,
   ResponsiveContainer,
 } from 'recharts'
+import { useTranslation } from 'react-i18next'
 import { useAppStore } from '@/store'
 import type { WalkOutcome } from '@/types'
 
@@ -57,6 +58,7 @@ function WalkHistoryTooltip({ active, payload }: any) {
 }
 
 export function WalkHistoryChart({ dogId }: WalkHistoryChartProps) {
+  const { t } = useTranslation()
   const walkHistory = useAppStore((s) => s.walkHistory)
   const dogs = useAppStore((s) => s.dogs)
 
@@ -68,7 +70,7 @@ export function WalkHistoryChart({ dogId }: WalkHistoryChartProps) {
   if (entries.length === 0) {
     return (
       <div className="flex items-center justify-center h-[220px] text-sm text-muted-foreground/70">
-        No walks logged yet
+        {t('history.empty', { defaultValue: 'No walks logged yet' })}
       </div>
     )
   }

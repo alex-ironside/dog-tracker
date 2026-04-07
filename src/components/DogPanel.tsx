@@ -1,5 +1,6 @@
 import { useState, useEffect, useId } from 'react'
 import { X } from 'lucide-react'
+import { useTranslation } from 'react-i18next'
 import { Sheet, SheetContent, SheetTitle } from '@/components/ui/sheet'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -34,6 +35,7 @@ function OutcomeBadge({ outcome }: { outcome: WalkOutcome }) {
 }
 
 export function DogPanel({ open, onOpenChange, editingDog }: DogPanelProps) {
+  const { t } = useTranslation()
   const [name, setName] = useState('')
   const [breed, setBreed] = useState('')
   const [age, setAge] = useState('')
@@ -276,10 +278,10 @@ export function DogPanel({ open, onOpenChange, editingDog }: DogPanelProps) {
         {activeTab === 'profile' && (
           <div className="sticky bottom-0 bg-card border-t border-border py-4 px-6 flex justify-between">
             <Button variant="outline" onClick={handleDiscard}>
-              Discard
+              {t('common.discard')}
             </Button>
             <Button variant="default" onClick={handleSave}>
-              Save Dog
+              {t('dogPanel.saveDog', { defaultValue: 'Save Dog' })}
             </Button>
           </div>
         )}

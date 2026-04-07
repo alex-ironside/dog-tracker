@@ -1,5 +1,6 @@
 import { useState, useMemo } from 'react'
 import { Pencil, Trash2 } from 'lucide-react'
+import { useTranslation } from 'react-i18next'
 import { useAppStore } from '@/store'
 import { Button } from '@/components/ui/button'
 import { WalkLogSheet } from '@/components/WalkLogSheet'
@@ -156,6 +157,7 @@ function WalkLogEntryRow({
 }
 
 export function WalkHistory() {
+  const { t } = useTranslation()
   const walkHistory = useAppStore((s) => s.walkHistory)
   const dogs = useAppStore((s) => s.dogs)
   const compatibilityEntries = useAppStore((s) => s.compatibilityEntries)
@@ -193,7 +195,7 @@ export function WalkHistory() {
     <div>
       <div className="flex items-end justify-between mb-6">
         <div>
-          <h1 className="font-display text-4xl font-semibold tracking-tight text-foreground">Walk History</h1>
+          <h1 className="font-display text-4xl font-semibold tracking-tight text-foreground">{t('history.title', { defaultValue: 'Walk History' })}</h1>
           <p className="text-sm text-muted-foreground mt-1">Every walk, every outcome.</p>
         </div>
         <Button variant="default" size="lg" onClick={() => { setEditEntry(undefined); setSheetOpen(true) }} className="shadow-sm">

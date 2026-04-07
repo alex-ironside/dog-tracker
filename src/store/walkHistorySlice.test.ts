@@ -95,8 +95,8 @@ describe('walkHistorySlice', () => {
     expect(store.getState().walkHistory).toHaveLength(3)
   })
 
-  it('no editWalkLog or deleteWalkLog action exists on the slice', () => {
-    expect(store.getState()).not.toHaveProperty('editWalkLog')
-    expect(store.getState()).not.toHaveProperty('deleteWalkLog')
+  it('updateWalkLog and deleteWalkLog actions exist on the slice', () => {
+    expect(store.getState()).toHaveProperty('updateWalkLog')
+    expect(store.getState()).toHaveProperty('deleteWalkLog')
   })
 })

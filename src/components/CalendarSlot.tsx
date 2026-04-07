@@ -1,4 +1,5 @@
 import { useDroppable } from '@dnd-kit/core'
+import { useTranslation } from 'react-i18next'
 import { slotKey } from '@/lib/calendarUtils'
 import { getConflictsInGroup } from '@/lib/scoring'
 import { ScheduledGroupCard } from '@/components/ScheduledGroupCard'
@@ -29,6 +30,7 @@ export function CalendarSlot({
   onUnschedule,
   onLog,
 }: CalendarSlotProps) {
+  const { t } = useTranslation()
   const slotKeyStr = slotKey({ dayOfWeek, hour, minute })
   const { setNodeRef, isOver } = useDroppable({ id: slotKeyStr })
 
@@ -41,8 +43,8 @@ export function CalendarSlot({
     : false
 
   const ariaLabel = session && group
-    ? `${dayName} ${hour}:00 — ${group.name}, ${group.dogIds.length} dogs`
-    : `${dayName} ${hour}:00 — empty`
+    ? `${dayName} ${hour}:00 — ${group.name}, ${t('calendar.dogs', { count: group.dogIds.length })}`
+    : `${dayName} ${hour}:00 — ${t('calendar.emptySlot', { defaultValue: 'empty' })}`
 
   const isOccupied = !!(session && group)
   const ringClass = isOver

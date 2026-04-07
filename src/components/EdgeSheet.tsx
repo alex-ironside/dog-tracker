@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import { X } from 'lucide-react'
+import { useTranslation } from 'react-i18next'
 import { Sheet, SheetContent, SheetTitle } from '@/components/ui/sheet'
 import { Button } from '@/components/ui/button'
 import { CompatBadge } from '@/components/CompatBadge'
@@ -31,6 +32,7 @@ export function EdgeSheet({
   onSetStatus,
   onRemove,
 }: EdgeSheetProps) {
+  const { t } = useTranslation()
   const [selectedStatus, setSelectedStatus] = useState<CompatibilityStatus | null>(null)
 
   // Reset selection when sheet opens
@@ -70,7 +72,7 @@ export function EdgeSheet({
           </div>
 
           {/* Status picker */}
-          <p className="text-sm font-semibold text-foreground/90 mt-6">Set compatibility:</p>
+          <p className="text-sm font-semibold text-foreground/90 mt-6">{t('compat.setStatus', { defaultValue: 'Set compatibility' })}:</p>
           <div className="grid grid-cols-2 gap-2 mt-2">
             {STATUS_OPTIONS.map(({ value, label }) => (
               <Button

@@ -2,8 +2,8 @@ import { describe, it, expect } from 'vitest'
 import { migrate, CURRENT_SCHEMA_VERSION } from './migrations'
 
 describe('migrations', () => {
-  it('CURRENT_SCHEMA_VERSION is 2', () => {
-    expect(CURRENT_SCHEMA_VERSION).toBe(2)
+  it('CURRENT_SCHEMA_VERSION is 4', () => {
+    expect(CURRENT_SCHEMA_VERSION).toBe(4)
   })
 
   it('migrates v1 state to v2 by adding walkHistory: []', () => {
@@ -16,7 +16,7 @@ describe('migrations', () => {
     }
     const result = migrate(v1State, 1)
     expect(result.walkHistory).toEqual([])
-    expect(result.schemaVersion).toBe(2)
+    expect(result.schemaVersion).toBe(CURRENT_SCHEMA_VERSION)
     expect(result.dogs).toHaveLength(1)
   })
 
@@ -43,7 +43,7 @@ describe('migrations', () => {
       walkHistory: [],
     }
     const result = migrate(v2State, 2)
-    expect(result.schemaVersion).toBe(2)
+    expect(result.schemaVersion).toBe(CURRENT_SCHEMA_VERSION)
     expect(result.walkHistory).toEqual([])
   })
 })

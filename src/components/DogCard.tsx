@@ -1,4 +1,5 @@
 import { GripVertical, Pencil, Archive, ArchiveRestore } from 'lucide-react'
+import { useTranslation } from 'react-i18next'
 import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
 import type { Dog } from '@/types'
@@ -18,6 +19,7 @@ function buildMeta(dog: Dog): string {
 }
 
 export function DogCard({ dog, onEdit, onArchive, onUnarchive }: DogCardProps) {
+  const { t } = useTranslation()
   const meta = buildMeta(dog)
 
   return (
@@ -49,7 +51,7 @@ export function DogCard({ dog, onEdit, onArchive, onUnarchive }: DogCardProps) {
           className="flex items-center gap-1"
         >
           <Pencil size={14} />
-          Edit
+          {t('common.edit')}
         </Button>
 
         {dog.archived ? (
@@ -60,7 +62,7 @@ export function DogCard({ dog, onEdit, onArchive, onUnarchive }: DogCardProps) {
             className="flex items-center gap-1"
           >
             <ArchiveRestore size={14} />
-            Unarchive
+            {t('common.unarchive')}
           </Button>
         ) : (
           <Button
@@ -70,7 +72,7 @@ export function DogCard({ dog, onEdit, onArchive, onUnarchive }: DogCardProps) {
             className="text-destructive hover:text-destructive flex items-center gap-1"
           >
             <Archive size={14} />
-            Archive
+            {t('common.archive')}
           </Button>
         )}
       </div>

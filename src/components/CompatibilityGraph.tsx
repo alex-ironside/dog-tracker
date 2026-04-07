@@ -1,5 +1,6 @@
 import { useMemo, useState, useEffect, useRef, useCallback } from 'react'
 import ForceGraph2D from 'react-force-graph-2d'
+import { useTranslation } from 'react-i18next'
 import { useAppStore } from '@/store'
 import { EdgeSheet } from '@/components/EdgeSheet'
 import { DogPanel } from '@/components/DogPanel'
@@ -39,6 +40,7 @@ const GROUP_NODE_FILL = '#e36841'
 const GROUP_LABEL_FILL = '#f0e9dd'
 
 export function CompatibilityGraph() {
+  const { t } = useTranslation()
   const allDogs = useAppStore((s) => s.dogs)
   const compatibilityEntries = useAppStore((s) => s.compatibilityEntries)
   const walkHistory = useAppStore((s) => s.walkHistory)
@@ -183,13 +185,13 @@ export function CompatibilityGraph() {
     return (
       <div>
         <header className='mb-8'>
-          <h1 className='font-display text-4xl font-semibold tracking-tight text-foreground'>Compatibility</h1>
-          <p className='text-sm text-muted-foreground mt-1'>How your dogs get along.</p>
+          <h1 className='font-display text-4xl font-semibold tracking-tight text-foreground'>{t('nav.compatibility')}</h1>
+          <p className='text-sm text-muted-foreground mt-1'>{t('compat.tagline', { defaultValue: 'How your dogs get along.' })}</p>
         </header>
         <div className='flex flex-col items-center justify-center rounded-2xl border border-dashed border-border bg-card/40 py-20 text-center gap-3'>
-          <h2 className='font-display text-2xl font-semibold text-foreground'>No compatibility data yet</h2>
+          <h2 className='font-display text-2xl font-semibold text-foreground'>{t('compat.noData')}</h2>
           <p className='text-sm text-muted-foreground max-w-xs'>
-            Add dogs in the Dogs tab, then click any two dogs to set their compatibility.
+            {t('compat.noDataBody', { defaultValue: 'Add dogs in the Dogs tab, then click any two dogs to set their compatibility.' })}
           </p>
         </div>
       </div>

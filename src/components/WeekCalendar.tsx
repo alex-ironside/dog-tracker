@@ -1,5 +1,6 @@
 import React from 'react'
 import { ChevronLeft, ChevronRight } from 'lucide-react'
+import { useTranslation } from 'react-i18next'
 import { Button } from '@/components/ui/button'
 import { CalendarSlot } from '@/components/CalendarSlot'
 import {
@@ -34,6 +35,7 @@ export function WeekCalendar({
   onUnschedule,
   onLog,
 }: WeekCalendarProps) {
+  const { t } = useTranslation()
   const weekDays = getWeekDays(weekOffset)
   const monday = getMondayOfWeek(weekOffset)
 
@@ -44,7 +46,7 @@ export function WeekCalendar({
         <Button
           variant='ghost'
           size='icon'
-          aria-label='Previous week'
+          aria-label={t('calendar.prevWeek', { defaultValue: 'Previous week' })}
           onClick={onPrevWeek}
         >
           <ChevronLeft className='h-4 w-4' />
@@ -55,7 +57,7 @@ export function WeekCalendar({
         <Button
           variant='ghost'
           size='icon'
-          aria-label='Next week'
+          aria-label={t('calendar.nextWeek', { defaultValue: 'Next week' })}
           onClick={onNextWeek}
         >
           <ChevronRight className='h-4 w-4' />

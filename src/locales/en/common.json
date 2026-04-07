@@ -12,5 +12,117 @@
   "lang": {
     "en": "EN",
     "pl": "PL"
+  },
+  "common": {
+    "save": "Save",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "edit": "Edit",
+    "remove": "Remove",
+    "add": "Add",
+    "close": "Close",
+    "discard": "Discard",
+    "confirm": "Confirm",
+    "archive": "Archive",
+    "unarchive": "Unarchive"
+  },
+  "roster": {
+    "title": "Dog Roster",
+    "subtitle": "Your pack at a glance.",
+    "addDog": "Add Dog",
+    "emptyTitle": "No dogs yet",
+    "emptyBody": "Add your first dog to start tracking walks, groups, and compatibility.",
+    "searchPlaceholder": "Search dogs...",
+    "showArchived": "Show archived",
+    "archived": "Archived",
+    "noMatches": "No dogs match your search.",
+    "deleteDog": "Delete dog",
+    "editDog": "Edit dog",
+    "inGroup": "in {{group}}"
+  },
+  "dogPanel": {
+    "addTitle": "Add Dog",
+    "editTitle": "Edit Dog",
+    "name": "Name",
+    "breed": "Breed",
+    "age": "Age",
+    "notes": "Notes",
+    "namePlaceholder": "Dog's name",
+    "breedPlaceholder": "Breed",
+    "notesPlaceholder": "Notes about this dog",
+    "saveDog": "Save Dog",
+    "nameRequired": "Name is required"
+  },
+  "compat": {
+    "status": {
+      "compatible": "Compatible",
+      "neutral": "Neutral",
+      "conflict": "Conflict",
+      "unknown": "Unknown"
+    },
+    "graphTitle": "Compatibility Graph",
+    "noData": "No compatibility data yet",
+    "setStatus": "Set compatibility",
+    "edgeTitle": "Compatibility",
+    "tagline": "How your dogs get along.",
+    "noDataBody": "Add dogs in the Dogs tab, then click any two dogs to set their compatibility."
+  },
+  "groups": {
+    "title": "Groups",
+    "addGroup": "Add Group",
+    "newGroup": "New group",
+    "emptyBuilder": "Drag dogs here to build a group",
+    "score": "Score",
+    "noGroups": "No groups yet",
+    "deleteGroup": "Delete group",
+    "removeDog": "Remove dog",
+    "removeDogAria": "Remove {{name}} from group",
+    "groupName": "Group name",
+    "sidebarEmpty": "No groups yet. Create groups in the Groups tab, then drag them here to schedule walks.",
+    "allScheduled": "All groups are scheduled this week."
+  },
+  "calendar": {
+    "title": "Calendar",
+    "emptySlot": "empty",
+    "dogs_one": "{{count}} dog",
+    "dogs_other": "{{count}} dogs",
+    "unschedule": "Unschedule",
+    "logWalk": "Log walk",
+    "log": "Log",
+    "logWalkAria": "Log walk for {{group}} at {{day}} {{hour}}:00",
+    "removeAria": "Remove {{group}} from {{day}} {{hour}}:00",
+    "prevWeek": "Previous week",
+    "nextWeek": "Next week"
+  },
+  "history": {
+    "title": "Walk History",
+    "empty": "No walks logged yet",
+    "date": "Date",
+    "dogs": "Dogs",
+    "outcome": "Outcome",
+    "notes": "Notes",
+    "edit": "Edit",
+    "delete": "Delete"
+  },
+  "walkLog": {
+    "title": "Log a walk",
+    "outcome": "Outcome",
+    "notes": "Notes",
+    "save": "Save",
+    "selectDogs": "Select at least one dog.",
+    "twoGroups": "Two groups",
+    "singleWalk": "Single walk",
+    "groupA": "Group A",
+    "groupB": "Group B",
+    "pool": "Pool",
+    "great": "Great",
+    "good": "Good",
+    "neutralOutcome": "Neutral",
+    "tense": "Tense",
+    "conflict": "Conflict"
+  },
+  "dialog": {
+    "confirmDelete": "Are you sure?",
+    "deleteCannotUndo": "This action cannot be undone."
   }
 }

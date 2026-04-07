@@ -1,5 +1,6 @@
 import { useDraggable } from '@dnd-kit/core'
 import { AlertTriangle, X } from 'lucide-react'
+import { useTranslation } from 'react-i18next'
 
 type ScheduledGroupCardProps = {
   groupId: string
@@ -22,6 +23,7 @@ export function ScheduledGroupCard({
   dayName,
   hour,
 }: ScheduledGroupCardProps) {
+  const { t } = useTranslation()
   const { setNodeRef, attributes, listeners, isDragging } = useDraggable({
     id: `scheduled-${groupId}`,
     data: { type: 'scheduled-group', groupId },
@@ -37,7 +39,7 @@ export function ScheduledGroupCard({
       <span className='flex items-center gap-1 min-w-0'>
         <span className='font-semibold truncate'>{groupName}</span>
         <span className='text-muted-foreground/70'>•</span>
-        <span>{dogCount} dogs</span>
+        <span>{t('calendar.dogs', { count: dogCount })}</span>
         {hasConflicts && (
           <AlertTriangle size={12} className='text-primary ml-1 inline shrink-0' />
         )}
@@ -47,17 +49,17 @@ export function ScheduledGroupCard({
           e.stopPropagation()
           onLog()
         }}
-        aria-label={`Log walk for ${groupName} at ${dayName} ${hour}:00`}
+        aria-label={t('calendar.logWalkAria', { group: groupName, day: dayName, hour, defaultValue: `Log walk for ${groupName} at ${dayName} ${hour}:00` })}
         className="text-xs text-muted-foreground hover:text-foreground/90 shrink-0"
       >
-        Log
+        {t('calendar.log', { defaultValue: 'Log' })}
       </button>
       <button
         onClick={(e) => {
           e.stopPropagation()
           onRemove()
         }}
-        aria-label={`Remove ${groupName} from ${dayName} ${hour}:00`}
+        aria-label={t('calendar.removeAria', { group: groupName, day: dayName, hour, defaultValue: `Remove ${groupName} from ${dayName} ${hour}:00` })}
         className='shrink-0'
       >
         <X size={12} className='text-muted-foreground/70 hover:text-destructive' />

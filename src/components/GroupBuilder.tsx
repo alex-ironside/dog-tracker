@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import {
   DndContext,
   PointerSensor,
@@ -60,6 +61,7 @@ type EdgeSheetState = {
 }
 
 export function GroupBuilder() {
+  const { t } = useTranslation()
   const { dogs, walkGroups, compatibilityEntries, walkHistory, addGroup, renameGroup, deleteGroup, addDogToGroup, removeDogFromGroup, setCompatibility, removeCompatibility } = useAppStore(
     useShallow((s) => ({
       dogs: s.dogs,
@@ -136,7 +138,7 @@ export function GroupBuilder() {
   return (
     <>
       <header className='mb-6'>
-        <h1 className='font-display text-4xl font-semibold tracking-tight text-foreground'>Groups</h1>
+        <h1 className='font-display text-4xl font-semibold tracking-tight text-foreground'>{t('nav.groups')}</h1>
         <p className='text-sm text-muted-foreground mt-1'>Build walking groups by dragging dogs.</p>
       </header>
       <DndContext sensors={sensors} onDragStart={handleDragStart} onDragEnd={handleDragEnd}>

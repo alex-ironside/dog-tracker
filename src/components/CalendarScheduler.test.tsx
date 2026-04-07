@@ -195,10 +195,9 @@ describe('CalendarScheduler', () => {
 
     render(<CalendarScheduler />)
 
-    // AlertTriangle renders as an SVG; verify at least one SVG with amber color class is present
-    // The icon has class 'text-amber-500'
-    const amberIcons = document.querySelectorAll('.text-amber-500')
-    expect(amberIcons.length).toBeGreaterThan(0)
+    // AlertTriangle renders as an SVG when conflicts are present
+    const warningIcons = document.querySelectorAll('svg.lucide-triangle-alert')
+    expect(warningIcons.length).toBeGreaterThan(0)
   })
 
   it('sidebar shows "No groups yet" when no walk groups exist', () => {

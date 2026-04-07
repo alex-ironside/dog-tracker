@@ -1,4 +1,5 @@
 import { useState, useMemo } from 'react'
+import { useTranslation } from 'react-i18next'
 import { WalkLogSheet } from '@/components/WalkLogSheet'
 import {
   DndContext,
@@ -17,6 +18,7 @@ import { slotKey, parseSlotKey } from '@/lib/calendarUtils'
 import { buildCompatMap } from '@/lib/scoring'
 
 export function CalendarScheduler() {
+  const { t } = useTranslation()
   const [weekOffset, setWeekOffset] = useState(0)
   const [activeDragId, setActiveDragId] = useState<string | null>(null)
   const [logSheet, setLogSheet] = useState<{
@@ -106,7 +108,7 @@ export function CalendarScheduler() {
   return (
     <>
     <header className='mb-6'>
-      <h1 className='font-display text-4xl font-semibold tracking-tight text-foreground'>Calendar</h1>
+      <h1 className='font-display text-4xl font-semibold tracking-tight text-foreground'>{t('nav.calendar')}</h1>
       <p className='text-sm text-muted-foreground mt-1'>Schedule walks for the week.</p>
     </header>
     <DndContext
