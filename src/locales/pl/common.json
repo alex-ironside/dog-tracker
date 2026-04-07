@@ -163,6 +163,11 @@
     "conflict": "Konflikt",
     "discard": "Odrzuć"
   },
+  "picker": {
+    "searchPlaceholder": "Szukaj psów…",
+    "clearSearch": "Wyczyść wyszukiwanie",
+    "noMatches": "Brak pasujących psów"
+  },
   "dialog": {
     "confirmDelete": "Czy na pewno?",
     "deleteCannotUndo": "Tej akcji nie można cofnąć."

@@ -161,6 +161,11 @@
     "conflict": "Conflict",
     "discard": "Discard"
   },
+  "picker": {
+    "searchPlaceholder": "Search dogs…",
+    "clearSearch": "Clear search",
+    "noMatches": "No dogs match"
+  },
   "dialog": {
     "confirmDelete": "Are you sure?",
     "deleteCannotUndo": "This action cannot be undone."
