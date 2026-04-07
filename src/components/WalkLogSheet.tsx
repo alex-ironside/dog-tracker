@@ -17,6 +17,7 @@ import { Sheet, SheetContent, SheetTitle } from '@/components/ui/sheet'
 import { Button } from '@/components/ui/button'
 import { useAppStore } from '@/store'
 import { cn } from '@/lib/utils'
+import { useDogSearch, DogSearchInput } from './SearchableDogPicker'
 import type { Dog, WalkOutcome } from '@/types'
 
 function DraggableChip({ dog, className, onRemove }: {
@@ -96,6 +97,7 @@ export function WalkLogSheet({
   const { t } = useTranslation()
   const dogs = useAppStore((s) => s.dogs)
   const activeDogs = dogs.filter((d) => !d.archived)
+  const { query: dogQuery, setQuery: setDogQuery, filtered: filteredDogs } = useDogSearch(activeDogs)
 
   const isEditing = !!editEntry
   const sheetTitle = title ?? (isEditing ? t('walkLog.editTitle', { defaultValue: 'Edit Walk Log' }) : t('walkLog.addTitle', { defaultValue: 'Log a Walk' }))
@@ -416,11 +418,16 @@ export function WalkLogSheet({
 
               {groupMode === 'together' ? (
                 <>
+                  {activeDogs.length > 0 && (
+                    <DogSearchInput value={dogQuery} onChange={setDogQuery} className="mb-2" />
+                  )}
                   <div className="max-h-48 overflow-y-auto border border-input rounded-md px-3 py-2">
                     {activeDogs.length === 0 ? (
                       <p className="text-sm text-muted-foreground/70">{t('walkLog.noActiveDogs')}</p>
+                    ) : filteredDogs.length === 0 ? (
+                      <p className="text-sm text-muted-foreground/70">{t('picker.noMatches')}</p>
                     ) : (
-                      activeDogs.map((dog) => (
+                      filteredDogs.map((dog) => (
                         <label key={dog.id} className="flex items-center gap-2 py-1 cursor-pointer">
                           <input
                             type="checkbox"
@@ -450,24 +457,30 @@ export function WalkLogSheet({
                     >
                       <div className="space-y-3">
                         {/* Pool — unassigned dogs */}
-                        {activeDogs.some((d) => !groupAssignments[d.id]) && (
-                          <DroppableBox id="pool" className="border border-border rounded-md p-3">
-                            <p className="text-xs font-medium text-muted-foreground mb-2">
-                              {t('walkLog.dragHint')}
-                            </p>
-                            <div className="flex flex-wrap gap-2">
-                              {activeDogs
-                                .filter((d) => !groupAssignments[d.id])
-                                .map((dog) => (
-                                  <DraggableChip
-                                    key={dog.id}
-                                    dog={dog}
-                                    className="bg-muted text-foreground/80 hover:bg-muted"
-                                  />
-                                ))}
-                            </div>
-                          </DroppableBox>
-                        )}
+                        {activeDogs.some((d) => !groupAssignments[d.id]) && (() => {
+                          const poolDogs = filteredDogs.filter((d) => !groupAssignments[d.id])
+                          return (
+                            <DroppableBox id="pool" className="border border-border rounded-md p-3">
+                              <p className="text-xs font-medium text-muted-foreground mb-2">
+                                {t('walkLog.dragHint')}
+                              </p>
+                              <DogSearchInput value={dogQuery} onChange={setDogQuery} className="mb-2" />
+                              {poolDogs.length === 0 ? (
+                                <p className="text-sm text-muted-foreground/70">{t('picker.noMatches')}</p>
+                              ) : (
+                                <div className="flex flex-wrap gap-2">
+                                  {poolDogs.map((dog) => (
+                                    <DraggableChip
+                                      key={dog.id}
+                                      dog={dog}
+                                      className="bg-muted text-foreground/80 hover:bg-muted"
+                                    />
+                                  ))}
+                                </div>
+                              )}
+                            </DroppableBox>
+                          )
+                        })()}
 
                         {/* Group A box */}
                         <DroppableBox id="group-a" className="border-2 border-primary/40 rounded-md overflow-hidden">
