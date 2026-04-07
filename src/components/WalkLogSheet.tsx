@@ -69,14 +69,15 @@ type WalkLogSheetProps = {
   initialDogIds?: string[]
   initialDate?: string
   initialGroupId?: string
+  editEntry?: import('@/types').WalkLogEntry
 }
 
 const OUTCOME_OPTIONS: { value: WalkOutcome; label: string; textColor: string }[] = [
-  { value: 'great',    label: 'Great',    textColor: 'text-green-700' },
-  { value: 'good',     label: 'Good',     textColor: 'text-teal-700' },
-  { value: 'neutral',  label: 'Neutral',  textColor: 'text-slate-600' },
-  { value: 'poor',     label: 'Poor',     textColor: 'text-amber-700' },
-  { value: 'incident', label: 'Incident', textColor: 'text-red-700' },
+  { value: 'great',    label: 'Great',    textColor: 'text-accent' },
+  { value: 'good',     label: 'Good',     textColor: 'text-accent' },
+  { value: 'neutral',  label: 'Neutral',  textColor: 'text-muted-foreground' },
+  { value: 'poor',     label: 'Poor',     textColor: 'text-primary' },
+  { value: 'incident', label: 'Incident', textColor: 'text-destructive' },
 ]
 
 type GroupMode = 'together' | 'groups'
@@ -85,13 +86,17 @@ type GroupAssignment = 'A' | 'B' | null
 export function WalkLogSheet({
   open,
   onOpenChange,
-  title = 'Log a Walk',
+  title,
   initialDogIds,
   initialDate,
   initialGroupId,
+  editEntry,
 }: WalkLogSheetProps) {
   const dogs = useAppStore((s) => s.dogs)
   const activeDogs = dogs.filter((d) => !d.archived)
+
+  const isEditing = !!editEntry
+  const sheetTitle = title ?? (isEditing ? 'Edit Walk Log' : 'Log a Walk')
 
   const todayStr = new Date().toISOString().split('T')[0]
 
@@ -116,16 +121,37 @@ export function WalkLogSheet({
   const [dateError, setDateError] = useState(false)
   const [groupError, setGroupError] = useState<string | null>(null)
 
-  // Reset form when sheet opens
+  // Reset / populate form when sheet opens
   useEffect(() => {
     if (open) {
-      setDate(initialDate ?? todayStr)
-      setOutcome(null)
-      setSelectedDogIds(initialDogIds ?? [])
-      setNotes('')
-      setGroupMode('together')
-      setGroupAssignments({})
-      setGroupOutcome(null)
+      if (editEntry) {
+        setDate(editEntry.date)
+        setNotes(editEntry.notes)
+        if (editEntry.groupContext) {
+          setGroupMode('groups')
+          const assignments: Record<string, GroupAssignment> = {}
+          editEntry.groupContext.groupA.forEach((id) => { assignments[id] = 'A' })
+          editEntry.groupContext.groupB.forEach((id) => { assignments[id] = 'B' })
+          setGroupAssignments(assignments)
+          setGroupOutcome(editEntry.groupContext.groupOutcome ?? null)
+          setOutcome(null)
+          setSelectedDogIds([])
+        } else {
+          setGroupMode('together')
+          setGroupAssignments({})
+          setGroupOutcome(null)
+          setOutcome(editEntry.outcome)
+          setSelectedDogIds(editEntry.dogIds)
+        }
+      } else {
+        setDate(initialDate ?? todayStr)
+        setOutcome(null)
+        setSelectedDogIds(initialDogIds ?? [])
+        setNotes('')
+        setGroupMode('together')
+        setGroupAssignments({})
+        setGroupOutcome(null)
+      }
       setOutcomeError(false)
       setDogsError(false)
       setDateError(false)
@@ -252,14 +278,20 @@ export function WalkLogSheet({
     // Walk-level outcome: use selected in together mode, groupOutcome for group encounter
     const resolvedOutcome = groupMode === 'groups' ? groupOutcome! : outcome!
 
-    useAppStore.getState().addWalkLog({
+    const payload = {
       date,
       outcome: resolvedOutcome,
       notes,
       dogIds: effectiveSelectedDogIds,
-      groupId: initialGroupId,
+      groupId: editEntry?.groupId ?? initialGroupId,
       groupContext: groupContextPayload,
-    })
+    }
+
+    if (isEditing && editEntry) {
+      useAppStore.getState().updateWalkLog(editEntry.id, payload)
+    } else {
+      useAppStore.getState().addWalkLog(payload)
+    }
 
     onOpenChange(false)
   }
@@ -271,8 +303,8 @@ export function WalkLogSheet({
         className="w-full max-w-md p-0 flex flex-col overflow-hidden"
       >
         {/* Header */}
-        <div className="flex items-center justify-between px-6 py-4 border-b border-slate-200">
-          <SheetTitle className="text-lg font-semibold text-slate-900">{title}</SheetTitle>
+        <div className="flex items-center justify-between px-6 py-4 border-b border-border">
+          <SheetTitle className="text-lg font-semibold text-foreground">{sheetTitle}</SheetTitle>
           <Button
             variant="ghost"
             size="icon"
@@ -288,7 +320,7 @@ export function WalkLogSheet({
           <div className="space-y-4">
             {/* Date */}
             <div>
-              <label className="text-sm font-medium text-slate-700 leading-normal block mb-1">
+              <label className="text-sm font-medium text-foreground/80 leading-normal block mb-1">
                 Date
               </label>
               <input
@@ -306,7 +338,7 @@ export function WalkLogSheet({
                 )}
               />
               {dateError && (
-                <p className="text-sm text-red-600 mt-1" role="alert">
+                <p className="text-sm text-destructive mt-1" role="alert">
                   Date is required.
                 </p>
               )}
@@ -315,7 +347,7 @@ export function WalkLogSheet({
             {/* Outcome — hidden in groups mode (per-group outcomes shown inside each group box) */}
             {groupMode === 'together' && (
               <div>
-                <label className="text-sm font-medium text-slate-700 leading-normal block mb-1">
+                <label className="text-sm font-medium text-foreground/80 leading-normal block mb-1">
                   Outcome
                 </label>
                 <div className="flex flex-wrap gap-2">
@@ -326,7 +358,7 @@ export function WalkLogSheet({
                       aria-pressed={outcome === value}
                       className={cn(
                         textColor,
-                        outcome === value ? 'ring-2 ring-offset-1 ring-slate-500' : ''
+                        outcome === value ? 'ring-2 ring-offset-1 ring-primary' : ''
                       )}
                       onClick={() => {
                         setOutcome(value)
@@ -338,7 +370,7 @@ export function WalkLogSheet({
                   ))}
                 </div>
                 {outcomeError && (
-                  <p className="text-sm text-red-600 mt-1" role="alert">
+                  <p className="text-sm text-destructive mt-1" role="alert">
                     Please select an outcome.
                   </p>
                 )}
@@ -348,18 +380,18 @@ export function WalkLogSheet({
             {/* Dogs present */}
             <div>
               <div className="flex items-center justify-between mb-2">
-                <label className="text-sm font-medium text-slate-700 leading-normal">
+                <label className="text-sm font-medium text-foreground/80 leading-normal">
                   Dogs present
                 </label>
                 {/* Group mode toggle */}
-                <div className="flex rounded-md border border-slate-200 overflow-hidden text-xs">
+                <div className="flex rounded-md border border-border overflow-hidden text-xs">
                   <button
                     type="button"
                     className={cn(
                       'px-3 py-1 font-medium transition-colors',
                       groupMode === 'together'
-                        ? 'bg-slate-800 text-white'
-                        : 'bg-white text-slate-600 hover:bg-slate-50'
+                        ? 'bg-primary text-primary-foreground'
+                        : 'bg-background text-muted-foreground hover:bg-muted/50'
                     )}
                     onClick={() => setGroupMode('together')}
                   >
@@ -368,10 +400,10 @@ export function WalkLogSheet({
                   <button
                     type="button"
                     className={cn(
-                      'px-3 py-1 font-medium border-l border-slate-200 transition-colors',
+                      'px-3 py-1 font-medium border-l border-border transition-colors',
                       groupMode === 'groups'
-                        ? 'bg-slate-800 text-white'
-                        : 'bg-white text-slate-600 hover:bg-slate-50'
+                        ? 'bg-primary text-primary-foreground'
+                        : 'bg-background text-muted-foreground hover:bg-muted/50'
                     )}
                     onClick={() => setGroupMode('groups')}
                   >
@@ -384,7 +416,7 @@ export function WalkLogSheet({
                 <>
                   <div className="max-h-48 overflow-y-auto border border-input rounded-md px-3 py-2">
                     {activeDogs.length === 0 ? (
-                      <p className="text-sm text-slate-400">No active dogs</p>
+                      <p className="text-sm text-muted-foreground/70">No active dogs</p>
                     ) : (
                       activeDogs.map((dog) => (
                         <label key={dog.id} className="flex items-center gap-2 py-1 cursor-pointer">
@@ -393,13 +425,13 @@ export function WalkLogSheet({
                             checked={selectedDogIds.includes(dog.id)}
                             onChange={() => handleDogToggle(dog.id)}
                           />
-                          <span className="text-sm text-slate-700">{dog.name}</span>
+                          <span className="text-sm text-foreground/80">{dog.name}</span>
                         </label>
                       ))
                     )}
                   </div>
                   {dogsError && (
-                    <p className="text-sm text-red-600 mt-1" role="alert">
+                    <p className="text-sm text-destructive mt-1" role="alert">
                       Select at least one dog.
                     </p>
                   )}
@@ -407,7 +439,7 @@ export function WalkLogSheet({
               ) : (
                 <>
                   {activeDogs.length === 0 ? (
-                    <p className="text-sm text-slate-400">No active dogs</p>
+                    <p className="text-sm text-muted-foreground/70">No active dogs</p>
                   ) : (
                     <DndContext
                       sensors={sensors}
@@ -417,8 +449,8 @@ export function WalkLogSheet({
                       <div className="space-y-3">
                         {/* Pool — unassigned dogs */}
                         {activeDogs.some((d) => !groupAssignments[d.id]) && (
-                          <DroppableBox id="pool" className="border border-slate-200 rounded-md p-3">
-                            <p className="text-xs font-medium text-slate-500 mb-2">
+                          <DroppableBox id="pool" className="border border-border rounded-md p-3">
+                            <p className="text-xs font-medium text-muted-foreground mb-2">
                               Drag dogs into Group A or Group B
                             </p>
                             <div className="flex flex-wrap gap-2">
@@ -428,7 +460,7 @@ export function WalkLogSheet({
                                   <DraggableChip
                                     key={dog.id}
                                     dog={dog}
-                                    className="bg-slate-100 text-slate-700 hover:bg-slate-200"
+                                    className="bg-muted text-foreground/80 hover:bg-muted"
                                   />
                                 ))}
                             </div>
@@ -436,11 +468,11 @@ export function WalkLogSheet({
                         )}
 
                         {/* Group A box */}
-                        <DroppableBox id="group-a" className="border-2 border-blue-200 rounded-md overflow-hidden">
-                          <div className="bg-blue-50 px-3 py-2 flex items-center justify-between">
-                            <span className="text-sm font-semibold text-blue-700">Group A</span>
+                        <DroppableBox id="group-a" className="border-2 border-primary/40 rounded-md overflow-hidden">
+                          <div className="bg-muted px-3 py-2 flex items-center justify-between">
+                            <span className="text-sm font-semibold text-foreground">Group A</span>
                             {groupA.length === 0 && (
-                              <span className="text-xs text-blue-400">No dogs assigned</span>
+                              <span className="text-xs text-muted-foreground">No dogs assigned</span>
                             )}
                           </div>
                           {groupA.length > 0 && (
@@ -451,7 +483,7 @@ export function WalkLogSheet({
                                   <DraggableChip
                                     key={id}
                                     dog={dog}
-                                    className="bg-blue-100 text-blue-700"
+                                    className="bg-primary/15 text-foreground"
                                     onRemove={() => handleRemoveFromGroup(id)}
                                   />
                                 ) : null
@@ -461,11 +493,11 @@ export function WalkLogSheet({
                         </DroppableBox>
 
                         {/* Group B box */}
-                        <DroppableBox id="group-b" className="border-2 border-amber-200 rounded-md overflow-hidden">
-                          <div className="bg-amber-50 px-3 py-2 flex items-center justify-between">
-                            <span className="text-sm font-semibold text-amber-700">Group B</span>
+                        <DroppableBox id="group-b" className="border-2 border-primary/40 rounded-md overflow-hidden">
+                          <div className="bg-primary/10 px-3 py-2 flex items-center justify-between">
+                            <span className="text-sm font-semibold text-primary">Group B</span>
                             {groupB.length === 0 && (
-                              <span className="text-xs text-amber-400">No dogs assigned</span>
+                              <span className="text-xs text-primary/80">No dogs assigned</span>
                             )}
                           </div>
                           {groupB.length > 0 && (
@@ -476,7 +508,7 @@ export function WalkLogSheet({
                                   <DraggableChip
                                     key={id}
                                     dog={dog}
-                                    className="bg-amber-100 text-amber-700"
+                                    className="bg-primary/15 text-primary"
                                     onRemove={() => handleRemoveFromGroup(id)}
                                   />
                                 ) : null
@@ -486,9 +518,9 @@ export function WalkLogSheet({
                         </DroppableBox>
 
                         {/* Shared encounter outcome picker */}
-                        <div className="border border-slate-200 rounded-md px-3 py-3">
-                          <p className="text-sm font-medium text-slate-700 mb-0.5">Encounter outcome</p>
-                          <p className="text-xs text-slate-500 mb-2">How did the groups interact?</p>
+                        <div className="border border-border rounded-md px-3 py-3">
+                          <p className="text-sm font-medium text-foreground/80 mb-0.5">Encounter outcome</p>
+                          <p className="text-xs text-muted-foreground mb-2">How did the groups interact?</p>
                           <div className="flex flex-wrap gap-1.5">
                             {OUTCOME_OPTIONS.map(({ value, label, textColor }) => (
                               <Button
@@ -499,7 +531,7 @@ export function WalkLogSheet({
                                 className={cn(
                                   textColor,
                                   'text-xs h-7 px-2',
-                                  groupOutcome === value ? 'ring-2 ring-offset-1 ring-slate-500' : ''
+                                  groupOutcome === value ? 'ring-2 ring-offset-1 ring-primary' : ''
                                 )}
                                 onClick={() => {
                                   setGroupOutcome(value)
@@ -515,7 +547,7 @@ export function WalkLogSheet({
 
                       <DragOverlay>
                         {activeDragId ? (
-                          <div className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-slate-800 text-white shadow-lg cursor-grabbing">
+                          <div className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-primary text-primary-foreground shadow-lg cursor-grabbing">
                             {activeDogs.find((d) => d.id === activeDragId)?.name ?? ''}
                           </div>
                         ) : null}
@@ -523,7 +555,7 @@ export function WalkLogSheet({
                     </DndContext>
                   )}
                   {groupError && (
-                    <p className="text-sm text-red-600 mt-1" role="alert">
+                    <p className="text-sm text-destructive mt-1" role="alert">
                       {groupError}
                     </p>
                   )}
@@ -533,7 +565,7 @@ export function WalkLogSheet({
 
             {/* Notes */}
             <div>
-              <label className="text-sm font-medium text-slate-700 leading-normal block mb-1">
+              <label className="text-sm font-medium text-foreground/80 leading-normal block mb-1">
                 Notes
               </label>
               <textarea
@@ -553,7 +585,7 @@ export function WalkLogSheet({
         </div>
 
         {/* Footer */}
-        <div className="sticky bottom-0 bg-white border-t border-slate-200 py-4 px-6 flex justify-between">
+        <div className="sticky bottom-0 bg-background border-t border-border py-4 px-6 flex justify-between">
           <Button variant="outline" onClick={() => onOpenChange(false)}>
             Discard
           </Button>

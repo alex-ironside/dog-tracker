@@ -104,12 +104,17 @@ export function CalendarScheduler() {
   }
 
   return (
+    <>
+    <header className='mb-6'>
+      <h1 className='font-display text-4xl font-semibold tracking-tight text-foreground'>Calendar</h1>
+      <p className='text-sm text-muted-foreground mt-1'>Schedule walks for the week.</p>
+    </header>
     <DndContext
       sensors={sensors}
       onDragStart={handleDragStart}
       onDragEnd={handleDragEnd}
     >
-      <div className='flex h-full'>
+      <div className='flex h-[600px] rounded-2xl border border-border overflow-hidden'>
         <GroupSidebar
           walkGroups={walkGroups}
           scheduledGroupIds={scheduledGroupIds}
@@ -139,11 +144,12 @@ export function CalendarScheduler() {
 
       <DragOverlay>
         {activeDragGroup ? (
-          <div className='px-3 py-2 rounded-md bg-white shadow-lg opacity-70 text-sm'>
+          <div className='px-3 py-2 rounded-md bg-card shadow-lg opacity-70 text-sm'>
             {activeDragGroup.name} • {activeDragGroup.dogIds.length} dogs
           </div>
         ) : null}
       </DragOverlay>
     </DndContext>
+    </>
   )
 }

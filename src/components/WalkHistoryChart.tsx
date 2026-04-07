@@ -48,10 +48,10 @@ function WalkHistoryTooltip({ active, payload }: any) {
   if (!active || !payload?.length) return null
   const data = payload[0].payload
   return (
-    <div className="bg-white border border-slate-200 rounded px-3 py-2 shadow-sm text-sm">
+    <div className="bg-card border border-border rounded px-3 py-2 shadow-sm text-sm">
       <p className="font-semibold">{data.date}</p>
       <p>{OUTCOME_LABEL[data.y]}</p>
-      {data.notes && <p className="text-slate-500 line-clamp-2">{data.notes}</p>}
+      {data.notes && <p className="text-muted-foreground line-clamp-2">{data.notes}</p>}
     </div>
   )
 }
@@ -67,7 +67,7 @@ export function WalkHistoryChart({ dogId }: WalkHistoryChartProps) {
 
   if (entries.length === 0) {
     return (
-      <div className="flex items-center justify-center h-[220px] text-sm text-slate-400">
+      <div className="flex items-center justify-center h-[220px] text-sm text-muted-foreground/70">
         No walks logged yet
       </div>
     )

@@ -16,18 +16,18 @@ type DogPanelProps = {
   editingDog: Dog | null
 }
 
-const OUTCOME_BADGE: Record<WalkOutcome, { bg: string; text: string; label: string }> = {
-  great:    { bg: 'bg-green-100',  text: 'text-green-700',  label: 'Great' },
-  good:     { bg: 'bg-teal-100',   text: 'text-teal-700',   label: 'Good' },
-  neutral:  { bg: 'bg-slate-100',  text: 'text-slate-600',  label: 'Neutral' },
-  poor:     { bg: 'bg-amber-100',  text: 'text-amber-700',  label: 'Poor' },
-  incident: { bg: 'bg-red-100',    text: 'text-red-700',    label: 'Incident' },
+const OUTCOME_BADGE: Record<WalkOutcome, { className: string; label: string }> = {
+  great:    { className: 'bg-accent/20 text-accent border border-accent/40',           label: 'Great' },
+  good:     { className: 'bg-accent/10 text-accent/90 border border-accent/30',        label: 'Good' },
+  neutral:  { className: 'bg-muted text-muted-foreground border border-border',        label: 'Neutral' },
+  poor:     { className: 'bg-primary/15 text-primary border border-primary/30',        label: 'Poor' },
+  incident: { className: 'bg-destructive/15 text-destructive border border-destructive/40', label: 'Incident' },
 }
 
 function OutcomeBadge({ outcome }: { outcome: WalkOutcome }) {
   const badge = OUTCOME_BADGE[outcome]
   return (
-    <span className={cn('inline-flex px-2 py-0.5 rounded-full text-xs font-semibold', badge.bg, badge.text)}>
+    <span className={cn('inline-flex px-2 py-0.5 rounded-full text-xs font-semibold', badge.className)}>
       {badge.label}
     </span>
   )
@@ -115,8 +115,8 @@ export function DogPanel({ open, onOpenChange, editingDog }: DogPanelProps) {
         className="w-full max-w-md p-0 flex flex-col overflow-hidden"
       >
         {/* Header */}
-        <div className="flex items-center justify-between px-6 py-4 border-b border-slate-200">
-          <SheetTitle className="text-lg font-semibold text-slate-900">{title}</SheetTitle>
+        <div className="flex items-center justify-between px-6 py-4 border-b border-border">
+          <SheetTitle className="font-display text-2xl font-semibold tracking-tight text-foreground">{title}</SheetTitle>
           <Button
             variant="ghost"
             size="icon"
@@ -129,15 +129,15 @@ export function DogPanel({ open, onOpenChange, editingDog }: DogPanelProps) {
 
         {/* Tab bar — only shown in edit mode */}
         {editingDog && (
-          <div role="tablist" className="flex border-b border-slate-200 px-6">
+          <div role="tablist" className="flex border-b border-border px-6">
             <button
               role="tab"
               aria-selected={activeTab === 'profile'}
               onClick={() => setActiveTab('profile')}
               className={`py-2 text-sm font-semibold mr-4 ${
                 activeTab === 'profile'
-                  ? 'text-slate-900 border-b-2 border-primary'
-                  : 'text-slate-500 hover:text-slate-700'
+                  ? 'text-foreground border-b-2 border-primary'
+                  : 'text-muted-foreground hover:text-foreground/90'
               }`}
             >
               Profile
@@ -148,8 +148,8 @@ export function DogPanel({ open, onOpenChange, editingDog }: DogPanelProps) {
               onClick={() => setActiveTab('history')}
               className={`py-2 text-sm font-semibold ${
                 activeTab === 'history'
-                  ? 'text-slate-900 border-b-2 border-primary'
-                  : 'text-slate-500 hover:text-slate-700'
+                  ? 'text-foreground border-b-2 border-primary'
+                  : 'text-muted-foreground hover:text-foreground/90'
               }`}
             >
               History
@@ -163,7 +163,7 @@ export function DogPanel({ open, onOpenChange, editingDog }: DogPanelProps) {
             <div className="space-y-4">
               {/* Name */}
               <div>
-                <Label htmlFor={nameId} className="text-sm font-medium text-slate-700 leading-normal">
+                <Label htmlFor={nameId} className="text-sm font-medium text-foreground/90 leading-normal">
                   Name
                 </Label>
                 <Input
@@ -176,11 +176,11 @@ export function DogPanel({ open, onOpenChange, editingDog }: DogPanelProps) {
                   }}
                   className={cn(
                     'mt-1',
-                    nameError && 'border-red-500 focus-visible:ring-red-500'
+                    nameError && 'border-destructive focus-visible:ring-destructive'
                   )}
                 />
                 {nameError && (
-                  <p className="text-sm text-red-600 mt-1" role="alert" aria-live="polite">
+                  <p className="text-sm text-destructive mt-1" role="alert" aria-live="polite">
                     Name is required.
                   </p>
                 )}
@@ -188,7 +188,7 @@ export function DogPanel({ open, onOpenChange, editingDog }: DogPanelProps) {
 
               {/* Breed */}
               <div>
-                <Label htmlFor={breedId} className="text-sm font-medium text-slate-700 leading-normal">
+                <Label htmlFor={breedId} className="text-sm font-medium text-foreground/90 leading-normal">
                   Breed
                 </Label>
                 <Input
@@ -202,7 +202,7 @@ export function DogPanel({ open, onOpenChange, editingDog }: DogPanelProps) {
 
               {/* Age */}
               <div>
-                <Label htmlFor={ageId} className="text-sm font-medium text-slate-700 leading-normal">
+                <Label htmlFor={ageId} className="text-sm font-medium text-foreground/90 leading-normal">
                   Age
                 </Label>
                 <Input
@@ -218,7 +218,7 @@ export function DogPanel({ open, onOpenChange, editingDog }: DogPanelProps) {
 
               {/* Notes */}
               <div>
-                <Label htmlFor={notesId} className="text-sm font-medium text-slate-700 leading-normal">
+                <Label htmlFor={notesId} className="text-sm font-medium text-foreground/90 leading-normal">
                   Notes
                 </Label>
                 <textarea
@@ -252,13 +252,13 @@ export function DogPanel({ open, onOpenChange, editingDog }: DogPanelProps) {
             </Button>
             <div className="mt-4 space-y-2">
               {recentEntries.map((entry) => (
-                <div key={entry.id} className="border border-slate-200 rounded-md px-3 py-2 bg-white">
+                <div key={entry.id} className="border border-border rounded-md px-3 py-2 bg-card">
                   <div className="flex items-center gap-2">
-                    <span className="text-sm text-slate-500">{entry.date}</span>
+                    <span className="text-sm text-muted-foreground">{entry.date}</span>
                     <OutcomeBadge outcome={entry.outcome} />
                   </div>
                   {entry.notes && (
-                    <p className="text-sm text-slate-500 mt-1 line-clamp-2">{entry.notes}</p>
+                    <p className="text-sm text-muted-foreground mt-1 line-clamp-2">{entry.notes}</p>
                   )}
                 </div>
               ))}
@@ -274,7 +274,7 @@ export function DogPanel({ open, onOpenChange, editingDog }: DogPanelProps) {
 
         {/* Sticky Footer — only shown on Profile tab (D-13) */}
         {activeTab === 'profile' && (
-          <div className="sticky bottom-0 bg-white border-t border-slate-200 py-4 px-6 flex justify-between">
+          <div className="sticky bottom-0 bg-card border-t border-border py-4 px-6 flex justify-between">
             <Button variant="outline" onClick={handleDiscard}>
               Discard
             </Button>

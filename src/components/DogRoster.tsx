@@ -61,23 +61,26 @@ export function DogRoster() {
   return (
     <div>
       {/* Header bar */}
-      <div className="flex items-center justify-between mb-4">
-        <h1 className="text-2xl font-semibold text-slate-900 leading-normal">Dog Roster</h1>
-        <Button variant="default" onClick={handleAddDog} className="flex items-center gap-1">
+      <div className="flex items-end justify-between mb-2">
+        <div>
+          <h1 className="font-display text-4xl font-semibold tracking-tight text-foreground">Dog Roster</h1>
+          <p className="text-sm text-muted-foreground mt-1">Your pack at a glance.</p>
+        </div>
+        <Button variant="default" size="lg" onClick={handleAddDog} className="flex items-center gap-2 shadow-sm">
           <Plus size={16} />
           Add Dog
         </Button>
       </div>
 
       {/* Filter bar */}
-      <div className="flex items-center gap-2 mb-6">
+      <div className="flex items-center gap-2 mb-8 mt-4">
         <Switch
           id={switchId}
           checked={showArchived}
           onCheckedChange={setShowArchived}
           aria-label="Show archived dogs"
         />
-        <Label htmlFor={switchId} className="text-sm text-slate-600 cursor-pointer">
+        <Label htmlFor={switchId} className="text-sm text-muted-foreground cursor-pointer">
           Show archived dogs
         </Label>
       </div>
@@ -110,7 +113,7 @@ export function DogRoster() {
           <AlertDialogFooter>
             <AlertDialogCancel>Keep Dog</AlertDialogCancel>
             <AlertDialogAction
-              className="bg-red-600 hover:bg-red-700 text-white"
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
               onClick={handleConfirmArchive}
             >
               Archive

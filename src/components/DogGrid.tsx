@@ -13,16 +13,16 @@ type DogGridProps = {
 export function DogGrid({ dogs, onEdit, onArchive, onUnarchive, onAddDog }: DogGridProps) {
   if (dogs.length === 0) {
     return (
-      <div className="flex flex-col items-center justify-center py-20 text-center gap-3">
-        <h2 className="text-base font-medium text-slate-600 leading-relaxed">No dogs yet</h2>
-        <p className="text-sm text-slate-400 leading-relaxed">Add your first dog to get started.</p>
-        <Button variant="default" onClick={onAddDog}>Add Dog</Button>
+      <div className="flex flex-col items-center justify-center rounded-2xl border border-dashed border-border bg-card/40 py-20 text-center gap-4">
+        <h2 className="font-display text-2xl font-semibold text-foreground">No dogs yet</h2>
+        <p className="text-sm text-muted-foreground max-w-xs">Add your first dog to start tracking walks, groups, and compatibility.</p>
+        <Button variant="default" onClick={onAddDog} className="mt-2">Add Dog</Button>
       </div>
     )
   }
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
       {dogs.map((dog) => (
         <DogCard
           key={dog.id}

@@ -22,10 +22,10 @@ export function RosterRow({ dog, assignedGroupName }: RosterRowProps) {
 
   if (isAssigned) {
     return (
-      <div className='flex items-center gap-2 px-3 py-2 rounded-md opacity-60 cursor-not-allowed bg-slate-100'>
-        <GripVertical size={16} className='text-slate-300' />
-        <span className='text-sm text-slate-900 flex-1'>{dog.name}</span>
-        <span className='text-xs text-slate-400 italic'>in {assignedGroupName}</span>
+      <div className='flex items-center gap-2 px-3 py-2 rounded-md opacity-60 cursor-not-allowed bg-muted'>
+        <GripVertical size={16} className='text-muted-foreground/50' />
+        <span className='text-sm text-foreground flex-1'>{dog.name}</span>
+        <span className='text-xs text-muted-foreground/70 italic'>in {assignedGroupName}</span>
       </div>
     )
   }
@@ -36,10 +36,10 @@ export function RosterRow({ dog, assignedGroupName }: RosterRowProps) {
       style={style}
       {...attributes}
       {...listeners}
-      className='flex items-center gap-2 px-3 py-2 rounded-md hover:bg-slate-100 cursor-grab'
+      className='flex items-center gap-2 px-3 py-2 rounded-md hover:bg-muted cursor-grab'
     >
-      <GripVertical size={16} className='text-slate-300' />
-      <span className='text-sm text-slate-900 flex-1'>{dog.name}</span>
+      <GripVertical size={16} className='text-muted-foreground/50' />
+      <span className='text-sm text-foreground flex-1'>{dog.name}</span>
     </div>
   )
 }

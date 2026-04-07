@@ -47,8 +47,8 @@ export function EdgeSheet({
         className="w-full max-w-md p-0 flex flex-col overflow-hidden"
       >
         {/* Header */}
-        <div className="flex items-center justify-between px-6 py-4 border-b border-slate-200">
-          <SheetTitle className="text-lg font-semibold text-slate-900">
+        <div className="flex items-center justify-between px-6 py-4 border-b border-border">
+          <SheetTitle className="font-display text-2xl font-semibold tracking-tight text-foreground">
             {dogNameA} & {dogNameB}
           </SheetTitle>
           <Button
@@ -64,13 +64,13 @@ export function EdgeSheet({
         {/* Body */}
         <div className="flex-1 overflow-y-auto px-6 py-4">
           {/* Current status */}
-          <p className="text-sm font-semibold text-slate-700">Current status:</p>
+          <p className="text-sm font-semibold text-foreground/90">Current status:</p>
           <div className="mt-1">
             <CompatBadge status={currentStatus} />
           </div>
 
           {/* Status picker */}
-          <p className="text-sm font-semibold text-slate-700 mt-6">Set compatibility:</p>
+          <p className="text-sm font-semibold text-foreground/90 mt-6">Set compatibility:</p>
           <div className="grid grid-cols-2 gap-2 mt-2">
             {STATUS_OPTIONS.map(({ value, label }) => (
               <Button
@@ -79,7 +79,7 @@ export function EdgeSheet({
                 aria-pressed={selectedStatus === value}
                 className={
                   selectedStatus === value
-                    ? 'ring-2 ring-offset-1 ring-slate-500'
+                    ? 'ring-2 ring-offset-1 ring-primary'
                     : ''
                 }
                 onClick={() => setSelectedStatus(value)}
@@ -90,7 +90,7 @@ export function EdgeSheet({
           </div>
 
           {/* Separator */}
-          <div className="border-t border-slate-200 mt-6 pt-4">
+          <div className="border-t border-border mt-6 pt-4">
             <Button
               variant="ghost"
               className="text-destructive w-full justify-start"
@@ -102,7 +102,7 @@ export function EdgeSheet({
         </div>
 
         {/* Sticky footer */}
-        <div className="sticky bottom-0 bg-white border-t border-slate-200 py-4 px-6 flex justify-between">
+        <div className="sticky bottom-0 bg-card border-t border-border py-4 px-6 flex justify-between">
           <Button variant="outline" onClick={() => onOpenChange(false)}>
             Discard changes
           </Button>

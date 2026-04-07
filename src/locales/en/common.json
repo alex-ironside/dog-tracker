@@ -1,0 +1,16 @@
+{
+  "nav": {
+    "dogs": "Dogs",
+    "compatibility": "Compatibility",
+    "groups": "Groups",
+    "calendar": "Calendar",
+    "history": "History"
+  },
+  "app": {
+    "tagline": "dog tracker"
+  },
+  "lang": {
+    "en": "EN",
+    "pl": "PL"
+  }
+}

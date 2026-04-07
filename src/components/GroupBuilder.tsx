@@ -35,11 +35,11 @@ function RosterPanel() {
   return (
     <div
       ref={setNodeRef}
-      className={`w-[280px] min-w-[280px] border-r border-slate-200 overflow-y-auto p-4 transition-colors${isOver ? ' bg-slate-100' : ' bg-slate-50'}`}
+      className={`w-[280px] min-w-[280px] border-r border-border overflow-y-auto p-4 transition-colors${isOver ? ' bg-muted' : ' bg-muted/50'}`}
     >
-      <p className='text-sm font-semibold text-slate-700 mb-3'>Available Dogs</p>
+      <p className='text-sm font-semibold text-foreground/90 mb-3'>Available Dogs</p>
       {activeDogs.length === 0 ? (
-        <p className='text-sm text-slate-400 px-3 py-4'>No active dogs. Add dogs in the Dogs tab.</p>
+        <p className='text-sm text-muted-foreground/70 px-3 py-4'>No active dogs. Add dogs in the Dogs tab.</p>
       ) : (
         activeDogs.map((dog) => (
           <RosterRow
@@ -135,13 +135,17 @@ export function GroupBuilder() {
 
   return (
     <>
+      <header className='mb-6'>
+        <h1 className='font-display text-4xl font-semibold tracking-tight text-foreground'>Groups</h1>
+        <p className='text-sm text-muted-foreground mt-1'>Build walking groups by dragging dogs.</p>
+      </header>
       <DndContext sensors={sensors} onDragStart={handleDragStart} onDragEnd={handleDragEnd}>
-        <div className='flex h-full'>
+        <div className='flex h-[600px] rounded-2xl border border-border overflow-hidden'>
           {/* Left panel: roster */}
           <RosterPanel />
 
           {/* Right panel: groups */}
-          <div className='flex-1 overflow-y-auto bg-white p-4 flex flex-col gap-4'>
+          <div className='flex-1 overflow-y-auto bg-card p-4 flex flex-col gap-4'>
             <Button
               variant='outline'
               className='self-start'
@@ -179,7 +183,7 @@ export function GroupBuilder() {
 
         <DragOverlay>
           {activeDragId ? (
-            <div className='px-3 py-2 rounded-md bg-white shadow-lg opacity-70 text-sm'>
+            <div className='px-3 py-2 rounded-md bg-card shadow-lg opacity-70 text-sm'>
               {activeDogs.find((d) => d.id === activeDragId)?.name}
             </div>
           ) : null}

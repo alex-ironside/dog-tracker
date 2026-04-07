@@ -16,5 +16,9 @@
       "mcp__stitch__get_project",
       "Skill(gsd:ui-phase)"
     ]
-  }
+  },
+  "enabledMcpjsonServers": [
+    "stitch"
+  ],
+  "enableAllProjectMcpServers": true
 }

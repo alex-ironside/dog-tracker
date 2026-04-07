@@ -20,9 +20,9 @@ type GroupPanelProps = {
 }
 
 function scoreBadgeClasses(score: number): string {
-  if (score >= 80) return 'bg-green-100 text-green-700'
-  if (score >= 50) return 'bg-yellow-100 text-yellow-700'
-  return 'bg-red-100 text-red-700'
+  if (score >= 80) return 'bg-accent/20 text-accent'
+  if (score >= 50) return 'bg-primary/15 text-primary'
+  return 'bg-destructive/15 text-destructive'
 }
 
 export function GroupPanel({ group, dogs, onRename, onDelete, onRemoveDog, score, hasConflicts, conflicts, onConflictClick }: GroupPanelProps) {
@@ -68,10 +68,10 @@ export function GroupPanel({ group, dogs, onRename, onDelete, onRemoveDog, score
   return (
     <div
       ref={setNodeRef}
-      className={`border border-slate-200 rounded-xl bg-white shadow-sm${isOver ? ' ring-2 ring-primary' : ''}`}
+      className={`border border-border rounded-xl bg-card shadow-sm${isOver ? ' ring-2 ring-primary' : ''}`}
     >
       {/* Header */}
-      <div className='flex items-center justify-between px-4 py-3 border-b border-slate-200 bg-slate-50 rounded-t-xl'>
+      <div className='flex items-center justify-between px-4 py-3 border-b border-border bg-muted/50 rounded-t-xl'>
         <div className='flex items-center gap-2'>
           {isEditing ? (
             <input
@@ -80,11 +80,11 @@ export function GroupPanel({ group, dogs, onRename, onDelete, onRemoveDog, score
               onChange={(e) => setEditValue(e.target.value)}
               onBlur={commitRename}
               onKeyDown={handleKeyDown}
-              className='text-sm font-semibold text-slate-900 bg-transparent border border-slate-300 rounded px-1 min-w-[120px] max-w-[240px]'
+              className='text-sm font-semibold text-foreground bg-transparent border border-border rounded px-1 min-w-[120px] max-w-[240px]'
             />
           ) : (
             <span
-              className='text-sm font-semibold text-slate-900 cursor-pointer'
+              className='text-sm font-semibold text-foreground cursor-pointer'
               onClick={handleNameClick}
             >
               {group.name}
@@ -94,7 +94,7 @@ export function GroupPanel({ group, dogs, onRename, onDelete, onRemoveDog, score
             Score: {score}
           </span>
           {hasConflicts && (
-            <AlertTriangle size={14} className='text-amber-500' />
+            <AlertTriangle size={14} className='text-primary' />
           )}
         </div>
         <Button
@@ -114,8 +114,8 @@ export function GroupPanel({ group, dogs, onRename, onDelete, onRemoveDog, score
         className='px-4 py-3 min-h-[64px] relative'
       >
         {dogs.length === 0 ? (
-          <div className='border-2 border-dashed border-slate-200 rounded-lg flex items-center justify-center py-4'>
-            <span className='text-sm text-slate-400'>Drop a dog here</span>
+          <div className='border-2 border-dashed border-border rounded-lg flex items-center justify-center py-4'>
+            <span className='text-sm text-muted-foreground/70'>Drop a dog here</span>
           </div>
         ) : (
           <div className='flex flex-wrap gap-2'>

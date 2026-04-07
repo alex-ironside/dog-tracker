@@ -23,12 +23,20 @@ export function buildGraphData(dogs: Dog[], entries: CompatibilityEntry[]) {
   return { nodes, links }
 }
 
+// Graph palette derived from theme tokens (canvas can't read CSS vars directly)
+// accent (sage), muted, destructive, muted/dim
 const STATUS_COLOR: Record<CompatibilityStatus, string> = {
-  compatible: '#22c55e',
-  neutral: '#94a3b8',
-  conflict: '#ef4444',
-  unknown: '#cbd5e1',
+  compatible: '#5fa775', // sage accent
+  neutral: '#aba093',    // muted-foreground
+  conflict: '#d83a3a',   // destructive
+  unknown: '#5a544c',    // dim border
 }
+const NODE_FILL = '#e36841'      // terracotta primary
+const NODE_STROKE = '#181412'    // espresso bg
+const LABEL_FILL = '#f0e9dd'     // cream foreground
+const LABEL_PILL_BG = '#241e1a'  // card bg, slightly elevated
+const GROUP_NODE_FILL = '#e36841'
+const GROUP_LABEL_FILL = '#f0e9dd'
 
 export function CompatibilityGraph() {
   const allDogs = useAppStore((s) => s.dogs)
@@ -173,17 +181,33 @@ export function CompatibilityGraph() {
 
   if (graphData.nodes.length === 0) {
     return (
-      <div className='flex flex-col items-center justify-center h-full py-16 text-center'>
-        <h2 className='text-xl font-semibold text-slate-900 mb-2'>No compatibility data yet</h2>
-        <p className='text-sm text-slate-500 max-w-xs'>
-          Add dogs in the Dogs tab, then click any two dogs to set their compatibility.
-        </p>
+      <div>
+        <header className='mb-8'>
+          <h1 className='font-display text-4xl font-semibold tracking-tight text-foreground'>Compatibility</h1>
+          <p className='text-sm text-muted-foreground mt-1'>How your dogs get along.</p>
+        </header>
+        <div className='flex flex-col items-center justify-center rounded-2xl border border-dashed border-border bg-card/40 py-20 text-center gap-3'>
+          <h2 className='font-display text-2xl font-semibold text-foreground'>No compatibility data yet</h2>
+          <p className='text-sm text-muted-foreground max-w-xs'>
+            Add dogs in the Dogs tab, then click any two dogs to set their compatibility.
+          </p>
+        </div>
       </div>
     )
   }
 
   return (
-    <div ref={containerRef} className='w-full flex-1' style={{ minHeight: '400px' }}>
+    <div>
+      <header className='mb-6'>
+        <h1 className='font-display text-4xl font-semibold tracking-tight text-foreground'>Compatibility</h1>
+        <p className='text-sm text-muted-foreground mt-1'>How your dogs get along.</p>
+      </header>
+      <div className='flex flex-wrap gap-4 mb-4 text-xs text-muted-foreground'>
+        <span className='flex items-center gap-1.5'><span className='inline-block w-3 h-0.5 bg-accent' />Compatible</span>
+        <span className='flex items-center gap-1.5'><span className='inline-block w-3 h-0.5 bg-muted-foreground' />Neutral</span>
+        <span className='flex items-center gap-1.5'><span className='inline-block w-3 h-0.5 bg-destructive' />Conflict</span>
+      </div>
+    <div ref={containerRef} className='w-full flex-1 rounded-2xl border border-border bg-card/40 overflow-hidden' style={{ minHeight: '500px' }}>
       <ForceGraph2D
         graphData={graphData}
         width={dimensions.width}
@@ -192,8 +216,8 @@ export function CompatibilityGraph() {
         cooldownTicks={100}
         linkColor={(link) => {
           const l = link as GraphLink
-          if (l.isGroupEdge) return '#94a3b8'
-          if (l.isGroupTarget) return '#ef4444'
+          if (l.isGroupEdge) return STATUS_COLOR.neutral
+          if (l.isGroupTarget) return STATUS_COLOR.conflict
           return STATUS_COLOR[l.status]
         }}
         linkWidth={(link) => {
@@ -222,9 +246,9 @@ export function CompatibilityGraph() {
             ctx.lineTo(x, y + size)
             ctx.lineTo(x - size, y)
             ctx.closePath()
-            ctx.fillStyle = '#f97316'
+            ctx.fillStyle = GROUP_NODE_FILL
             ctx.fill()
-            ctx.strokeStyle = '#ffffff'
+            ctx.strokeStyle = NODE_STROKE
             ctx.lineWidth = 1.5
             ctx.stroke()
 
@@ -241,8 +265,8 @@ export function CompatibilityGraph() {
 
             const pillX = x - pillWidth / 2
             const pillY = labelY - fontSize / 2 - paddingV
-            ctx.globalAlpha = 0.7
-            ctx.fillStyle = '#ffffff'
+            ctx.globalAlpha = 0.85
+            ctx.fillStyle = LABEL_PILL_BG
             const r = 2
             ctx.beginPath()
             ctx.moveTo(pillX + r, pillY)
@@ -258,7 +282,7 @@ export function CompatibilityGraph() {
             ctx.fill()
             ctx.globalAlpha = 1
 
-            ctx.fillStyle = '#ea580c'
+            ctx.fillStyle = GROUP_LABEL_FILL
             ctx.textAlign = 'center'
             ctx.textBaseline = 'middle'
             ctx.fillText(label, x, labelY)
@@ -270,9 +294,9 @@ export function CompatibilityGraph() {
           // Draw node circle
           ctx.beginPath()
           ctx.arc(x, y, radius, 0, Math.PI * 2)
-          ctx.fillStyle = '#3b82f6'
+          ctx.fillStyle = NODE_FILL
           ctx.fill()
-          ctx.strokeStyle = '#ffffff'
+          ctx.strokeStyle = NODE_STROKE
           ctx.lineWidth = 1.5
           ctx.stroke()
 
@@ -290,8 +314,8 @@ export function CompatibilityGraph() {
           // Background pill
           const pillX = x - pillWidth / 2
           const pillY = labelY - fontSize / 2 - paddingV
-          ctx.globalAlpha = 0.7
-          ctx.fillStyle = '#ffffff'
+          ctx.globalAlpha = 0.85
+          ctx.fillStyle = LABEL_PILL_BG
           const r = 3
           ctx.beginPath()
           ctx.moveTo(pillX + r, pillY)
@@ -308,7 +332,7 @@ export function CompatibilityGraph() {
           ctx.globalAlpha = 1
 
           // Label text
-          ctx.fillStyle = '#1e293b'
+          ctx.fillStyle = LABEL_FILL
           ctx.textAlign = 'center'
           ctx.textBaseline = 'middle'
           ctx.fillText(label, x, labelY)
@@ -337,6 +361,7 @@ export function CompatibilityGraph() {
         onLinkClick={handleLinkClick}
         onNodeClick={handleNodeClick}
       />
+      </div>
 
       <EdgeSheet
         open={edgeSheet.open}

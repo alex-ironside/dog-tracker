@@ -1,0 +1,16 @@
+{
+  "nav": {
+    "dogs": "Psy",
+    "compatibility": "Zgodność",
+    "groups": "Grupy",
+    "calendar": "Kalendarz",
+    "history": "Historia"
+  },
+  "app": {
+    "tagline": "tracker psów"
+  },
+  "lang": {
+    "en": "EN",
+    "pl": "PL"
+  }
+}

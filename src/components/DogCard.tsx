@@ -23,26 +23,25 @@ export function DogCard({ dog, onEdit, onArchive, onUnarchive }: DogCardProps) {
   return (
     <div
       className={cn(
-        'border border-slate-200 rounded-xl p-4 hover:shadow-md transition-shadow duration-150',
-        dog.archived
-          ? 'bg-slate-100 opacity-60'
-          : 'bg-white shadow-sm'
+        'group relative rounded-2xl border border-border bg-card p-5 shadow-sm transition-all duration-200',
+        'hover:border-primary/40 hover:shadow-md hover:-translate-y-0.5',
+        dog.archived && 'opacity-50 hover:opacity-70'
       )}
     >
-      <div className="flex items-start gap-2">
-        <GripVertical size={16} className="text-slate-300 cursor-grab mt-1 shrink-0" aria-hidden="true" />
+      <div className="flex items-start gap-3">
+        <GripVertical size={16} className="text-muted-foreground/40 cursor-grab mt-1.5 shrink-0 group-hover:text-muted-foreground/70 transition-colors" aria-hidden="true" />
         <div className="flex-1 min-w-0">
-          <h3 className="text-base font-semibold text-slate-900 leading-normal">{dog.name}</h3>
+          <h3 className="font-display text-xl font-semibold text-foreground leading-tight tracking-tight">{dog.name}</h3>
           {meta && (
-            <p className="text-sm text-slate-500 leading-normal">{meta}</p>
+            <p className="text-sm text-muted-foreground mt-0.5">{meta}</p>
           )}
           {dog.notes && (
-            <p className="text-sm text-slate-500 leading-normal line-clamp-2 mt-1">{dog.notes}</p>
+            <p className="text-sm text-muted-foreground/80 line-clamp-2 mt-2 italic">{dog.notes}</p>
           )}
         </div>
       </div>
 
-      <div className="border-t border-slate-200 mt-3 pt-3 flex items-center justify-between">
+      <div className="border-t border-border/60 mt-4 pt-3 flex items-center justify-between">
         <Button
           variant="ghost"
           size="sm"
@@ -68,7 +67,7 @@ export function DogCard({ dog, onEdit, onArchive, onUnarchive }: DogCardProps) {
             variant="ghost"
             size="sm"
             onClick={() => onArchive(dog)}
-            className="text-red-600 hover:text-red-700 flex items-center gap-1"
+            className="text-destructive hover:text-destructive flex items-center gap-1"
           >
             <Archive size={14} />
             Archive

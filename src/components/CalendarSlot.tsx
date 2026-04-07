@@ -56,7 +56,7 @@ export function CalendarSlot({
       ref={setNodeRef}
       role='gridcell'
       aria-label={ariaLabel}
-      className={`border-b border-r border-slate-100 p-1 min-h-[48px]${ringClass}`}
+      className={`border-b border-r border-border/60 p-1 min-h-[48px]${ringClass}`}
     >
       {session && group && (
         <ScheduledGroupCard

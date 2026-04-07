@@ -16,7 +16,7 @@ export function SidebarGroupCard({ group }: SidebarGroupCardProps) {
       ref={setNodeRef}
       {...attributes}
       {...listeners}
-      className={`px-3 py-2 rounded-md bg-white border border-slate-200 text-sm text-slate-900 shadow-sm cursor-grab mb-2${isDragging ? ' opacity-50' : ''}`}
+      className={`px-3 py-2 rounded-md bg-card border border-border text-sm text-foreground shadow-sm cursor-grab mb-2${isDragging ? ' opacity-50' : ''}`}
     >
       {group.name} • {group.dogIds.length} dogs
     </div>
