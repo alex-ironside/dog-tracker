@@ -241,7 +241,7 @@ export function CompatibilityGraph() {
 
           if (n.isGroupNode) {
             // Draw diamond shape for group nodes
-            const size = 5
+            const size = 8
             ctx.beginPath()
             ctx.moveTo(x, y - size)
             ctx.lineTo(x + size, y)
@@ -256,8 +256,8 @@ export function CompatibilityGraph() {
 
             // Small label below diamond
             const label = n.name
-            const fontSize = Math.max(8, 11 / globalScale)
-            ctx.font = `${fontSize}px sans-serif`
+            const fontSize = Math.max(11, 14 / globalScale)
+            ctx.font = `${fontSize}px "Bricolage Grotesque", sans-serif`
             const textWidth = ctx.measureText(label).width
             const paddingH = 2
             const paddingV = 1
@@ -291,7 +291,7 @@ export function CompatibilityGraph() {
             return
           }
 
-          const radius = 6
+          const radius = 10
 
           // Draw node circle
           ctx.beginPath()
@@ -304,8 +304,8 @@ export function CompatibilityGraph() {
 
           // Draw label with background pill below circle
           const label = n.name
-          const fontSize = Math.max(10, 14 / globalScale)
-          ctx.font = `${fontSize}px sans-serif`
+          const fontSize = Math.max(13, 17 / globalScale)
+          ctx.font = `${fontSize}px "Bricolage Grotesque", sans-serif`
           const textWidth = ctx.measureText(label).width
           const paddingH = 2
           const paddingV = 1
@@ -346,7 +346,7 @@ export function CompatibilityGraph() {
           const n = node as GraphNode
           ctx.fillStyle = color
           if (n.isGroupNode) {
-            const size = 5
+            const size = 8
             ctx.beginPath()
             ctx.moveTo(x, y - size)
             ctx.lineTo(x + size, y)
@@ -356,7 +356,7 @@ export function CompatibilityGraph() {
             ctx.fill()
           } else {
             ctx.beginPath()
-            ctx.arc(x, y, 6, 0, Math.PI * 2)
+            ctx.arc(x, y, 10, 0, Math.PI * 2)
             ctx.fill()
           }
         }}
