@@ -131,6 +131,7 @@ export function GroupPanel({ group, dogs, onRename, onDelete, onRemoveDog, score
                 }}
               >
                 <MiniDogCard
+                  dogId={dog.id}
                   dogName={dog.name}
                   onRemove={() => onRemoveDog(dog.id)}
                 />
