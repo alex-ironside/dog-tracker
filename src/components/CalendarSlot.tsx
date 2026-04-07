@@ -1,7 +1,7 @@
 import { useDroppable } from '@dnd-kit/core'
 import { useTranslation } from 'react-i18next'
 import { slotKey } from '@/lib/calendarUtils'
-import { getConflictsInGroup } from '@/lib/scoring'
+import { getConflictsInGroup, scoreGroup } from '@/lib/scoring'
 import { ScheduledGroupCard } from '@/components/ScheduledGroupCard'
 import type { TimeSlot, WalkSession, WalkGroup, Dog, CompatibilityStatus } from '@/types'
 
@@ -25,7 +25,6 @@ export function CalendarSlot({
   minute,
   sessionMap,
   walkGroups,
-  dogs,
   compatMap,
   onUnschedule,
   onLog,
@@ -41,6 +40,7 @@ export function CalendarSlot({
   const hasConflicts = group
     ? getConflictsInGroup(group.dogIds, compatMap).some((c) => c.status === 'conflict')
     : false
+  const score = group ? scoreGroup(group.dogIds, compatMap) : 0
 
   const ariaLabel = session && group
     ? `${dayName} ${hour}:00 — ${group.name}, ${t('calendar.dogs', { count: group.dogIds.length })}`
@@ -66,6 +66,7 @@ export function CalendarSlot({
           groupName={group.name}
           dogCount={group.dogIds.length}
           hasConflicts={hasConflicts}
+          score={score}
           onRemove={() => onUnschedule(session.groupId)}
           onLog={() => onLog(session.groupId, group.dogIds, group.name)}
           dayName={dayName}

@@ -50,13 +50,19 @@ function RosterPanel() {
       ) : filtered.length === 0 && query ? (
         <p className='text-sm text-muted-foreground/70 px-3 py-4'>{t('picker.noMatches')}</p>
       ) : (
-        filtered.map((dog) => (
-          <RosterRow
-            key={dog.id}
-            dog={dog}
-            assignedGroupName={dogGroupMap.get(dog.id) ?? null}
-          />
-        ))
+        filtered.map((dog) => {
+          const assignedGroupName = dogGroupMap.get(dog.id) ?? null
+          // Keyed by assignment state so dnd-kit remounts the draggable when a
+          // dog moves between assigned/unassigned — avoids stale pointer state
+          // after removing a dog from a group.
+          return (
+            <RosterRow
+              key={`${dog.id}:${assignedGroupName ?? 'free'}`}
+              dog={dog}
+              assignedGroupName={assignedGroupName}
+            />
+          )
+        })
       )}
     </div>
   )

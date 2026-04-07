@@ -109,6 +109,7 @@ export function CompatibilityGraph() {
     }
   }, [allDogs, compatibilityEntries, walkHistory])
 
+  const fgRef = useRef<any>(null)
   const containerRef = useRef<HTMLDivElement>(null)
   const [dimensions, setDimensions] = useState({ width: 800, height: 600 })
 
@@ -128,6 +129,23 @@ export function CompatibilityGraph() {
     observer.observe(el)
     return () => observer.disconnect()
   }, [])
+
+  // Tune forces for breathing room; scale with node count so small graphs
+  // stay tight and large graphs don't overlap labels.
+  useEffect(() => {
+    const fg = fgRef.current
+    if (!fg) return
+    const n = Math.max(1, graphData.nodes.length)
+    // link distance: ~60 for tiny graphs, grows with sqrt(n), capped
+    const linkDist = Math.min(180, 50 + Math.sqrt(n) * 18)
+    // charge: stronger repulsion as nodes grow, capped
+    const chargeStrength = -Math.min(600, 120 + n * 20)
+    const charge = fg.d3Force?.('charge')
+    if (charge) charge.strength(chargeStrength)
+    const link = fg.d3Force?.('link')
+    if (link) link.distance(linkDist)
+    fg.d3ReheatSimulation?.()
+  }, [graphData])
 
   // EdgeSheet state
   const [edgeSheet, setEdgeSheet] = useState<{
@@ -211,6 +229,7 @@ export function CompatibilityGraph() {
       </div>
     <div ref={containerRef} className='w-full flex-1 rounded-2xl border border-border bg-card/40 overflow-hidden' style={{ minHeight: '500px' }}>
       <ForceGraph2D
+        ref={fgRef}
         graphData={graphData}
         width={dimensions.width}
         height={dimensions.height}

@@ -7,10 +7,17 @@ type ScheduledGroupCardProps = {
   groupName: string
   dogCount: number
   hasConflicts: boolean
+  score: number
   onRemove: () => void
   onLog: () => void
   dayName: string
   hour: number
+}
+
+function scoreBadgeClasses(score: number): string {
+  if (score >= 80) return 'bg-accent/20 text-accent'
+  if (score >= 50) return 'bg-primary/15 text-primary'
+  return 'bg-destructive/15 text-destructive'
 }
 
 export function ScheduledGroupCard({
@@ -18,6 +25,7 @@ export function ScheduledGroupCard({
   groupName,
   dogCount,
   hasConflicts,
+  score,
   onRemove,
   onLog,
   dayName,
@@ -40,8 +48,13 @@ export function ScheduledGroupCard({
         <span className='font-semibold truncate'>{groupName}</span>
         <span className='text-muted-foreground/70'>•</span>
         <span>{t('calendar.dogs', { count: dogCount })}</span>
+        {dogCount >= 2 && (
+          <span className={`inline-flex items-center px-1.5 py-0 rounded-full text-[10px] font-medium shrink-0 ${scoreBadgeClasses(score)}`}>
+            {score}
+          </span>
+        )}
         {hasConflicts && (
-          <AlertTriangle size={12} className='text-primary ml-1 inline shrink-0' />
+          <AlertTriangle size={12} className='text-primary ml-0.5 inline shrink-0' />
         )}
       </span>
       <button

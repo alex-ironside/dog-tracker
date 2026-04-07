@@ -15,7 +15,7 @@ import { useAppStore } from '@/store'
 import { GroupSidebar } from '@/components/GroupSidebar'
 import { WeekCalendar } from '@/components/WeekCalendar'
 import { slotKey, parseSlotKey } from '@/lib/calendarUtils'
-import { buildCompatMap } from '@/lib/scoring'
+import { buildCompatMap, inferStatusFromHistory, pairKey } from '@/lib/scoring'
 
 export function CalendarScheduler() {
   const { t } = useTranslation()
@@ -33,6 +33,7 @@ export function CalendarScheduler() {
     walkGroups,
     dogs,
     compatibilityEntries,
+    walkHistory,
     scheduleGroup,
     unscheduleGroup,
   } = useAppStore(
@@ -41,6 +42,7 @@ export function CalendarScheduler() {
       walkGroups: s.walkGroups,
       dogs: s.dogs,
       compatibilityEntries: s.compatibilityEntries,
+      walkHistory: s.walkHistory,
       scheduleGroup: s.scheduleGroup,
       unscheduleGroup: s.unscheduleGroup,
     }))
@@ -61,10 +63,20 @@ export function CalendarScheduler() {
     [walkSessions]
   )
 
-  const compatMap = useMemo(
-    () => buildCompatMap(compatibilityEntries),
-    [compatibilityEntries]
-  )
+  const compatMap = useMemo(() => {
+    const map = buildCompatMap(compatibilityEntries)
+    const activeDogIds = dogs.filter((d) => !d.archived).map((d) => d.id)
+    for (let i = 0; i < activeDogIds.length; i++) {
+      for (let j = i + 1; j < activeDogIds.length; j++) {
+        const key = pairKey(activeDogIds[i], activeDogIds[j])
+        if (!map.has(key)) {
+          const inferred = inferStatusFromHistory(activeDogIds[i], activeDogIds[j], walkHistory)
+          if (inferred) map.set(key, inferred)
+        }
+      }
+    }
+    return map
+  }, [compatibilityEntries, dogs, walkHistory])
 
   const activeDragGroup = activeDragId
     ? walkGroups.find((g) => g.id === activeDragId) ?? null
@@ -120,6 +132,7 @@ export function CalendarScheduler() {
         <GroupSidebar
           walkGroups={walkGroups}
           scheduledGroupIds={scheduledGroupIds}
+          compatMap={compatMap}
         />
         <WeekCalendar
           weekOffset={weekOffset}

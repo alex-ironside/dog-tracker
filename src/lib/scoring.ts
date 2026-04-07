@@ -43,13 +43,30 @@ export function inferStatusFromHistory(
   )
   if (pairWalks.length === 0) return null
 
-  // Resolve per-walk outcome using groupOutcome when available
-  const resolvedOutcomes = pairWalks.map((e) => {
-    if (e.groupContext?.groupOutcome) {
-      return e.groupContext.groupOutcome
+  // Resolve per-walk outcome. When the walk has groupContext, the groupOutcome
+  // describes the cross-group encounter (groupA vs groupB) and the top-level
+  // outcome reflects the worst thing across the whole walk. For two dogs on
+  // the same side of a split walk, neither signal cleanly attributes to the
+  // pair, so skip the walk entirely. Cross-side pairs inherit the groupOutcome.
+  // Walks without groupContext use the raw outcome for every included pair.
+  const resolvedOutcomes: Array<'great' | 'good' | 'poor' | 'incident'> = []
+  for (const e of pairWalks) {
+    const ctx = e.groupContext
+    if (ctx?.groupOutcome) {
+      const aIsA = ctx.groupA.includes(dogIdA)
+      const aIsB = ctx.groupB.includes(dogIdA)
+      const bIsA = ctx.groupA.includes(dogIdB)
+      const bIsB = ctx.groupB.includes(dogIdB)
+      const sameSide = (aIsA && bIsA) || (aIsB && bIsB)
+      if (sameSide) continue // no clean signal for this pair
+      if ((aIsA || aIsB) && (bIsA || bIsB)) {
+        resolvedOutcomes.push(ctx.groupOutcome)
+        continue
+      }
     }
-    return e.outcome
-  })
+    resolvedOutcomes.push(e.outcome)
+  }
+  if (resolvedOutcomes.length === 0) return null
 
   if (resolvedOutcomes.some((o) => o === 'incident')) return 'conflict'
   if (resolvedOutcomes.some((o) => o === 'poor')) return 'neutral'

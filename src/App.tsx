@@ -45,7 +45,7 @@ function App() {
           </div>
 
           {/* Tab bar */}
-          <nav role='tablist' className='flex gap-1 -mb-px overflow-x-auto pt-4'>
+          <nav role='tablist' className='flex gap-1 -mb-px overflow-x-auto pt-4 [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden'>
             {TABS.map((tab) => {
               const active = activeTab === tab.id
               return (
