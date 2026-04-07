@@ -36,7 +36,7 @@ function App() {
               </span>
               <div className='flex items-baseline gap-2'>
                 <h1 className='font-display text-3xl font-semibold tracking-tight'>Pack</h1>
-                <span className='text-xs uppercase tracking-[0.18em] text-muted-foreground'>
+                <span className='hidden sm:inline text-xs uppercase tracking-[0.18em] text-muted-foreground'>
                   {t('app.tagline')}
                 </span>
               </div>
