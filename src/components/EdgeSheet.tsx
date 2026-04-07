@@ -56,7 +56,7 @@ export function EdgeSheet({
           <Button
             variant="ghost"
             size="icon"
-            aria-label="Close panel"
+            aria-label={t('common.closePanel')}
             onClick={() => onOpenChange(false)}
           >
             <X size={18} />
@@ -66,7 +66,7 @@ export function EdgeSheet({
         {/* Body */}
         <div className="flex-1 overflow-y-auto px-6 py-4">
           {/* Current status */}
-          <p className="text-sm font-semibold text-foreground/90">Current status:</p>
+          <p className="text-sm font-semibold text-foreground/90">{t('compat.currentStatus')}</p>
           <div className="mt-1">
             <CompatBadge status={currentStatus} />
           </div>
@@ -98,7 +98,7 @@ export function EdgeSheet({
               className="text-destructive w-full justify-start"
               onClick={onRemove}
             >
-              Remove relationship
+              {t('compat.removeRelationship')}
             </Button>
           </div>
         </div>
@@ -106,7 +106,7 @@ export function EdgeSheet({
         {/* Sticky footer */}
         <div className="sticky bottom-0 bg-card border-t border-border py-4 px-6 flex justify-between">
           <Button variant="outline" onClick={() => onOpenChange(false)}>
-            Discard changes
+            {t('common.discardChanges')}
           </Button>
           <Button
             variant="default"
@@ -115,7 +115,7 @@ export function EdgeSheet({
               if (selectedStatus) onSetStatus(selectedStatus)
             }}
           >
-            Set compatibility
+            {t('compat.setStatus')}
           </Button>
         </div>
       </SheetContent>

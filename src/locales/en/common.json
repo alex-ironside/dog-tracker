@@ -11,7 +11,8 @@
   },
   "lang": {
     "en": "EN",
-    "pl": "PL"
+    "pl": "PL",
+    "label": "Language"
   },
   "common": {
     "save": "Save",
@@ -21,10 +22,13 @@
     "remove": "Remove",
     "add": "Add",
     "close": "Close",
+    "closePanel": "Close panel",
     "discard": "Discard",
+    "discardChanges": "Discard changes",
     "confirm": "Confirm",
     "archive": "Archive",
-    "unarchive": "Unarchive"
+    "unarchive": "Unarchive",
+    "keep": "Keep"
   },
   "roster": {
     "title": "Dog Roster",
@@ -34,11 +38,15 @@
     "emptyBody": "Add your first dog to start tracking walks, groups, and compatibility.",
     "searchPlaceholder": "Search dogs...",
     "showArchived": "Show archived",
+    "showArchivedDogs": "Show archived dogs",
     "archived": "Archived",
     "noMatches": "No dogs match your search.",
     "deleteDog": "Delete dog",
     "editDog": "Edit dog",
-    "inGroup": "in {{group}}"
+    "inGroup": "in {{group}}",
+    "archiveHidden": "They'll be hidden from active views but their history is preserved.",
+    "keepDog": "Keep Dog",
+    "archiveConfirm": "Archive {{name}}?"
   },
   "dogPanel": {
     "addTitle": "Add Dog",
@@ -47,11 +55,15 @@
     "breed": "Breed",
     "age": "Age",
     "notes": "Notes",
+    "profile": "Profile",
+    "history": "History",
     "namePlaceholder": "Dog's name",
     "breedPlaceholder": "Breed",
     "notesPlaceholder": "Notes about this dog",
+    "notesAboutDogPlaceholder": "Any notes about this dog...",
     "saveDog": "Save Dog",
-    "nameRequired": "Name is required"
+    "nameRequired": "Name is required",
+    "nameRequiredDot": "Name is required."
   },
   "compat": {
     "status": {
@@ -65,7 +77,9 @@
     "setStatus": "Set compatibility",
     "edgeTitle": "Compatibility",
     "tagline": "How your dogs get along.",
-    "noDataBody": "Add dogs in the Dogs tab, then click any two dogs to set their compatibility."
+    "noDataBody": "Add dogs in the Dogs tab, then click any two dogs to set their compatibility.",
+    "currentStatus": "Current status:",
+    "removeRelationship": "Remove relationship"
   },
   "groups": {
     "title": "Groups",
@@ -79,10 +93,15 @@
     "removeDogAria": "Remove {{name}} from group",
     "groupName": "Group name",
     "sidebarEmpty": "No groups yet. Create groups in the Groups tab, then drag them here to schedule walks.",
-    "allScheduled": "All groups are scheduled this week."
+    "allScheduled": "All groups are scheduled this week.",
+    "availableDogs": "Available Dogs",
+    "noActiveDogs": "No active dogs. Add dogs in the Dogs tab.",
+    "builderTagline": "Build walking groups by dragging dogs.",
+    "dropDogHere": "Drop a dog here"
   },
   "calendar": {
     "title": "Calendar",
+    "subtitle": "Schedule walks for the week.",
     "emptySlot": "empty",
     "dogs_one": "{{count}} dog",
     "dogs_other": "{{count}} dogs",
@@ -96,30 +115,51 @@
   },
   "history": {
     "title": "Walk History",
+    "subtitle": "Every walk, every outcome.",
     "empty": "No walks logged yet",
+    "emptyBody": "Log your first walk to start tracking outcomes.",
+    "logWalk": "Log a walk",
     "date": "Date",
     "dogs": "Dogs",
     "outcome": "Outcome",
     "notes": "Notes",
     "edit": "Edit",
-    "delete": "Delete"
+    "delete": "Delete",
+    "editWalkAria": "Edit walk log",
+    "deleteWalkAria": "Delete walk log",
+    "groupALabel": "Group A:",
+    "groupBLabel": "Group B:",
+    "crossGroup": "Cross-group:",
+    "withinGroup": "Within group:"
   },
   "walkLog": {
     "title": "Log a walk",
     "outcome": "Outcome",
+    "outcomeTitle": "Encounter outcome",
+    "outcomeSubtitle": "How did the groups interact?",
     "notes": "Notes",
+    "notesPlaceholder": "Any notes about this walk...",
     "save": "Save",
+    "saveWalkLog": "Save Walk Log",
+    "dateRequired": "Date is required.",
+    "outcomeRequired": "Please select an outcome.",
     "selectDogs": "Select at least one dog.",
+    "dogsPresent": "Dogs present",
+    "allTogether": "All together",
     "twoGroups": "Two groups",
     "singleWalk": "Single walk",
+    "noActiveDogs": "No active dogs",
+    "dragHint": "Drag dogs into Group A or Group B",
     "groupA": "Group A",
     "groupB": "Group B",
+    "noDogsAssigned": "No dogs assigned",
     "pool": "Pool",
     "great": "Great",
     "good": "Good",
     "neutralOutcome": "Neutral",
     "tense": "Tense",
-    "conflict": "Conflict"
+    "conflict": "Conflict",
+    "discard": "Discard"
   },
   "dialog": {
     "confirmDelete": "Are you sure?",

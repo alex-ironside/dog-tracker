@@ -80,10 +80,10 @@ export function DogRoster() {
           id={switchId}
           checked={showArchived}
           onCheckedChange={setShowArchived}
-          aria-label="Show archived dogs"
+          aria-label={t('roster.showArchivedDogs')}
         />
         <Label htmlFor={switchId} className="text-sm text-muted-foreground cursor-pointer">
-          Show archived dogs
+          {t('roster.showArchivedDogs')}
         </Label>
       </div>
 
@@ -109,16 +109,16 @@ export function DogRoster() {
           <AlertDialogHeader>
             <AlertDialogTitle>Archive {archivingDog?.name}?</AlertDialogTitle>
             <AlertDialogDescription>
-              They'll be hidden from active views but their history is preserved.
+              {t('roster.archiveHidden')}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>Keep Dog</AlertDialogCancel>
+            <AlertDialogCancel>{t('roster.keepDog')}</AlertDialogCancel>
             <AlertDialogAction
               className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
               onClick={handleConfirmArchive}
             >
-              Archive
+              {t('common.archive')}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

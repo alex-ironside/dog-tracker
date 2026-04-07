@@ -310,7 +310,7 @@ export function WalkLogSheet({
           <Button
             variant="ghost"
             size="icon"
-            aria-label="Close panel"
+            aria-label={t('common.closePanel')}
             onClick={() => onOpenChange(false)}
           >
             <X size={18} />
@@ -341,7 +341,7 @@ export function WalkLogSheet({
               />
               {dateError && (
                 <p className="text-sm text-destructive mt-1" role="alert">
-                  Date is required.
+                  {t('walkLog.dateRequired')}
                 </p>
               )}
             </div>
@@ -350,7 +350,7 @@ export function WalkLogSheet({
             {groupMode === 'together' && (
               <div>
                 <label className="text-sm font-medium text-foreground/80 leading-normal block mb-1">
-                  Outcome
+                  {t('walkLog.outcome')}
                 </label>
                 <div className="flex flex-wrap gap-2">
                   {OUTCOME_OPTIONS.map(({ value, label, textColor }) => (
@@ -373,7 +373,7 @@ export function WalkLogSheet({
                 </div>
                 {outcomeError && (
                   <p className="text-sm text-destructive mt-1" role="alert">
-                    Please select an outcome.
+                    {t('walkLog.outcomeRequired')}
                   </p>
                 )}
               </div>
@@ -383,7 +383,7 @@ export function WalkLogSheet({
             <div>
               <div className="flex items-center justify-between mb-2">
                 <label className="text-sm font-medium text-foreground/80 leading-normal">
-                  Dogs present
+                  {t('walkLog.dogsPresent')}
                 </label>
                 {/* Group mode toggle */}
                 <div className="flex rounded-md border border-border overflow-hidden text-xs">
@@ -397,7 +397,7 @@ export function WalkLogSheet({
                     )}
                     onClick={() => setGroupMode('together')}
                   >
-                    All together
+                    {t('walkLog.allTogether')}
                   </button>
                   <button
                     type="button"
@@ -409,7 +409,7 @@ export function WalkLogSheet({
                     )}
                     onClick={() => setGroupMode('groups')}
                   >
-                    Two groups
+                    {t('walkLog.twoGroups')}
                   </button>
                 </div>
               </div>
@@ -418,7 +418,7 @@ export function WalkLogSheet({
                 <>
                   <div className="max-h-48 overflow-y-auto border border-input rounded-md px-3 py-2">
                     {activeDogs.length === 0 ? (
-                      <p className="text-sm text-muted-foreground/70">No active dogs</p>
+                      <p className="text-sm text-muted-foreground/70">{t('walkLog.noActiveDogs')}</p>
                     ) : (
                       activeDogs.map((dog) => (
                         <label key={dog.id} className="flex items-center gap-2 py-1 cursor-pointer">
@@ -434,14 +434,14 @@ export function WalkLogSheet({
                   </div>
                   {dogsError && (
                     <p className="text-sm text-destructive mt-1" role="alert">
-                      Select at least one dog.
+                      {t('walkLog.selectDogs')}
                     </p>
                   )}
                 </>
               ) : (
                 <>
                   {activeDogs.length === 0 ? (
-                    <p className="text-sm text-muted-foreground/70">No active dogs</p>
+                    <p className="text-sm text-muted-foreground/70">{t('walkLog.noActiveDogs')}</p>
                   ) : (
                     <DndContext
                       sensors={sensors}
@@ -453,7 +453,7 @@ export function WalkLogSheet({
                         {activeDogs.some((d) => !groupAssignments[d.id]) && (
                           <DroppableBox id="pool" className="border border-border rounded-md p-3">
                             <p className="text-xs font-medium text-muted-foreground mb-2">
-                              Drag dogs into Group A or Group B
+                              {t('walkLog.dragHint')}
                             </p>
                             <div className="flex flex-wrap gap-2">
                               {activeDogs
@@ -472,9 +472,9 @@ export function WalkLogSheet({
                         {/* Group A box */}
                         <DroppableBox id="group-a" className="border-2 border-primary/40 rounded-md overflow-hidden">
                           <div className="bg-muted px-3 py-2 flex items-center justify-between">
-                            <span className="text-sm font-semibold text-foreground">Group A</span>
+                            <span className="text-sm font-semibold text-foreground">{t('walkLog.groupA')}</span>
                             {groupA.length === 0 && (
-                              <span className="text-xs text-muted-foreground">No dogs assigned</span>
+                              <span className="text-xs text-muted-foreground">{t('walkLog.noDogsAssigned')}</span>
                             )}
                           </div>
                           {groupA.length > 0 && (
@@ -497,9 +497,9 @@ export function WalkLogSheet({
                         {/* Group B box */}
                         <DroppableBox id="group-b" className="border-2 border-primary/40 rounded-md overflow-hidden">
                           <div className="bg-primary/10 px-3 py-2 flex items-center justify-between">
-                            <span className="text-sm font-semibold text-primary">Group B</span>
+                            <span className="text-sm font-semibold text-primary">{t('walkLog.groupB')}</span>
                             {groupB.length === 0 && (
-                              <span className="text-xs text-primary/80">No dogs assigned</span>
+                              <span className="text-xs text-primary/80">{t('walkLog.noDogsAssigned')}</span>
                             )}
                           </div>
                           {groupB.length > 0 && (
@@ -521,8 +521,8 @@ export function WalkLogSheet({
 
                         {/* Shared encounter outcome picker */}
                         <div className="border border-border rounded-md px-3 py-3">
-                          <p className="text-sm font-medium text-foreground/80 mb-0.5">Encounter outcome</p>
-                          <p className="text-xs text-muted-foreground mb-2">How did the groups interact?</p>
+                          <p className="text-sm font-medium text-foreground/80 mb-0.5">{t('walkLog.outcomeTitle')}</p>
+                          <p className="text-xs text-muted-foreground mb-2">{t('walkLog.outcomeSubtitle')}</p>
                           <div className="flex flex-wrap gap-1.5">
                             {OUTCOME_OPTIONS.map(({ value, label, textColor }) => (
                               <Button
@@ -572,7 +572,7 @@ export function WalkLogSheet({
               </label>
               <textarea
                 rows={3}
-                placeholder="Any notes about this walk..."
+                placeholder={t('walkLog.notesPlaceholder')}
                 value={notes}
                 onChange={(e) => setNotes(e.target.value)}
                 className={cn(
@@ -589,10 +589,10 @@ export function WalkLogSheet({
         {/* Footer */}
         <div className="sticky bottom-0 bg-background border-t border-border py-4 px-6 flex justify-between">
           <Button variant="outline" onClick={() => onOpenChange(false)}>
-            Discard
+            {t('walkLog.discard')}
           </Button>
           <Button variant="default" onClick={handleSave}>
-            Save Walk Log
+            {t('walkLog.saveWalkLog')}
           </Button>
         </div>
       </SheetContent>

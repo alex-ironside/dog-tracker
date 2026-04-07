@@ -19,6 +19,7 @@ import { useAppStore } from '@/store'
 import { scoreGroup, getConflictsInGroup, buildCompatMap, pairKey, inferStatusFromHistory } from '@/lib/scoring'
 
 function RosterPanel() {
+  const { t } = useTranslation()
   const { setNodeRef, isOver } = useDroppable({ id: 'roster' })
   const dogs = useAppStore((s) => s.dogs)
   const walkGroups = useAppStore((s) => s.walkGroups)
@@ -38,9 +39,9 @@ function RosterPanel() {
       ref={setNodeRef}
       className={`w-[280px] min-w-[280px] border-r border-border overflow-y-auto p-4 transition-colors${isOver ? ' bg-muted' : ' bg-muted/50'}`}
     >
-      <p className='text-sm font-semibold text-foreground/90 mb-3'>Available Dogs</p>
+      <p className='text-sm font-semibold text-foreground/90 mb-3'>{t('groups.availableDogs')}</p>
       {activeDogs.length === 0 ? (
-        <p className='text-sm text-muted-foreground/70 px-3 py-4'>No active dogs. Add dogs in the Dogs tab.</p>
+        <p className='text-sm text-muted-foreground/70 px-3 py-4'>{t('groups.noActiveDogs')}</p>
       ) : (
         activeDogs.map((dog) => (
           <RosterRow
@@ -139,7 +140,7 @@ export function GroupBuilder() {
     <>
       <header className='mb-6'>
         <h1 className='font-display text-4xl font-semibold tracking-tight text-foreground'>{t('nav.groups')}</h1>
-        <p className='text-sm text-muted-foreground mt-1'>Build walking groups by dragging dogs.</p>
+        <p className='text-sm text-muted-foreground mt-1'>{t('groups.builderTagline')}</p>
       </header>
       <DndContext sensors={sensors} onDragStart={handleDragStart} onDragEnd={handleDragEnd}>
         <div className='flex h-[600px] rounded-2xl border border-border overflow-hidden'>

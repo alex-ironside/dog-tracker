@@ -7,7 +7,7 @@ export function LanguageToggle() {
   const langs: Array<'en' | 'pl'> = ['en', 'pl']
 
   return (
-    <div role='group' aria-label='Language' className='inline-flex rounded-md border border-border overflow-hidden'>
+    <div role='group' aria-label={t('lang.label')} className='inline-flex rounded-md border border-border overflow-hidden'>
       {langs.map((lng) => {
         const active = current === lng
         return (

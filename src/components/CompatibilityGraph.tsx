@@ -201,13 +201,13 @@ export function CompatibilityGraph() {
   return (
     <div>
       <header className='mb-6'>
-        <h1 className='font-display text-4xl font-semibold tracking-tight text-foreground'>Compatibility</h1>
-        <p className='text-sm text-muted-foreground mt-1'>How your dogs get along.</p>
+        <h1 className='font-display text-4xl font-semibold tracking-tight text-foreground'>{t('compat.edgeTitle')}</h1>
+        <p className='text-sm text-muted-foreground mt-1'>{t('compat.tagline')}</p>
       </header>
       <div className='flex flex-wrap gap-4 mb-4 text-xs text-muted-foreground'>
-        <span className='flex items-center gap-1.5'><span className='inline-block w-3 h-0.5 bg-accent' />Compatible</span>
-        <span className='flex items-center gap-1.5'><span className='inline-block w-3 h-0.5 bg-muted-foreground' />Neutral</span>
-        <span className='flex items-center gap-1.5'><span className='inline-block w-3 h-0.5 bg-destructive' />Conflict</span>
+        <span className='flex items-center gap-1.5'><span className='inline-block w-3 h-0.5 bg-accent' />{t('compat.status.compatible')}</span>
+        <span className='flex items-center gap-1.5'><span className='inline-block w-3 h-0.5 bg-muted-foreground' />{t('compat.status.neutral')}</span>
+        <span className='flex items-center gap-1.5'><span className='inline-block w-3 h-0.5 bg-destructive' />{t('compat.status.conflict')}</span>
       </div>
     <div ref={containerRef} className='w-full flex-1 rounded-2xl border border-border bg-card/40 overflow-hidden' style={{ minHeight: '500px' }}>
       <ForceGraph2D

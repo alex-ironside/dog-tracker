@@ -117,7 +117,7 @@ export function GroupPanel({ group, dogs, onRename, onDelete, onRemoveDog, score
       >
         {dogs.length === 0 ? (
           <div className='border-2 border-dashed border-border rounded-lg flex items-center justify-center py-4'>
-            <span className='text-sm text-muted-foreground/70'>Drop a dog here</span>
+            <span className='text-sm text-muted-foreground/70'>{t('groups.dropDogHere')}</span>
           </div>
         ) : (
           <div className='flex flex-wrap gap-2'>

@@ -122,7 +122,7 @@ export function DogPanel({ open, onOpenChange, editingDog }: DogPanelProps) {
           <Button
             variant="ghost"
             size="icon"
-            aria-label="Close panel"
+            aria-label={t('common.closePanel')}
             onClick={resetAndClose}
           >
             <X size={18} />
@@ -142,7 +142,7 @@ export function DogPanel({ open, onOpenChange, editingDog }: DogPanelProps) {
                   : 'text-muted-foreground hover:text-foreground/90'
               }`}
             >
-              Profile
+              {t('dogPanel.profile')}
             </button>
             <button
               role="tab"
@@ -154,7 +154,7 @@ export function DogPanel({ open, onOpenChange, editingDog }: DogPanelProps) {
                   : 'text-muted-foreground hover:text-foreground/90'
               }`}
             >
-              History
+              {t('dogPanel.history')}
             </button>
           </div>
         )}
@@ -183,7 +183,7 @@ export function DogPanel({ open, onOpenChange, editingDog }: DogPanelProps) {
                 />
                 {nameError && (
                   <p className="text-sm text-destructive mt-1" role="alert" aria-live="polite">
-                    Name is required.
+                    {t('dogPanel.nameRequiredDot')}
                   </p>
                 )}
               </div>
@@ -226,7 +226,7 @@ export function DogPanel({ open, onOpenChange, editingDog }: DogPanelProps) {
                 <textarea
                   id={notesId}
                   rows={3}
-                  placeholder="Any notes about this dog..."
+                  placeholder={t('dogPanel.notesAboutDogPlaceholder')}
                   value={notes}
                   onChange={(e) => setNotes(e.target.value)}
                   className={cn(

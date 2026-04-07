@@ -41,6 +41,7 @@ function WalkLogEntryRow({
   onEdit: (entry: WalkLogEntry) => void
   onDelete: (id: string) => void
 }) {
+  const { t } = useTranslation()
   const dogNames = entry.dogIds
     .map((id) => dogs.find((d) => d.id === id)?.name ?? 'Unknown')
     .join(', ')
@@ -98,10 +99,10 @@ function WalkLogEntryRow({
             {hasGroupOutcome && (
               <>{' '}<OutcomeBadge outcome={entry.groupContext.groupOutcome!} />{' '}</>
             )}
-            <span className="text-foreground font-medium">Group A:</span>{' '}
+            <span className="text-foreground font-medium">{t('history.groupALabel')}</span>{' '}
             {groupANames.join(', ')}
             <span className="mx-2 text-muted-foreground/50">|</span>
-            <span className="text-primary font-medium">Group B:</span>{' '}
+            <span className="text-primary font-medium">{t('history.groupBLabel')}</span>{' '}
             {groupBNames.join(', ')}
           </span>
         ) : (
@@ -112,14 +113,14 @@ function WalkLogEntryRow({
           <button
             onClick={() => onEdit(entry)}
             className="p-1 rounded text-muted-foreground/70 hover:text-foreground/80 hover:bg-muted"
-            aria-label="Edit walk log"
+            aria-label={t('history.editWalkAria')}
           >
             <Pencil size={14} />
           </button>
           <button
             onClick={() => onDelete(entry.id)}
             className="p-1 rounded text-muted-foreground/70 hover:text-destructive hover:bg-destructive/10"
-            aria-label="Delete walk log"
+            aria-label={t('history.deleteWalkAria')}
           >
             <Trash2 size={14} />
           </button>
@@ -132,7 +133,7 @@ function WalkLogEntryRow({
         <div className="mt-2 space-y-1">
           {crossGroupPairs.length > 0 && (
             <div>
-              <span className="text-xs text-muted-foreground/70 font-medium mr-1">Cross-group:</span>
+              <span className="text-xs text-muted-foreground/70 font-medium mr-1">{t('history.crossGroup')}</span>
               <span className="inline-flex flex-wrap gap-1">
                 {crossGroupPairs.map(renderPairButton)}
               </span>
@@ -140,7 +141,7 @@ function WalkLogEntryRow({
           )}
           {intraGroupPairs.length > 0 && (
             <div>
-              <span className="text-xs text-muted-foreground/70 font-medium mr-1">Within group:</span>
+              <span className="text-xs text-muted-foreground/70 font-medium mr-1">{t('history.withinGroup')}</span>
               <span className="inline-flex flex-wrap gap-1">
                 {intraGroupPairs.map(renderPairButton)}
               </span>
@@ -195,19 +196,19 @@ export function WalkHistory() {
     <div>
       <div className="flex items-end justify-between mb-6">
         <div>
-          <h1 className="font-display text-4xl font-semibold tracking-tight text-foreground">{t('history.title', { defaultValue: 'Walk History' })}</h1>
-          <p className="text-sm text-muted-foreground mt-1">Every walk, every outcome.</p>
+          <h1 className="font-display text-4xl font-semibold tracking-tight text-foreground">{t('history.title')}</h1>
+          <p className="text-sm text-muted-foreground mt-1">{t('history.subtitle')}</p>
         </div>
         <Button variant="default" size="lg" onClick={() => { setEditEntry(undefined); setSheetOpen(true) }} className="shadow-sm">
-          Log a walk
+          {t('history.logWalk')}
         </Button>
       </div>
 
       {sortedEntries.length === 0 ? (
         <div className="text-center py-12">
-          <p className="text-lg font-semibold text-foreground">No walks logged yet</p>
+          <p className="text-lg font-semibold text-foreground">{t('history.empty')}</p>
           <p className="text-sm text-muted-foreground mt-1">
-            Log your first walk to start tracking outcomes.
+            {t('history.emptyBody')}
           </p>
         </div>
       ) : (

@@ -11,7 +11,8 @@
   },
   "lang": {
     "en": "EN",
-    "pl": "PL"
+    "pl": "PL",
+    "label": "Język"
   },
   "common": {
     "save": "Zapisz",
@@ -21,10 +22,13 @@
     "remove": "Usuń",
     "add": "Dodaj",
     "close": "Zamknij",
+    "closePanel": "Zamknij panel",
     "discard": "Odrzuć",
+    "discardChanges": "Odrzuć zmiany",
     "confirm": "Potwierdź",
     "archive": "Archiwizuj",
-    "unarchive": "Przywróć"
+    "unarchive": "Przywróć",
+    "keep": "Zachowaj"
   },
   "roster": {
     "title": "Lista psów",
@@ -34,11 +38,15 @@
     "emptyBody": "Dodaj pierwszego psa, aby śledzić spacery, grupy i zgodność.",
     "searchPlaceholder": "Szukaj psów...",
     "showArchived": "Pokaż zarchiwizowane",
+    "showArchivedDogs": "Pokaż zarchiwizowane psy",
     "archived": "Zarchiwizowane",
     "noMatches": "Żaden pies nie pasuje do wyszukiwania.",
     "deleteDog": "Usuń psa",
     "editDog": "Edytuj psa",
-    "inGroup": "w {{group}}"
+    "inGroup": "w {{group}}",
+    "archiveHidden": "Zostaną ukryte w aktywnych widokach, ale ich historia zostanie zachowana.",
+    "keepDog": "Zachowaj psa",
+    "archiveConfirm": "Zarchiwizować {{name}}?"
   },
   "dogPanel": {
     "addTitle": "Dodaj psa",
@@ -47,11 +55,15 @@
     "breed": "Rasa",
     "age": "Wiek",
     "notes": "Notatki",
+    "profile": "Profil",
+    "history": "Historia",
     "namePlaceholder": "Imię psa",
     "breedPlaceholder": "Rasa",
     "notesPlaceholder": "Notatki o tym psie",
+    "notesAboutDogPlaceholder": "Dowolne notatki o tym psie...",
     "saveDog": "Zapisz psa",
-    "nameRequired": "Imię jest wymagane"
+    "nameRequired": "Imię jest wymagane",
+    "nameRequiredDot": "Imię jest wymagane."
   },
   "compat": {
     "status": {
@@ -65,7 +77,9 @@
     "setStatus": "Ustaw zgodność",
     "edgeTitle": "Zgodność",
     "tagline": "Jak twoje psy się dogadują.",
-    "noDataBody": "Dodaj psy w zakładce Psy, a następnie kliknij dowolne dwa psy, aby ustawić ich zgodność."
+    "noDataBody": "Dodaj psy w zakładce Psy, a następnie kliknij dowolne dwa psy, aby ustawić ich zgodność.",
+    "currentStatus": "Aktualny status:",
+    "removeRelationship": "Usuń relację"
   },
   "groups": {
     "title": "Grupy",
@@ -79,10 +93,15 @@
     "removeDogAria": "Usuń {{name}} z grupy",
     "groupName": "Nazwa grupy",
     "sidebarEmpty": "Brak grup. Utwórz grupy w zakładce Grupy, a następnie przeciągnij je tutaj, aby zaplanować spacery.",
-    "allScheduled": "Wszystkie grupy są zaplanowane w tym tygodniu."
+    "allScheduled": "Wszystkie grupy są zaplanowane w tym tygodniu.",
+    "availableDogs": "Dostępne psy",
+    "noActiveDogs": "Brak aktywnych psów. Dodaj psy w zakładce Psy.",
+    "builderTagline": "Buduj grupy spacerowe przeciągając psy.",
+    "dropDogHere": "Upuść psa tutaj"
   },
   "calendar": {
     "title": "Kalendarz",
+    "subtitle": "Zaplanuj spacery na tydzień.",
     "emptySlot": "pusty",
     "dogs_one": "{{count}} pies",
     "dogs_few": "{{count}} psy",
@@ -98,30 +117,51 @@
   },
   "history": {
     "title": "Historia spacerów",
+    "subtitle": "Każdy spacer, każdy rezultat.",
     "empty": "Brak zapisanych spacerów",
+    "emptyBody": "Zapisz pierwszy spacer, aby rozpocząć śledzenie rezultatów.",
+    "logWalk": "Zapisz spacer",
     "date": "Data",
     "dogs": "Psy",
     "outcome": "Rezultat",
     "notes": "Notatki",
     "edit": "Edytuj",
-    "delete": "Usuń"
+    "delete": "Usuń",
+    "editWalkAria": "Edytuj zapis spaceru",
+    "deleteWalkAria": "Usuń zapis spaceru",
+    "groupALabel": "Grupa A:",
+    "groupBLabel": "Grupa B:",
+    "crossGroup": "Między grupami:",
+    "withinGroup": "W grupie:"
   },
   "walkLog": {
     "title": "Zapisz spacer",
     "outcome": "Rezultat",
+    "outcomeTitle": "Rezultat spotkania",
+    "outcomeSubtitle": "Jak grupy wchodziły w interakcje?",
     "notes": "Notatki",
+    "notesPlaceholder": "Dowolne notatki o tym spacerze...",
     "save": "Zapisz",
+    "saveWalkLog": "Zapisz spacer",
+    "dateRequired": "Data jest wymagana.",
+    "outcomeRequired": "Wybierz rezultat.",
     "selectDogs": "Wybierz co najmniej jednego psa.",
+    "dogsPresent": "Obecne psy",
+    "allTogether": "Wszystkie razem",
     "twoGroups": "Dwie grupy",
     "singleWalk": "Jeden spacer",
+    "noActiveDogs": "Brak aktywnych psów",
+    "dragHint": "Przeciągnij psy do Grupy A lub Grupy B",
     "groupA": "Grupa A",
     "groupB": "Grupa B",
+    "noDogsAssigned": "Brak przypisanych psów",
     "pool": "Pula",
     "great": "Świetnie",
     "good": "Dobrze",
     "neutralOutcome": "Neutralnie",
     "tense": "Napięcie",
-    "conflict": "Konflikt"
+    "conflict": "Konflikt",
+    "discard": "Odrzuć"
   },
   "dialog": {
     "confirmDelete": "Czy na pewno?",
