@@ -13,6 +13,7 @@ import type { DragEndEvent, DragStartEvent } from '@dnd-kit/core'
 import { useShallow } from 'zustand/react/shallow'
 import { Button } from '@/components/ui/button'
 import { RosterRow } from '@/components/RosterRow'
+import { useDogSearch, DogSearchInput } from '@/components/SearchableDogPicker'
 import { GroupPanel } from '@/components/GroupPanel'
 import { EdgeSheet } from '@/components/EdgeSheet'
 import { useAppStore } from '@/store'
@@ -25,6 +26,7 @@ function RosterPanel() {
   const walkGroups = useAppStore((s) => s.walkGroups)
 
   const activeDogs = dogs.filter((d) => !d.archived)
+  const { query, setQuery, filtered } = useDogSearch(activeDogs)
 
   // Build dogId -> groupName map
   const dogGroupMap = new Map<string, string>()
@@ -40,10 +42,15 @@ function RosterPanel() {
       className={`w-[280px] min-w-[280px] border-r border-border overflow-y-auto p-4 transition-colors${isOver ? ' bg-muted' : ' bg-muted/50'}`}
     >
       <p className='text-sm font-semibold text-foreground/90 mb-3'>{t('groups.availableDogs')}</p>
+      {activeDogs.length > 0 && (
+        <DogSearchInput value={query} onChange={setQuery} className='mb-3' />
+      )}
       {activeDogs.length === 0 ? (
         <p className='text-sm text-muted-foreground/70 px-3 py-4'>{t('groups.noActiveDogs')}</p>
+      ) : filtered.length === 0 && query ? (
+        <p className='text-sm text-muted-foreground/70 px-3 py-4'>{t('picker.noMatches')}</p>
       ) : (
-        activeDogs.map((dog) => (
+        filtered.map((dog) => (
           <RosterRow
             key={dog.id}
             dog={dog}
