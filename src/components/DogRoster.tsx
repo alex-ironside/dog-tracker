@@ -15,6 +15,7 @@ import {
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog'
 import { useAppStore } from '@/store'
+import { useDogSearch, DogSearchInput } from '@/components/SearchableDogPicker'
 import { DogGrid } from './DogGrid'
 import { DogPanel } from './DogPanel'
 import type { Dog } from '@/types'
@@ -34,6 +35,7 @@ export function DogRoster() {
   const switchId = useId()
 
   const visibleDogs = showArchived ? dogs : dogs.filter((d) => !d.archived)
+  const { query, setQuery, filtered: searchedDogs } = useDogSearch(visibleDogs)
 
   function handleAddDog() {
     setEditingDog(null)
@@ -75,7 +77,8 @@ export function DogRoster() {
       </div>
 
       {/* Filter bar */}
-      <div className="flex items-center gap-2 mb-8 mt-4">
+      <div className="flex items-center gap-4 mb-8 mt-4">
+        <DogSearchInput value={query} onChange={setQuery} className="max-w-xs" />
         <Switch
           id={switchId}
           checked={showArchived}
@@ -89,7 +92,7 @@ export function DogRoster() {
 
       {/* Grid */}
       <DogGrid
-        dogs={visibleDogs}
+        dogs={searchedDogs}
         onEdit={handleEditDog}
         onArchive={handleArchiveDog}
         onUnarchive={handleUnarchiveDog}

@@ -12,6 +12,7 @@ import {
 import type { DragEndEvent, DragStartEvent } from '@dnd-kit/core'
 import { useShallow } from 'zustand/react/shallow'
 import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
 import { RosterRow } from '@/components/RosterRow'
 import { useDogSearch, DogSearchInput } from '@/components/SearchableDogPicker'
 import { GroupPanel } from '@/components/GroupPanel'
@@ -28,11 +29,30 @@ function RosterPanel() {
   const activeDogs = dogs.filter((d) => !d.archived)
   const { query, setQuery, filtered } = useDogSearch(activeDogs)
 
-  // Build dogId -> groupName map
-  const dogGroupMap = new Map<string, string>()
+  const [addMode, setAddMode] = useState(false)
+  const [newDogName, setNewDogName] = useState('')
+
+  function handleAddDog() {
+    const trimmed = newDogName.trim()
+    if (!trimmed) return
+    useAppStore.getState().addDog({ name: trimmed, breed: '', age: null, notes: '' })
+    setNewDogName('')
+    setAddMode(false)
+    setQuery('')
+  }
+
+  function cancelAddDog() {
+    setNewDogName('')
+    setAddMode(false)
+  }
+
+  // Build dogId -> group names list
+  const dogGroupsMap = new Map<string, string[]>()
   for (const group of walkGroups) {
     for (const dogId of group.dogIds) {
-      dogGroupMap.set(dogId, group.name)
+      const list = dogGroupsMap.get(dogId) ?? []
+      list.push(group.name)
+      dogGroupsMap.set(dogId, list)
     }
   }
 
@@ -42,6 +62,38 @@ function RosterPanel() {
       className={`w-[280px] min-w-[280px] border-r border-border overflow-y-auto p-4 transition-colors${isOver ? ' bg-muted' : ' bg-muted/50'}`}
     >
       <p className='text-sm font-semibold text-foreground/90 mb-3'>{t('groups.availableDogs')}</p>
+      <div className='mb-3'>
+        {!addMode ? (
+          <Button type='button' variant='outline' size='sm' onClick={() => setAddMode(true)}>
+            {t('walkLog.addNewDog')}
+          </Button>
+        ) : (
+          <div className='flex items-center gap-2'>
+            <Input
+              value={newDogName}
+              onChange={(e) => setNewDogName(e.target.value)}
+              placeholder={t('walkLog.newDogNamePlaceholder')}
+              autoFocus
+              onKeyDown={(e) => {
+                if (e.key === 'Enter') {
+                  e.preventDefault()
+                  handleAddDog()
+                } else if (e.key === 'Escape') {
+                  e.preventDefault()
+                  cancelAddDog()
+                }
+              }}
+              className='h-8'
+            />
+            <Button type='button' size='sm' onClick={handleAddDog} disabled={!newDogName.trim()}>
+              {t('walkLog.saveNewDog')}
+            </Button>
+            <Button type='button' variant='outline' size='sm' onClick={cancelAddDog}>
+              {t('walkLog.cancelNewDog')}
+            </Button>
+          </div>
+        )}
+      </div>
       {activeDogs.length > 0 && (
         <DogSearchInput value={query} onChange={setQuery} className='mb-3' />
       )}
@@ -51,15 +103,14 @@ function RosterPanel() {
         <p className='text-sm text-muted-foreground/70 px-3 py-4'>{t('picker.noMatches')}</p>
       ) : (
         filtered.map((dog) => {
-          const assignedGroupName = dogGroupMap.get(dog.id) ?? null
-          // Keyed by assignment state so dnd-kit remounts the draggable when a
-          // dog moves between assigned/unassigned — avoids stale pointer state
-          // after removing a dog from a group.
+          const groupNames = dogGroupsMap.get(dog.id) ?? []
+          // Key includes assignment count so dnd-kit remounts the draggable
+          // after group membership changes — avoids stale pointer state.
           return (
             <RosterRow
-              key={`${dog.id}:${assignedGroupName ?? 'free'}`}
+              key={`${dog.id}:${groupNames.length}`}
               dog={dog}
-              assignedGroupName={assignedGroupName}
+              assignedGroupNames={groupNames}
             />
           )
         })
@@ -123,10 +174,11 @@ export function GroupBuilder() {
     const overId = over.id as string
 
     if (overId === 'roster') {
-      // drag-back to roster: remove dog from its group (GROUP-05)
-      const group = walkGroups.find((g) => g.dogIds.includes(dogId))
-      if (group) {
-        removeDogFromGroup(group.id, dogId)
+      // drag-back to roster: remove dog from all groups it's in (GROUP-05)
+      for (const group of walkGroups) {
+        if (group.dogIds.includes(dogId)) {
+          removeDogFromGroup(group.id, dogId)
+        }
       }
     } else {
       // drop onto a group: add dog to that group (GROUP-02 handled inside addDogToGroup)

@@ -19,19 +19,14 @@ export const createGroupSlice: StateCreator<AppState & GroupActions, [], [], Gro
   deleteGroup: (id) => set((state) => ({
     walkGroups: state.walkGroups.filter((g) => g.id !== id),
   })),
-  addDogToGroup: (groupId, dogId) => set((state) => {
-    // Remove dogId from any other group first (GROUP-02 enforcement)
-    const cleaned = state.walkGroups.map((g) =>
-      g.id === groupId ? g : { ...g, dogIds: g.dogIds.filter((d) => d !== dogId) }
-    )
-    return {
-      walkGroups: cleaned.map((g) =>
-        g.id === groupId && !g.dogIds.includes(dogId)
-          ? { ...g, dogIds: [...g.dogIds, dogId] }
-          : g
-      ),
-    }
-  }),
+  addDogToGroup: (groupId, dogId) => set((state) => ({
+    // Dogs may belong to multiple groups; just add if not already present.
+    walkGroups: state.walkGroups.map((g) =>
+      g.id === groupId && !g.dogIds.includes(dogId)
+        ? { ...g, dogIds: [...g.dogIds, dogId] }
+        : g
+    ),
+  })),
   removeDogFromGroup: (groupId, dogId) => set((state) => ({
     walkGroups: state.walkGroups.map((g) =>
       g.id === groupId ? { ...g, dogIds: g.dogIds.filter((d) => d !== dogId) } : g

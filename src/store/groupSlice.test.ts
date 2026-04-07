@@ -57,18 +57,17 @@ describe('groupSlice', () => {
     expect(store.getState().walkGroups[0].dogIds).toContain('dog-1')
   })
 
-  it('addDogToGroup removes dogId from other group when already assigned (GROUP-02)', () => {
+  it('addDogToGroup allows a dog to belong to multiple groups', () => {
     store.getState().addGroup('Walk A')
     store.getState().addGroup('Walk B')
     const groupAId = store.getState().walkGroups[0].id
     const groupBId = store.getState().walkGroups[1].id
 
     store.getState().addDogToGroup(groupAId, 'dog-1')
-    expect(store.getState().walkGroups[0].dogIds).toContain('dog-1')
-
     store.getState().addDogToGroup(groupBId, 'dog-1')
+
     const groups = store.getState().walkGroups
-    expect(groups.find(g => g.id === groupAId)!.dogIds).not.toContain('dog-1')
+    expect(groups.find(g => g.id === groupAId)!.dogIds).toContain('dog-1')
     expect(groups.find(g => g.id === groupBId)!.dogIds).toContain('dog-1')
   })
 
