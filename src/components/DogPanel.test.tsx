@@ -107,6 +107,87 @@ describe('DogPanel - Save edit mode', () => {
   })
 })
 
+describe('DogPanel - Enter-to-save', () => {
+  it('pressing Enter on Name input with valid name saves and closes panel', async () => {
+    const user = userEvent.setup()
+    const onOpenChange = vi.fn()
+    const addDog = vi.fn()
+    useAppStore.setState((s) => ({ ...s, addDog }))
+    render(<DogPanel open={true} onOpenChange={onOpenChange} editingDog={null} />)
+    const nameInput = screen.getByPlaceholderText('e.g. Rex')
+    await user.type(nameInput, 'Buddy')
+    await user.keyboard('{Enter}')
+    expect(addDog).toHaveBeenCalledWith(expect.objectContaining({ name: 'Buddy' }))
+    expect(onOpenChange).toHaveBeenCalledWith(false)
+  })
+
+  it('pressing Enter on Breed input with valid name triggers save', async () => {
+    const user = userEvent.setup()
+    const onOpenChange = vi.fn()
+    const addDog = vi.fn()
+    useAppStore.setState((s) => ({ ...s, addDog }))
+    render(<DogPanel open={true} onOpenChange={onOpenChange} editingDog={null} />)
+    await user.type(screen.getByPlaceholderText('e.g. Rex'), 'Buddy')
+    const breedInput = screen.getByPlaceholderText('e.g. Labrador')
+    await user.type(breedInput, 'Beagle')
+    await user.keyboard('{Enter}')
+    expect(addDog).toHaveBeenCalledWith(expect.objectContaining({ name: 'Buddy', breed: 'Beagle' }))
+    expect(onOpenChange).toHaveBeenCalledWith(false)
+  })
+
+  it('pressing Enter on Age input with valid name triggers save', async () => {
+    const user = userEvent.setup()
+    const onOpenChange = vi.fn()
+    const addDog = vi.fn()
+    useAppStore.setState((s) => ({ ...s, addDog }))
+    render(<DogPanel open={true} onOpenChange={onOpenChange} editingDog={null} />)
+    await user.type(screen.getByPlaceholderText('e.g. Rex'), 'Buddy')
+    const ageInput = screen.getByPlaceholderText('e.g. 3')
+    await user.type(ageInput, '5')
+    await user.keyboard('{Enter}')
+    expect(addDog).toHaveBeenCalledWith(expect.objectContaining({ name: 'Buddy', age: 5 }))
+    expect(onOpenChange).toHaveBeenCalledWith(false)
+  })
+
+  it('pressing Enter on Notes textarea does NOT trigger save', async () => {
+    const user = userEvent.setup()
+    const onOpenChange = vi.fn()
+    const addDog = vi.fn()
+    useAppStore.setState((s) => ({ ...s, addDog }))
+    render(<DogPanel open={true} onOpenChange={onOpenChange} editingDog={null} />)
+    await user.type(screen.getByPlaceholderText('e.g. Rex'), 'Buddy')
+    const notesTextarea = screen.getByLabelText(/notes/i)
+    await user.type(notesTextarea, 'Some notes')
+    await user.keyboard('{Enter}')
+    expect(addDog).not.toHaveBeenCalled()
+    expect(onOpenChange).not.toHaveBeenCalledWith(false)
+  })
+
+  it('pressing Shift+Enter on Name input does NOT trigger save', async () => {
+    const user = userEvent.setup()
+    const onOpenChange = vi.fn()
+    const addDog = vi.fn()
+    useAppStore.setState((s) => ({ ...s, addDog }))
+    render(<DogPanel open={true} onOpenChange={onOpenChange} editingDog={null} />)
+    const nameInput = screen.getByPlaceholderText('e.g. Rex')
+    await user.type(nameInput, 'Buddy')
+    await user.keyboard('{Shift>}{Enter}{/Shift}')
+    expect(addDog).not.toHaveBeenCalled()
+    expect(onOpenChange).not.toHaveBeenCalledWith(false)
+  })
+
+  it('pressing Enter on Name input with empty name shows validation error and keeps panel open', async () => {
+    const user = userEvent.setup()
+    const onOpenChange = vi.fn()
+    render(<DogPanel open={true} onOpenChange={onOpenChange} editingDog={null} />)
+    const nameInput = screen.getByPlaceholderText('e.g. Rex')
+    await user.click(nameInput)
+    await user.keyboard('{Enter}')
+    expect(await screen.findByText('Name is required.')).toBeInTheDocument()
+    expect(onOpenChange).not.toHaveBeenCalledWith(false)
+  })
+})
+
 describe('DogPanel - History tab', () => {
   it('renders Profile and History tab buttons when editing a dog', () => {
     render(<DogPanel open={true} onOpenChange={vi.fn()} editingDog={sampleDog} />)

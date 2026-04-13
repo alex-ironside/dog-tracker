@@ -79,6 +79,13 @@ export function DogPanel({ open, onOpenChange, editingDog }: DogPanelProps) {
     resetAndClose()
   }
 
+  function handleInputKeyDown(e: React.KeyboardEvent<HTMLInputElement>) {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault()
+      handleSave()
+    }
+  }
+
   function handleSave() {
     if (!name.trim()) {
       setNameError(true)
@@ -176,6 +183,7 @@ export function DogPanel({ open, onOpenChange, editingDog }: DogPanelProps) {
                     setName(e.target.value)
                     if (nameError && e.target.value.trim()) setNameError(false)
                   }}
+                  onKeyDown={handleInputKeyDown}
                   className={cn(
                     'mt-1',
                     nameError && 'border-destructive focus-visible:ring-destructive'
@@ -198,6 +206,7 @@ export function DogPanel({ open, onOpenChange, editingDog }: DogPanelProps) {
                   placeholder="e.g. Labrador"
                   value={breed}
                   onChange={(e) => setBreed(e.target.value)}
+                  onKeyDown={handleInputKeyDown}
                   className="mt-1"
                 />
               </div>
@@ -214,6 +223,7 @@ export function DogPanel({ open, onOpenChange, editingDog }: DogPanelProps) {
                   placeholder="e.g. 3"
                   value={age}
                   onChange={(e) => setAge(e.target.value)}
+                  onKeyDown={handleInputKeyDown}
                   className="mt-1"
                 />
               </div>
