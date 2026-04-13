@@ -205,7 +205,7 @@ export function CalendarScheduler() {
         </select>
       </div>
 
-      <div className='flex rounded-2xl border border-border overflow-hidden'>
+      <div className='flex rounded-2xl border border-border overflow-hidden w-[90%]'>
         <GroupSidebar
           walkGroups={walkGroups}
           scheduledGroupIds={scheduledGroupIds}

@@ -77,7 +77,6 @@ export function WeekCalendar({
             display: 'grid',
             gridTemplateColumns: '64px repeat(7, 1fr)',
             gridTemplateRows: `40px repeat(${hours.length}, minmax(64px, auto))`,
-            minWidth: '600px',
           }}
         >
           {/* Corner cell */}
