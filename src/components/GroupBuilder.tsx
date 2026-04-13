@@ -178,11 +178,11 @@ export function GroupBuilder() {
     const overId = over.id as string
 
     if (overId === 'roster') {
-      // drag-back to roster: remove dog from all groups it's in (GROUP-05)
-      for (const group of walkGroups) {
-        if (group.dogIds.includes(dogId)) {
-          removeDogFromGroup(group.id, dogId)
-        }
+      // drag-back to roster: remove dog only from the group it was dragged from (GROUP-05)
+      // MiniDogCard sets data.current.groupId; RosterRow drags have no groupId (already in roster)
+      const sourceGroupId = event.active.data.current?.groupId as string | undefined
+      if (sourceGroupId) {
+        removeDogFromGroup(sourceGroupId, dogId)
       }
     } else {
       // drop onto a group: add dog to that group (GROUP-02 handled inside addDogToGroup)

@@ -135,7 +135,7 @@ describe('GroupBuilder', () => {
     expect(useAppStore.getState().walkGroups[0].dogIds).not.toContain('d1')
   })
 
-  it("onDragEnd with over='roster' and no data payload falls back to active.id for dogId", async () => {
+  it("onDragEnd with over='roster' and no sourceGroupId in data is a no-op (roster-to-roster drag)", async () => {
     useAppStore.setState({
       dogs: [makeDog('d1', 'Rex')],
       walkGroups: [makeGroup('g1', 'Group 1', ['d1'])],
@@ -143,6 +143,7 @@ describe('GroupBuilder', () => {
     render(<GroupBuilder />)
 
     act(() => {
+      // RosterRow drags carry no groupId — dropping back on roster should not remove from any group
       ;(window as any).__dndCallbacks.onDragEnd({
         active: { id: 'd1', data: { current: {} } },
         over: { id: 'roster', data: { current: {} } },
@@ -151,7 +152,29 @@ describe('GroupBuilder', () => {
       })
     })
 
-    expect(useAppStore.getState().walkGroups[0].dogIds).not.toContain('d1')
+    expect(useAppStore.getState().walkGroups[0].dogIds).toContain('d1')
+  })
+
+  it("onDragEnd to roster removes dog only from source group when dog belongs to multiple groups", async () => {
+    useAppStore.setState({
+      dogs: [makeDog('d1', 'Rex')],
+      walkGroups: [makeGroup('g1', 'Group 1', ['d1']), makeGroup('g2', 'Group 2', ['d1'])],
+    })
+    render(<GroupBuilder />)
+
+    act(() => {
+      // Drag Rex from Group 1 back to roster — only g1 should lose Rex
+      ;(window as any).__dndCallbacks.onDragEnd({
+        active: { id: 'g1-d1', data: { current: { dogId: 'd1', groupId: 'g1' } } },
+        over: { id: 'roster', data: { current: {} } },
+        delta: { x: 0, y: 0 },
+        collisions: null,
+      })
+    })
+
+    const groups = useAppStore.getState().walkGroups
+    expect(groups.find((g) => g.id === 'g1')!.dogIds).not.toContain('d1')
+    expect(groups.find((g) => g.id === 'g2')!.dogIds).toContain('d1')
   })
 
   it('+ Add Group button creates a new group', async () => {
