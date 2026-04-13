@@ -78,7 +78,26 @@ describe('GroupBuilder', () => {
     expect(screen.getByText('in Group 1')).toBeInTheDocument()
   })
 
-  it('onDragEnd with over=groupId calls addDogToGroup', async () => {
+  it('onDragEnd with over=groupId and data payload calls addDogToGroup with plain dogId', async () => {
+    useAppStore.setState({
+      dogs: [makeDog('d1', 'Rex')],
+      walkGroups: [makeGroup('g1', 'Group 1')],
+    })
+    render(<GroupBuilder />)
+
+    act(() => {
+      ;(window as any).__dndCallbacks.onDragEnd({
+        active: { id: 'g1-d1', data: { current: { dogId: 'd1', groupId: 'g1' } } },
+        over: { id: 'g1', data: { current: {} } },
+        delta: { x: 0, y: 0 },
+        collisions: null,
+      })
+    })
+
+    expect(useAppStore.getState().walkGroups[0].dogIds).toContain('d1')
+  })
+
+  it('onDragEnd from roster (plain id, no data payload) calls addDogToGroup correctly', async () => {
     useAppStore.setState({
       dogs: [makeDog('d1', 'Rex')],
       walkGroups: [makeGroup('g1', 'Group 1')],
@@ -97,7 +116,26 @@ describe('GroupBuilder', () => {
     expect(useAppStore.getState().walkGroups[0].dogIds).toContain('d1')
   })
 
-  it("onDragEnd with over='roster' calls removeDogFromGroup", async () => {
+  it("onDragEnd with over='roster' and data payload calls removeDogFromGroup with plain dogId", async () => {
+    useAppStore.setState({
+      dogs: [makeDog('d1', 'Rex')],
+      walkGroups: [makeGroup('g1', 'Group 1', ['d1'])],
+    })
+    render(<GroupBuilder />)
+
+    act(() => {
+      ;(window as any).__dndCallbacks.onDragEnd({
+        active: { id: 'g1-d1', data: { current: { dogId: 'd1', groupId: 'g1' } } },
+        over: { id: 'roster', data: { current: {} } },
+        delta: { x: 0, y: 0 },
+        collisions: null,
+      })
+    })
+
+    expect(useAppStore.getState().walkGroups[0].dogIds).not.toContain('d1')
+  })
+
+  it("onDragEnd with over='roster' and no data payload falls back to active.id for dogId", async () => {
     useAppStore.setState({
       dogs: [makeDog('d1', 'Rex')],
       walkGroups: [makeGroup('g1', 'Group 1', ['d1'])],

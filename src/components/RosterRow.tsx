@@ -16,6 +16,7 @@ export function RosterRow({ dog, assignedGroupNames }: RosterRowProps) {
 
   const { attributes, listeners, setNodeRef, transform } = useDraggable({
     id: dog.id,
+    data: { dogId: dog.id },
   })
 
   const style = transform ? { transform: CSS.Translate.toString(transform) } : undefined
