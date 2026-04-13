@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react'
+import { useState, useMemo, useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
 import { WalkLogSheet } from '@/components/WalkLogSheet'
 import {
@@ -14,19 +14,40 @@ import { useShallow } from 'zustand/react/shallow'
 import { useAppStore } from '@/store'
 import { GroupSidebar } from '@/components/GroupSidebar'
 import { WeekCalendar } from '@/components/WeekCalendar'
-import { slotKey, parseSlotKey } from '@/lib/calendarUtils'
+import { slotKey, parseSlotKey, HOURS } from '@/lib/calendarUtils'
 import { buildCompatMap, inferStatusFromHistory, pairKey } from '@/lib/scoring'
 
 export function CalendarScheduler() {
   const { t } = useTranslation()
   const [weekOffset, setWeekOffset] = useState(0)
   const [activeDragId, setActiveDragId] = useState<string | null>(null)
+  const [highlightDogId, setHighlightDogId] = useState<string | null>(null)
+  const [startHour, setStartHour] = useState(() => {
+    try {
+      const saved = localStorage.getItem('portfolio:calHours')
+      return saved ? JSON.parse(saved).start : 8
+    } catch {
+      return 8
+    }
+  })
+  const [endHour, setEndHour] = useState(() => {
+    try {
+      const saved = localStorage.getItem('portfolio:calHours')
+      return saved ? JSON.parse(saved).end : 19
+    } catch {
+      return 19
+    }
+  })
   const [logSheet, setLogSheet] = useState<{
     open: boolean
     dogIds: string[]
     groupId: string
     groupName: string
   }>({ open: false, dogIds: [], groupId: '', groupName: '' })
+
+  useEffect(() => {
+    localStorage.setItem('portfolio:calHours', JSON.stringify({ start: startHour, end: endHour }))
+  }, [startHour, endHour])
 
   const {
     walkSessions,
@@ -78,6 +99,28 @@ export function CalendarScheduler() {
     return map
   }, [compatibilityEntries, dogs, walkHistory])
 
+  const multiWalkCountsByDay = useMemo(() => {
+    const countsByDay = new Map<number, Map<string, number>>()
+    for (const session of walkSessions) {
+      const { dayOfWeek } = session.slot
+      const group = walkGroups.find((g) => g.id === session.groupId)
+      if (!group) continue
+      if (!countsByDay.has(dayOfWeek)) {
+        countsByDay.set(dayOfWeek, new Map())
+      }
+      const dayCounts = countsByDay.get(dayOfWeek)!
+      for (const dogId of group.dogIds) {
+        dayCounts.set(dogId, (dayCounts.get(dogId) ?? 0) + 1)
+      }
+    }
+    return countsByDay
+  }, [walkSessions, walkGroups])
+
+  const filteredHours = useMemo(
+    () => HOURS.filter((h) => h >= startHour && h <= endHour),
+    [startHour, endHour]
+  )
+
   const activeDragGroup = activeDragId
     ? walkGroups.find((g) => g.id === activeDragId) ?? null
     : null
@@ -128,7 +171,41 @@ export function CalendarScheduler() {
       onDragStart={handleDragStart}
       onDragEnd={handleDragEnd}
     >
-      <div className='flex h-[600px] rounded-2xl border border-border overflow-hidden'>
+      <div className='flex items-center gap-4 mb-3'>
+        <label className='text-sm text-muted-foreground'>Highlight dog:</label>
+        <select
+          value={highlightDogId ?? ''}
+          onChange={(e) => setHighlightDogId(e.target.value || null)}
+          className='text-sm border border-border rounded px-2 py-1 bg-background'
+        >
+          <option value=''>None</option>
+          {dogs.filter((d) => !d.archived).map((d) => (
+            <option key={d.id} value={d.id}>{d.name}</option>
+          ))}
+        </select>
+        <label className='text-sm text-muted-foreground'>Hours:</label>
+        <select
+          value={startHour}
+          onChange={(e) => setStartHour(Number(e.target.value))}
+          className='text-sm border border-border rounded px-2 py-1 bg-background'
+        >
+          {HOURS.map((h) => (
+            <option key={h} value={h}>{String(h).padStart(2, '0')}:00</option>
+          ))}
+        </select>
+        <span className='text-muted-foreground'>-</span>
+        <select
+          value={endHour}
+          onChange={(e) => setEndHour(Number(e.target.value))}
+          className='text-sm border border-border rounded px-2 py-1 bg-background'
+        >
+          {HOURS.map((h) => (
+            <option key={h} value={h}>{String(h).padStart(2, '0')}:00</option>
+          ))}
+        </select>
+      </div>
+
+      <div className='flex rounded-2xl border border-border overflow-hidden'>
         <GroupSidebar
           walkGroups={walkGroups}
           scheduledGroupIds={scheduledGroupIds}
@@ -146,6 +223,9 @@ export function CalendarScheduler() {
           onLog={(groupId, dogIds, groupName) =>
             setLogSheet({ open: true, dogIds, groupId, groupName })
           }
+          multiWalkCountsByDay={multiWalkCountsByDay}
+          highlightDogId={highlightDogId}
+          hours={filteredHours}
         />
       </div>
 
