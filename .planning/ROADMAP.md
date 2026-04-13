@@ -117,3 +117,14 @@ Plans:
 | 4. Group Builder | 2/2 | Complete   | 2026-03-27 |
 | 5. Calendar Scheduler | 2/2 | Complete   | 2026-03-28 |
 | 6. Walk History | 2/2 | Complete   | 2026-03-28 |
+
+### Phase 7: UI/UX Improvements — Calendar Dog Display, DnD Fix, Enter-to-Save
+
+**Goal:** Enhance calendar slots with dog name pills, multi-walk indicators, dog highlighting, flexible height, and hour-range selection. Fix duplicate draggable IDs in group builder. Add Enter-to-save on DogPanel form inputs.
+**Depends on:** Phase 6
+**Plans:** 3 plans
+
+Plans:
+- [ ] 07-01-PLAN.md — Calendar improvements: dog name pills in ScheduledGroupCard, multi-walk indicator, dog highlight control, remove fixed height, hour-range selector
+- [ ] 07-02-PLAN.md — Group builder DnD fix: unique draggable IDs scoped to group (`${groupId}-${dog.id}`)
+- [ ] 07-03-PLAN.md — Enter-to-save on DogPanel Name, Breed, Age inputs (not Notes textarea)
