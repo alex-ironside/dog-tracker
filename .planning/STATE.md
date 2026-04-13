@@ -99,6 +99,10 @@ Recent decisions affecting current work:
 - [Phase 06-walk-history]: DogPanel tab bar only shown in edit mode (editingDog not null) — Add Dog flow unchanged
 - [Phase 06-walk-history]: CalendarScheduler owns logSheet state and renders single WalkLogSheet inline — consistent with EdgeSheet pattern
 
+### Roadmap Evolution
+
+- Phase 7 added: dog tracker UI/UX improvements: calendar dog display, drag-and-drop fix, enter-to-save forms
+
 ### Pending Todos
 
 None yet.
