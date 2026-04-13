@@ -4,14 +4,18 @@ import { useDraggable } from '@dnd-kit/core'
 import { CSS } from '@dnd-kit/utilities'
 
 type MiniDogCardProps = {
+  groupId: string
   dogId: string
   dogName: string
   onRemove: () => void
 }
 
-export function MiniDogCard({ dogId, dogName, onRemove }: MiniDogCardProps) {
+export function MiniDogCard({ groupId, dogId, dogName, onRemove }: MiniDogCardProps) {
   const { t } = useTranslation()
-  const { attributes, listeners, setNodeRef, transform, isDragging } = useDraggable({ id: dogId })
+  const { attributes, listeners, setNodeRef, transform, isDragging } = useDraggable({
+    id: `${groupId}-${dogId}`,
+    data: { dogId, groupId },
+  })
   return (
     <div
       ref={setNodeRef}
