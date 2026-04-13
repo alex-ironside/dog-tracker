@@ -161,16 +161,20 @@ export function GroupBuilder() {
   }, [])
 
   function handleDragStart(event: DragStartEvent) {
-    setActiveDragId(event.active.id as string)
+    // Extract dogId from data payload (set by MiniDogCard); fall back to raw id for RosterRow
+    const dogId = (event.active.data.current?.dogId as string) ?? (event.active.id as string)
+    setActiveDragId(dogId)
   }
 
   function handleDragEnd(event: DragEndEvent) {
     setActiveDragId(null)
-    const dogId = event.active.id as string
     const over = event.over
 
     if (!over) return
 
+    // Extract dogId from data payload (set by MiniDogCard and RosterRow).
+    // Fall back to raw active.id for roster cards that don't carry data.
+    const dogId = (event.active.data.current?.dogId as string) ?? (event.active.id as string)
     const overId = over.id as string
 
     if (overId === 'roster') {
