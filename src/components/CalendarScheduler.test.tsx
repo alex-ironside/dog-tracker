@@ -220,4 +220,58 @@ describe('CalendarScheduler', () => {
 
     expect(screen.getByText('All groups are scheduled this week.')).toBeInTheDocument()
   })
+
+  it('renders a dog highlight dropdown with "None" default and all active dog names', () => {
+    render(<CalendarScheduler />)
+
+    const select = screen.getByDisplayValue('None')
+    expect(select).toBeInTheDocument()
+    expect(screen.getByRole('option', { name: 'Rex' })).toBeInTheDocument()
+    expect(screen.getByRole('option', { name: 'Bella' })).toBeInTheDocument()
+  })
+
+  it('renders hour range selects with default 8 and 19 values', () => {
+    localStorage.removeItem('portfolio:calHours')
+    render(<CalendarScheduler />)
+
+    // Three comboboxes: highlight dog, start hour, end hour
+    // Start defaults to 8, end defaults to 19 (max in HOURS = [7..19])
+    const selects = screen.getAllByRole('combobox')
+    const values = selects.map((s) => (s as HTMLSelectElement).value)
+    expect(values).toContain('8')
+    expect(values).toContain('19')
+  })
+
+  it('does not have h-[600px] class in rendered output', () => {
+    const { container } = render(<CalendarScheduler />)
+    const el = container.querySelector('.h-\\[600px\\]')
+    expect(el).toBeNull()
+  })
+
+  it('changing start hour to 10 hides the 07:00 and 09:00 row labels', async () => {
+    localStorage.removeItem('portfolio:calHours')
+    render(<CalendarScheduler />)
+
+    const user = userEvent.setup()
+    // The Hours start select is the second combobox (after the highlight dog select)
+    const selects = screen.getAllByRole('combobox')
+    const startSelect = selects[1] // index 1 = start hour select
+
+    await user.selectOptions(startSelect, '10')
+
+    // Row label divs inside the grid are sticky left-0 cells; hour option elements also contain this text.
+    // Filter to only elements that are NOT option elements (i.e. the row label cells).
+    const allSevenOhOh = screen.queryAllByText('07:00')
+    const rowLabel = allSevenOhOh.filter((el) => el.tagName !== 'OPTION')
+    expect(rowLabel).toHaveLength(0)
+
+    const allNineOhOh = screen.queryAllByText('09:00')
+    const nineRowLabel = allNineOhOh.filter((el) => el.tagName !== 'OPTION')
+    expect(nineRowLabel).toHaveLength(0)
+
+    // 10:00 row label should still be visible
+    const allTenOhOh = screen.queryAllByText('10:00')
+    const tenRowLabel = allTenOhOh.filter((el) => el.tagName !== 'OPTION')
+    expect(tenRowLabel.length).toBeGreaterThan(0)
+  })
 })
