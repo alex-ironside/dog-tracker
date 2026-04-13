@@ -125,6 +125,6 @@ Plans:
 **Plans:** 3 plans
 
 Plans:
-- [ ] 07-01-PLAN.md — Calendar improvements: dog name pills in ScheduledGroupCard, multi-walk indicator, dog highlight control, remove fixed height, hour-range selector
-- [ ] 07-02-PLAN.md — Group builder DnD fix: unique draggable IDs scoped to group (`${groupId}-${dog.id}`)
-- [ ] 07-03-PLAN.md — Enter-to-save on DogPanel Name, Breed, Age inputs (not Notes textarea)
+- [x] 07-01-PLAN.md — Calendar improvements: dog name pills in ScheduledGroupCard, multi-walk indicator, dog highlight control, remove fixed height, hour-range selector
+- [x] 07-02-PLAN.md — Group builder DnD fix: unique draggable IDs scoped to group (`${groupId}-${dog.id}`)
+- [x] 07-03-PLAN.md — Enter-to-save on DogPanel Name, Breed, Age inputs (not Notes textarea)
