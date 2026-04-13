@@ -17,6 +17,8 @@ type CalendarSlotProps = {
   compatMap: Map<string, CompatibilityStatus>
   onUnschedule: (groupId: string) => void
   onLog: (groupId: string, dogIds: string[], groupName: string) => void
+  multiWalkCounts: Map<string, number>
+  highlightDogId: string | null
 }
 
 export function CalendarSlot({
@@ -25,9 +27,12 @@ export function CalendarSlot({
   minute,
   sessionMap,
   walkGroups,
+  dogs,
   compatMap,
   onUnschedule,
   onLog,
+  multiWalkCounts,
+  highlightDogId,
 }: CalendarSlotProps) {
   const { t } = useTranslation()
   const slotKeyStr = slotKey({ dayOfWeek, hour, minute })
@@ -47,11 +52,18 @@ export function CalendarSlot({
     : `${dayName} ${hour}:00 — ${t('calendar.emptySlot', { defaultValue: 'empty' })}`
 
   const isOccupied = !!(session && group)
+  const slotHighlight = highlightDogId && group && group.dogIds.includes(highlightDogId)
   const ringClass = isOver
     ? isOccupied
       ? ' ring-2 ring-red-300 ring-inset opacity-50'
       : ' ring-2 ring-primary ring-inset'
-    : ''
+    : slotHighlight
+      ? ' border-2 border-primary'
+      : ''
+
+  const dogNames = group
+    ? group.dogIds.map((id) => dogs.find((d) => d.id === id)?.name ?? '?')
+    : []
 
   return (
     <div
@@ -71,6 +83,10 @@ export function CalendarSlot({
           onLog={() => onLog(session.groupId, group.dogIds, group.name)}
           dayName={dayName}
           hour={hour}
+          dogNames={dogNames}
+          dogIds={group.dogIds}
+          multiWalkCounts={multiWalkCounts}
+          highlightDogId={highlightDogId}
         />
       )}
     </div>

@@ -8,7 +8,6 @@ import {
   getMondayOfWeek,
   formatColumnHeader,
   formatWeekLabel,
-  HOURS,
 } from '@/lib/calendarUtils'
 import type { TimeSlot, WalkSession, WalkGroup, Dog, CompatibilityStatus } from '@/types'
 
@@ -22,6 +21,9 @@ type WeekCalendarProps = {
   compatMap: Map<string, CompatibilityStatus>
   onUnschedule: (groupId: string) => void
   onLog: (groupId: string, dogIds: string[], groupName: string) => void
+  multiWalkCountsByDay: Map<number, Map<string, number>>
+  highlightDogId: string | null
+  hours: number[]
 }
 
 export function WeekCalendar({
@@ -34,13 +36,16 @@ export function WeekCalendar({
   compatMap,
   onUnschedule,
   onLog,
+  multiWalkCountsByDay,
+  highlightDogId,
+  hours,
 }: WeekCalendarProps) {
   const { t } = useTranslation()
   const weekDays = getWeekDays(weekOffset)
   const monday = getMondayOfWeek(weekOffset)
 
   return (
-    <div className='flex flex-col flex-1 overflow-hidden'>
+    <div className='flex flex-col flex-1'>
       {/* Week navigation header */}
       <div className='flex items-center gap-2 px-4 py-2 border-b border-border bg-card shrink-0'>
         <Button
@@ -64,14 +69,14 @@ export function WeekCalendar({
         </Button>
       </div>
 
-      {/* Scrollable grid */}
-      <div className='overflow-auto flex-1'>
+      {/* Grid */}
+      <div className='flex-1'>
         <div
           role='grid'
           style={{
             display: 'grid',
             gridTemplateColumns: '64px repeat(7, 1fr)',
-            gridTemplateRows: '40px repeat(13, 64px)',
+            gridTemplateRows: `40px repeat(${hours.length}, 64px)`,
             minWidth: '600px',
           }}
         >
@@ -89,7 +94,7 @@ export function WeekCalendar({
           ))}
 
           {/* Hour rows */}
-          {HOURS.map((hour) => (
+          {hours.map((hour) => (
             <React.Fragment key={`row-${hour}`}>
               {/* Hour label */}
               <div
@@ -113,6 +118,8 @@ export function WeekCalendar({
                     compatMap={compatMap}
                     onUnschedule={onUnschedule}
                     onLog={onLog}
+                    multiWalkCounts={multiWalkCountsByDay.get(dayOfWeek) ?? new Map()}
+                    highlightDogId={highlightDogId}
                   />
                 )
               })}
