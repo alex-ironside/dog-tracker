@@ -31,7 +31,7 @@ export function GroupSidebar({ walkGroups, scheduledGroupIds, compatMap }: Group
   return (
     <div
       ref={setNodeRef}
-      className={`w-[280px] min-w-[280px] border-r border-border overflow-y-auto p-4 transition-colors${isOver ? ' bg-muted' : ' bg-muted/50'}`}
+      className={`w-full md:w-[280px] md:min-w-[280px] max-h-[240px] md:max-h-none border-b md:border-b-0 md:border-r border-border overflow-y-auto p-4 transition-colors${isOver ? ' bg-muted' : ' bg-muted/50'}`}
     >
       <p className='text-sm font-semibold text-foreground/90 mb-3'>{t('nav.groups')}</p>
 
