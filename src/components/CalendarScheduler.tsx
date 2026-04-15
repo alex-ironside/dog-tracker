@@ -163,7 +163,7 @@ export function CalendarScheduler() {
   return (
     <>
     <header className='mb-6'>
-      <h1 className='font-display text-4xl font-semibold tracking-tight text-foreground'>{t('nav.calendar')}</h1>
+      <h1 className='font-display text-3xl sm:text-4xl font-semibold tracking-tight text-foreground'>{t('nav.calendar')}</h1>
       <p className='text-sm text-muted-foreground mt-1'>{t('calendar.subtitle')}</p>
     </header>
     <DndContext
@@ -171,41 +171,45 @@ export function CalendarScheduler() {
       onDragStart={handleDragStart}
       onDragEnd={handleDragEnd}
     >
-      <div className='flex items-center gap-4 mb-3'>
-        <label className='text-sm text-muted-foreground'>Highlight dog:</label>
-        <select
-          value={highlightDogId ?? ''}
-          onChange={(e) => setHighlightDogId(e.target.value || null)}
-          className='text-sm border border-border rounded px-2 py-1 bg-background'
-        >
-          <option value=''>None</option>
-          {dogs.filter((d) => !d.archived).map((d) => (
-            <option key={d.id} value={d.id}>{d.name}</option>
-          ))}
-        </select>
-        <label className='text-sm text-muted-foreground'>Hours:</label>
-        <select
-          value={startHour}
-          onChange={(e) => setStartHour(Number(e.target.value))}
-          className='text-sm border border-border rounded px-2 py-1 bg-background'
-        >
-          {HOURS.map((h) => (
-            <option key={h} value={h}>{String(h).padStart(2, '0')}:00</option>
-          ))}
-        </select>
-        <span className='text-muted-foreground'>-</span>
-        <select
-          value={endHour}
-          onChange={(e) => setEndHour(Number(e.target.value))}
-          className='text-sm border border-border rounded px-2 py-1 bg-background'
-        >
-          {HOURS.map((h) => (
-            <option key={h} value={h}>{String(h).padStart(2, '0')}:00</option>
-          ))}
-        </select>
+      <div className='flex flex-wrap items-center gap-x-4 gap-y-2 mb-3'>
+        <div className='flex items-center gap-2'>
+          <label className='text-sm text-muted-foreground'>Highlight dog:</label>
+          <select
+            value={highlightDogId ?? ''}
+            onChange={(e) => setHighlightDogId(e.target.value || null)}
+            className='text-sm border border-border rounded px-2 py-1 bg-background'
+          >
+            <option value=''>None</option>
+            {dogs.filter((d) => !d.archived).map((d) => (
+              <option key={d.id} value={d.id}>{d.name}</option>
+            ))}
+          </select>
+        </div>
+        <div className='flex items-center gap-2'>
+          <label className='text-sm text-muted-foreground'>Hours:</label>
+          <select
+            value={startHour}
+            onChange={(e) => setStartHour(Number(e.target.value))}
+            className='text-sm border border-border rounded px-2 py-1 bg-background'
+          >
+            {HOURS.map((h) => (
+              <option key={h} value={h}>{String(h).padStart(2, '0')}:00</option>
+            ))}
+          </select>
+          <span className='text-muted-foreground'>-</span>
+          <select
+            value={endHour}
+            onChange={(e) => setEndHour(Number(e.target.value))}
+            className='text-sm border border-border rounded px-2 py-1 bg-background'
+          >
+            {HOURS.map((h) => (
+              <option key={h} value={h}>{String(h).padStart(2, '0')}:00</option>
+            ))}
+          </select>
+        </div>
       </div>
 
-      <div className='flex rounded-2xl border border-border overflow-hidden w-[90%]'>
+      <div className='flex flex-col md:flex-row rounded-2xl border border-border overflow-hidden w-full md:w-[90%]'>
         <GroupSidebar
           walkGroups={walkGroups}
           scheduledGroupIds={scheduledGroupIds}

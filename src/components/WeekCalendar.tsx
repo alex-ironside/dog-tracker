@@ -69,13 +69,14 @@ export function WeekCalendar({
         </Button>
       </div>
 
-      {/* Grid */}
-      <div className='flex-1'>
+      {/* Grid — horizontally scrollable on small screens */}
+      <div className='flex-1 overflow-x-auto'>
         <div
           role='grid'
+          className='min-w-[640px]'
           style={{
             display: 'grid',
-            gridTemplateColumns: '64px repeat(7, 1fr)',
+            gridTemplateColumns: '48px repeat(7, minmax(80px, 1fr))',
             gridTemplateRows: `40px repeat(${hours.length}, minmax(64px, auto))`,
           }}
         >

@@ -59,7 +59,7 @@ function RosterPanel() {
   return (
     <div
       ref={setNodeRef}
-      className={`w-[280px] min-w-[280px] border-r border-border overflow-y-auto p-4 transition-colors${isOver ? ' bg-muted' : ' bg-muted/50'}`}
+      className={`w-full md:w-[280px] md:min-w-[280px] max-h-[240px] md:max-h-none border-b md:border-b-0 md:border-r border-border overflow-y-auto p-4 transition-colors${isOver ? ' bg-muted' : ' bg-muted/50'}`}
     >
       <p className='text-sm font-semibold text-foreground/90 mb-3'>{t('groups.availableDogs')}</p>
       <div className='mb-3'>
@@ -208,11 +208,11 @@ export function GroupBuilder() {
   return (
     <>
       <header className='mb-6'>
-        <h1 className='font-display text-4xl font-semibold tracking-tight text-foreground'>{t('nav.groups')}</h1>
+        <h1 className='font-display text-3xl sm:text-4xl font-semibold tracking-tight text-foreground'>{t('nav.groups')}</h1>
         <p className='text-sm text-muted-foreground mt-1'>{t('groups.builderTagline')}</p>
       </header>
       <DndContext sensors={sensors} onDragStart={handleDragStart} onDragEnd={handleDragEnd}>
-        <div className='flex h-[600px] rounded-2xl border border-border overflow-hidden'>
+        <div className='flex flex-col md:flex-row md:h-[600px] rounded-2xl border border-border overflow-hidden'>
           {/* Left panel: roster */}
           <RosterPanel />
 
